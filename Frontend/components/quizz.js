@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
     width: 130,
     borderRadius: 86,   
     marginBottom: 25,
+    bottom: 70,
   },
   buttonPreviousText: {
     color: '#EC9A1F',
@@ -234,6 +235,7 @@ const styles = StyleSheet.create({
     textShadowOffset: {width: 0, height: 1},
     textShadowRadius: 1,
     marginBottom: 25,
+    bottom: 70,
   },  
   buttonNextText: {
       color: '#FFF1E2',
