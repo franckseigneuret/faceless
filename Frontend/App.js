@@ -4,9 +4,9 @@ import { StyleSheet, Text, View } from 'react-native';
 
 
 //COMPONENTS
-import quizz from './components/quizz'
-import optionalQuizz from './components/optionalQuizz'
-import registration from './components/registration'
+import Quizz from './components/Quizz'
+import OptionalQuizz from './components/OptionalQuizz'
+import Registration from './components/Registration'
 // NAVIGATION
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -19,9 +19,9 @@ export default function App() {
   return (
     <NavigationContainer>
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {/* <Stack.Screen name="Registration" component={registration} /> */}
-      <Stack.Screen name="Quizz" component={quizz} />
-      <Stack.Screen name="optionalQuizz" component={optionalQuizz} />
+      {/* <Stack.Screen name="Registration" component={Registration} /> */}
+      <Stack.Screen name="Quizz" component={Quizz} />
+      <Stack.Screen name="OptionalQuizz" component={OptionalQuizz} />
     </Stack.Navigator>
   </NavigationContainer>
   );
