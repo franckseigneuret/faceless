@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from 'react-native-elements';
 import { StyleSheet, View, Dimensions, Image } from 'react-native';
+import AppLoading from 'expo-app-loading';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -21,36 +22,40 @@ export default function registration(props) {
         Montserrat_800ExtraBold,
       });
 
-    return(
-        <View style={styles.container}>
-          <View style={styles.logo}>
-            <Image
-              source={require('../assets/logo-faceless.png')}
-            />
-          </View>
-          <View  style={styles.btn}>
-            <Button 
-            title="S'inscrire"
-            type="solid"
-            buttonStyle={styles.buttonNext}
-            titleStyle={{
-              fontFamily: 'Montserrat_700Bold'
-            }}
-            onPress={() => props.navigation.navigate('Quizz')}
-            /> 
-            <Button 
-            title="découvrir"
-            type="clear"
-            titleStyle={{
-              color: '#EC9A1F',
-              textDecorationLine: "underline",
-              fontFamily: 'Montserrat_700Bold',
+      if (!fontsLoaded) {
+        return <AppLoading />;
+      } else {
+        return(
+          <View style={styles.container}>
+            <View style={styles.logo}>
+              <Image
+                source={require('../assets/logo-faceless.png')}
+              />
+            </View>
+            <View  style={styles.btn}>
+              <Button 
+              title="S'inscrire"
+              type="solid"
+              buttonStyle={styles.buttonNext}
+              titleStyle={{
+                fontFamily: 'Montserrat_700Bold'
               }}
-            onPress={() => props.navigation.navigate('Quizz')}
-            /> 
+              onPress={() => props.navigation.navigate('Quizz')}
+              /> 
+              <Button 
+              title="découvrir"
+              type="clear"
+              titleStyle={{
+                color: '#EC9A1F',
+                textDecorationLine: "underline",
+                fontFamily: 'Montserrat_700Bold',
+                }}
+              onPress={() => props.navigation.navigate('Quizz')}
+              /> 
+            </View>
           </View>
-        </View>
     );
+  }
 };
 
 const styles = StyleSheet.create({
