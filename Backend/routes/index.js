@@ -57,7 +57,7 @@ router.get('/show-msg', function(req, res, next) {
 query : conversationIdFront : 1234     ou     tokenFront : 1234
 response : collection message qui est liée et conversation_id.    OU : variable contenant 10 objets (10 dernières conv) contenant avatar, pseudo, contenu du message
 */
-router.get('/show-convers', function(req, res, next) {
+router.get('/show-convers', async function(req, res, next) {
 
   var user = await userModel.find({token: req.body.tokenFront})
   

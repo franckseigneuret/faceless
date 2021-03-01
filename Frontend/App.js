@@ -20,8 +20,7 @@ export default function App() {
   return (
     <NavigationContainer>
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {/* <Stack.Screen name="Registration" component={Registration} /> */}
-      <Stack.Screen name="Geolocalisation" component={Geolocalisation} />
+      <Stack.Screen name="Registration" component={Registration} />
       <Stack.Screen name="Quizz" component={Quizz} />
       <Stack.Screen name="OptionalQuizz" component={OptionalQuizz} />
     </Stack.Navigator>
