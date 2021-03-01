@@ -1,5 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import {connect} from 'react-redux';
+
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -12,8 +14,8 @@ import {
   } from "@expo-google-fonts/montserrat";
 
 
-export default function optionalQuizz(props) {
-
+function optionalQuizz(props) {
+console.log(props.userDisplay)
     let [fontsLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_900Black,
@@ -26,3 +28,14 @@ export default function optionalQuizz(props) {
         </View>
     );
 };
+
+function mapStateToProps(state) {
+  return { 
+    userDisplay: state.user
+   }
+ }
+
+ export default connect(
+  mapStateToProps, 
+  null
+)(optionalQuizz);
