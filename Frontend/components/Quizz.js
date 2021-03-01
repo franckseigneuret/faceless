@@ -146,7 +146,8 @@ export default function quizz(props) {
                 nextBtnTextStyle={styles.buttonNextText} 
                 nextBtnText='valider' 
                 previousBtnTextStyle={styles.buttonPreviousText}
-                previousBtnText='Revoir'>
+                previousBtnText='Revoir'
+                previousBtnStyle={styles.buttonPrevious}>
                 <View style={styles.stepContainer}> 
                     <Text style={styles.textQuizz}>Créé ton mot de passe</Text>
                     <Input
@@ -160,7 +161,8 @@ export default function quizz(props) {
                 nextBtnTextStyle={styles.buttonNextText} 
                 nextBtnText='valider' 
                 previousBtnTextStyle={styles.buttonPreviousText}
-                previousBtnText='Revoir'>
+                previousBtnText='Revoir'
+                previousBtnStyle={styles.buttonPrevious}>
                 <View style={styles.stepContainer}>
                     <Text style={styles.textQuizz}>Comment veux-tu qu'on t'appelle ?</Text>
                     <Input
@@ -174,7 +176,8 @@ export default function quizz(props) {
                 nextBtnTextStyle={styles.buttonNextText} 
                 nextBtnText='valider' 
                 previousBtnTextStyle={styles.buttonPreviousText}
-                previousBtnText='Revoir'>
+                previousBtnText='Revoir'
+                previousBtnStyle={styles.buttonPrevious}>
                 <View style={styles.stepContainer}>
                     <Text style={styles.textQuizz}>C'est quoi ta date de naissance ?</Text>
                     <TouchableOpacity
@@ -200,6 +203,7 @@ export default function quizz(props) {
                 nextBtnText='valider' 
                 previousBtnTextStyle={styles.buttonPreviousText}
                 previousBtnText='Revoir'
+                previousBtnStyle={styles.buttonPrevious}
                 onSubmit={handleSubmit}>
                 <View style={styles.stepContainer}>
                     <Text style={styles.textQuizz}>Sélectionne ton ou tes problème(s)</Text>
@@ -232,15 +236,20 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     bottom: 70,
   },
+  buttonPrevious: {
+    // borderWidth: 1,
+    // borderColor: 'black',
+    bottom: 95,
+
+  },
   buttonPreviousText: {
     color: '#EC9A1F',
-    width: 130,
+    width: 'auto',
     fontFamily: 'Montserrat_700Bold',
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
     textShadowOffset: {width: 0, height: 1},
     textShadowRadius: 1,
-    marginBottom: 25,
-    bottom: 70,
+    marginHorizontal: 20
   },  
   buttonNextText: {
       color: '#FFF1E2',
