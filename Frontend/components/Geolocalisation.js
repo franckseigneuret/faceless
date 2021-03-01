@@ -4,6 +4,7 @@ import {
   View,
   TextInput,
   StyleSheet,
+  ScrollView,
 } from 'react-native';
 
 export default function Geolocalisation(props) {
@@ -34,47 +35,86 @@ export default function Geolocalisation(props) {
     }
   }
 
-  const TownListComponent = townList.map((item, i) => {
+  const TownListComponent = townList.map((item, i, arr) => {
     const styleItem = [styles.town]
     selectedTown === item ? styleItem.push(styles.townSelected) : ''
+    arr.length - 1 === i ? styleItem.push(styles.lastItem) : ''
     return (
-      <Text
-        key={i}
-        style={styleItem}
-        className="town-item"
-        onPress={() => { setSelectedTown(item) }}
-      >{item}</Text>
+      <View style={styleItem}>
+        <Text
+          key={i}
+          onPress={() => {
+            setSelectedTown(item)
+            setSearch(item)
+          }}
+        >{item}</Text>
+      </View>
     )
-  }
-  )
+  })
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start', marginTop: 50 }}>
-      <Text style={styles.title}>
-        Tu viens d'où ? {selectedTown}</Text>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.title}>
+          Tu viens d'où ?</Text>
 
-      <TextInput
-        style={{ height: 40, width: 200, borderColor: 'gray', borderWidth: 1 }}
-        onChangeText={text => onChangeText(text)}
-        value={search}
-        placeholder={'Votre ville ?'}
-      />
-      {TownListComponent}
+        <TextInput
+          style={styles.chooseTown}
+          onChangeText={text => onChangeText(text)}
+          value={search}
+          placeholder={'Votre ville ?'}
+        />
+
+        {
+          TownListComponent.length > 0 && <View style={styles.townsList}>
+            {TownListComponent}
+          </View>
+        }
+      </ScrollView>
     </View>
   )
 }
 
 
 const styles = StyleSheet.create({
+  scrollView: {
+
+  },
+  container: {
+    flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 50
+  },
   title: {
     color: '#5571D7',
     fontSize: 18,
     fontWeight: 'bold',
   },
+  chooseTown: {
+    backgroundColor: '#FFCC99',
+    paddingHorizontal: 15,
+    height: 40,
+    width: 300,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+  },
+  townsList: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
   town: {
-    backgroundColor: 'yellow'
+    width: 300,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    backgroundColor: '#FFCC99',
+    borderColor: 'gray',
+    borderBottomWidth: 1,
+  },
+  lastItem: {
+    borderBottomWidth: 0,
   },
   townSelected: {
-    backgroundColor: 'blue'
+    backgroundColor: '#e7b685'
   },
 })
