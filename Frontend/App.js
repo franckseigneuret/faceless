@@ -7,7 +7,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Quizz from './components/Quizz'
 import OptionalQuizz from './components/OptionalQuizz'
 import Registration from './components/Registration'
-import Geolocalisation from './components/Geolocalisation'
+
 // NAVIGATION
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
