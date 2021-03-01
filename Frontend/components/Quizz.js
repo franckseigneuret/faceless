@@ -96,7 +96,8 @@ function quizz(props) {
       props.onAddUserInfo({
         email: email, 
         password: password, 
-        pseudo: pseudo, birthDate: birthDate, 
+        pseudo: pseudo,
+        birthDate: birthDate, 
         problems: problems
       })
         console.log('click')

@@ -5,7 +5,12 @@ import {
   TextInput,
   StyleSheet,
   ScrollView,
+  Dimensions,
+  YellowBox,
 } from 'react-native';
+
+const windowWidth = Dimensions.get('window').width
+const windowHeight = Dimensions.get('window').height
 
 export default function Geolocalisation(props) {
 
@@ -54,7 +59,7 @@ export default function Geolocalisation(props) {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+      {/* <ScrollView style={styles.scrollView}> */}
         <Text style={styles.title}>
           Tu viens d'où ?</Text>
 
@@ -70,7 +75,7 @@ export default function Geolocalisation(props) {
             {TownListComponent}
           </View>
         }
-      </ScrollView>
+      {/* </ScrollView> */}
     </View>
   )
 }
@@ -78,15 +83,21 @@ export default function Geolocalisation(props) {
 
 const styles = StyleSheet.create({
   scrollView: {
-
+    backgroundColor: 'yellow',
   },
   container: {
-    flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 50
+    flex: 1,
+    backgroundColor: '#FFF1E2',
+    alignItems: 'center',
+    paddingTop: windowHeight/4, // bof, problem scrollView
   },
   title: {
     color: '#5571D7',
-    fontSize: 18,
+
     fontWeight: 'bold',
+    fontFamily: 'Montserrat_800ExtraBold',
+    fontSize: 22,
+    marginBottom: 20,
   },
   chooseTown: {
     backgroundColor: '#FFCC99',
