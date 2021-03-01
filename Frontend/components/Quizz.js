@@ -1,10 +1,11 @@
 import React, { useState} from 'react';
 import { Input } from 'react-native-elements';
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Pressable, TouchableOpacity } from 'react-native';
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import { Ionicons } from '@expo/vector-icons'; 
 import AppLoading from 'expo-app-loading';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {connect} from 'react-redux';
 
 
 
@@ -18,10 +19,15 @@ import {
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
-export default function quizz(props) {
+function quizz(props) {
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [pseudo, setPseudo] = useState('')
+  const [birthDate, setBirthDate] = useState(new Date())
+  const [problems, setProblems] = useState([])
 
   
-
     let [fontsLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_900Black,
@@ -56,12 +62,10 @@ export default function quizz(props) {
       },
     ]
         
-    const [problemBadge, setProblemBadge] = useState([])
 
     const [visible, setVisible]= useState(false)
 
     const [showDate, setShowDate] = useState(false);
-    const [birthDate, setBirthDate] = useState(new Date())
     const [dateToDisplay, setDateToDisplay] = useState('JJ/MM/AAAA')
 
     const onChange = (event, selectedDate) => {
@@ -86,29 +90,36 @@ export default function quizz(props) {
         setVisible(!visible)
     }
     
-    const handlePressProblem = (arg) => {
-       problemsContent[arg].selected = false ? problemsContent[arg].selected = true : problemsContent[arg].selected = false;
-    } 
 
     const handleSubmit = () => {
-        props.navigation.navigate('optionalQuizz')
+      props.navigation.navigate('OptionalQuizz')
+      props.onAddUserInfo({
+        email: email, 
+        password: password, 
+        pseudo: pseudo, birthDate: birthDate, 
+        problems: problems
+      })
         console.log('click')
     }
 
-    
+    const onPress = (arg) => {
+      setProblems([...problems, arg])
+      console.log(arg)
+    }
     
     const handlePressDateBirth = () => {
         setShowDate(!showDate)
     }
     
     var allProblems = problemsContent.map((item, i) => (
-        <TouchableOpacity key={i} style={item.selected ? styles.problemCardBis : styles.problemCard} onPress={handlePressProblem(i)}>
+        <Pressable key={i} style={item.selected ? styles.problemCardBis : styles.problemCard} 
+        onPress={() => setProblems([...problems, item.name])}
+        >
             <Ionicons name={item.icon} size={24} color="#5571D7" />
             <Text style={styles.textProblem}>{item.name}</Text>
-        </TouchableOpacity>  
+        </Pressable>  
         ))
-        
-        const [problemsList, setProblemsList] = useState(allProblems);
+
   if (!fontsLoaded) {
     return <AppLoading />;
   } else {
@@ -138,6 +149,7 @@ export default function quizz(props) {
                     <Input
                       placeholder='helicoptere530@gmail.com'
                       inputContainerStyle={styles.inputQuizz}
+                      onChangeText={value => setEmail(value)}
                     />  
                 </View>
             </ProgressStep>
@@ -153,6 +165,7 @@ export default function quizz(props) {
                     <Input
                       placeholder='*****'
                       inputContainerStyle={styles.inputQuizz}
+                      onChangeText={value => setPassword(value)}
                     />
                 </View>
             </ProgressStep>
@@ -168,6 +181,7 @@ export default function quizz(props) {
                     <Input
                       placeholder='ThermomixMT1820'
                       inputContainerStyle={styles.inputQuizz}
+                      onChangeText={value => setPseudo(value)}
                     />  
                 </View>
             </ProgressStep>
@@ -213,7 +227,7 @@ export default function quizz(props) {
                     >
                         <Text style={styles.textButtonProblems}>Types de problèmes<Ionicons name="chevron-down" size={14} color="black" /></Text>
                     </TouchableOpacity>
-                      {visible ? problemsList : <Text></Text>}
+                      {visible ? allProblems : <Text></Text>}
                 </View>
             </ProgressStep>
         </ProgressSteps>
@@ -221,6 +235,19 @@ export default function quizz(props) {
 </View>
   );}
 }
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onAddUserInfo: function(arg) {
+        dispatch( {type: 'ADD_USER', payload: arg })
+    }
+  }
+ }
+
+ export default connect(
+  null, 
+  mapDispatchToProps
+)(quizz);
 
 const styles = StyleSheet.create({
   container: {
