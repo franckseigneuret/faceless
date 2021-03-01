@@ -28,12 +28,18 @@ export default function Geolocalisation(props) {
     if (search.length > 2) {
 
       const uri = `https://api-adresse.data.gouv.fr/search/?q=${search}&type=municipality&autocomplete=1`
+      console.log(uri)
       const data = await fetch(uri)
       const body = await data.json()
       const townsAPI = body.features
       const townsApiName = []
+      console.log(townsAPI)
       townsAPI && townsAPI.map((town) => {
-        townsApiName.push(town.properties.label)
+        townsApiName.push({
+          label: town.properties.label,
+          postcode: town.properties.postcode,
+          coordinates: town.geometry.coordinates,
+        })
       })
 
       setTownList(townsApiName)
@@ -41,6 +47,7 @@ export default function Geolocalisation(props) {
   }
 
   const TownListComponent = townList.map((item, i, arr) => {
+    console.log('i', townList)
     const styleItem = [styles.town]
     selectedTown === item ? styleItem.push(styles.townSelected) : ''
     arr.length - 1 === i ? styleItem.push(styles.lastItem) : ''
@@ -51,8 +58,13 @@ export default function Geolocalisation(props) {
           onPress={() => {
             setSelectedTown(item)
             setSearch(item)
+            setTimeout(() => {
+              setTownList([])
+            }, 1000);
+
+            // addTownStore(item)
           }}
-        >{item}</Text>
+        >{item.label} ({item.postcode})</Text>
       </View>
     )
   })
@@ -60,21 +72,21 @@ export default function Geolocalisation(props) {
   return (
     <View style={styles.container}>
       {/* <ScrollView style={styles.scrollView}> */}
-        <Text style={styles.title}>
-          Tu viens d'où ?</Text>
+      <Text style={styles.title}>
+        Tu viens d'où ?</Text>
 
-        <TextInput
-          style={styles.chooseTown}
-          onChangeText={text => onChangeText(text)}
-          value={search}
-          placeholder={'Votre ville ?'}
-        />
+      <TextInput
+        style={styles.chooseTown}
+        onChangeText={text => onChangeText(text)}
+        value={search}
+        placeholder={'Votre ville ?'}
+      />
 
-        {
-          TownListComponent.length > 0 && <View style={styles.townsList}>
-            {TownListComponent}
-          </View>
-        }
+      {
+        TownListComponent.length > 0 && <View style={styles.townsList}>
+          {TownListComponent}
+        </View>
+      }
       {/* </ScrollView> */}
     </View>
   )
@@ -89,7 +101,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFF1E2',
     alignItems: 'center',
-    paddingTop: windowHeight/4, // bof, problem scrollView
+    paddingTop: windowHeight / 4, // bof, problem scrollView
   },
   title: {
     color: '#5571D7',

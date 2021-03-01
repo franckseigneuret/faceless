@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import NavigationOptionalQuizz from "./NavigationOptionalQuizz"
 import Probleme from "./Probleme"
+import Geolocalisation from './Geolocalisation'
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -32,7 +33,7 @@ console.log(props.userDisplay)
 
     return(
       <View style={{flex:1, backgroundColor: '#FFF1E2'}}>
-        <Probleme/>
+        <Geolocalisation/>
         <NavigationOptionalQuizz/>
       </View>
     );
