@@ -91,7 +91,7 @@ export default function quizz(props) {
     } 
 
     const handleSubmit = () => {
-        props.navigation.navigate('optionalQuizz')
+        props.navigation.navigate('OptionalQuizz')
         console.log('click')
     }
 
