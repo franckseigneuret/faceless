@@ -3,6 +3,7 @@ import { Input } from 'react-native-elements';
 import { StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import { Ionicons } from '@expo/vector-icons'; 
+import AppLoading from 'expo-app-loading';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 
@@ -18,6 +19,8 @@ import {
   const windowHeight = Dimensions.get('window').height;
 
 export default function quizz(props) {
+
+  
 
     let [fontsLoaded] = useFonts({
         Montserrat_700Bold,
@@ -106,7 +109,9 @@ export default function quizz(props) {
         ))
         
         const [problemsList, setProblemsList] = useState(allProblems);
-
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  } else {
   return (
 <View style={styles.container}>
       <View style={{flex: 1, display:'flex', flexDirection:'column', justifyContent:'flex-end'}}>
@@ -210,7 +215,7 @@ export default function quizz(props) {
         </ProgressSteps>
     </View>
 </View>
-  );
+  );}
 }
 
 const styles = StyleSheet.create({
@@ -225,6 +230,7 @@ const styles = StyleSheet.create({
     width: 130,
     borderRadius: 86,   
     marginBottom: 25,
+    bottom: 70,
   },
   buttonPreviousText: {
     color: '#EC9A1F',
@@ -234,6 +240,7 @@ const styles = StyleSheet.create({
     textShadowOffset: {width: 0, height: 1},
     textShadowRadius: 1,
     marginBottom: 25,
+    bottom: 70,
   },  
   buttonNextText: {
       color: '#FFF1E2',
