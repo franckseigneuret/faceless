@@ -1,3 +1,5 @@
+require('./models/connection')
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -6,6 +8,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var addRandomDatasRouter = require('./routes/add_random_datas');
 
 var app = express();
 
@@ -21,6 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/random', addRandomDatasRouter); // ajout users sur http://172.17.1.161:3000/random/random-users
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

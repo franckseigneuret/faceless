@@ -17,7 +17,7 @@ var UserSchema = mongoose.Schema({
     is_adult: Boolean,
     problems_types: [String],
     problem_description: String,
-    localisation: String,
+    localisation: Object,
     gender : String,
     avatar : String,
     statut: String,

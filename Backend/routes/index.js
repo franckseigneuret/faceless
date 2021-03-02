@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get(`/email-check/?email=${req.query.emailFront}`, async function(req, res, next){
+router.get(`/email-check/?email=`, async function(req, res, next){
 
   var user = await userModel.find({email: req.query.emailFront})
   let result;
