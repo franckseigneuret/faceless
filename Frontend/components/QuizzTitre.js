@@ -16,7 +16,7 @@ import {
 import { startClock } from 'react-native-reanimated';
 
 
-export default function Probleme(props) {
+export default function QuizzTitre(props) {
 
     const[valueInput, setValueInput] = useState("")
     const [isSelected, setIsSelected] = useState(false)
