@@ -51,9 +51,10 @@ const BottomNavigator = () => {
         activeTintColor: '#5571D7',
         inactiveTintColor: '#BCC8F0',
         style: {
-          backgroundColor: '#FFF6EF',
+          backgroundColor: '#FFEEDD',
           height: 60,
-        }
+          borderTopWidth:0,
+        },
       }}>
         <Tab.Screen name='ProfilScreen' component={ProfilScreen} />
         <Tab.Screen name='HomeScreen' component={HomeScreen} />
