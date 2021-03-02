@@ -1,10 +1,46 @@
 var express = require('express');
 var router = express.Router();
+var bcrypt = require('bcrypt');
+var uid2 = require('uid2');
+const cost = 10;
+
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
+
+router.get(`/email-check/?email=${req.query.emailFront}`, async function(req, res, next){
+
+  var user = await userModel.find({email: req.query.emailFront})
+  let result;
+  let error;
+  if(user) {
+    result = true;
+    error= 'Cet email appartient déjà à un autre compte'
+  }
+  res.json({result: result, error: error})
+})
+
+router.post('/sign-up-first-step', async function(req, res, next){
+
+  const hash = bcrypt.hashSync(req.body.passwordFront, cost);
+
+  var user = await new userModel({
+    token: uid2(32),
+    email: req.body.emailFront,
+    password: hash,
+    pseudo: req.body.pseudoFront,
+    birthDate: req.body.birthDateFront,
+    problems_types: req.body.problemsFront
+  })
+
+  var userSaved = await user.save()
+  console.log(userSaved, '<------ userSaved on backend')
+
+  res.json({userSaved: userSaved})
+})
 
 /* Sign-up -> Inscription 
   Body :
@@ -12,7 +48,7 @@ router.get('/', function(req, res, next) {
       OPTIONALE --> problemDescriptionFront : String, localisationFront : String, genderFront : StringFront, avatarFront : String, 
   Response : result (true), token (1234), birthDate : (12/23/1992), problems_types : String, localisation : String
 */
-router.post('/sign-up', function(req, res, next) {
+router.post('/sign-up-second-step', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
