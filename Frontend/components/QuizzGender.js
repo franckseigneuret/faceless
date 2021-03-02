@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Image , TouchableOpacity } from 'react-native'; 
+import {connect} from 'react-redux';
 
 import BlueButton from './BlueButton';
 import QuizzTitre from './QuizzTitre';
@@ -11,13 +12,13 @@ import {
     Montserrat_800ExtraBold,
   } from "@expo-google-fonts/montserrat";
 
-export default function QuizzGender(props) {
+function QuizzGender(props) {
   
   const [gender, setGender] = useState("")
   const [isSelected, setIsSelected] = useState(-1)
 
   var handleClick = () => {
-    props.handleClickParent("gender", gender);
+    props.onAddUserGender(gender)
   }
 
   var updateGender = (index) => {
@@ -59,6 +60,19 @@ export default function QuizzGender(props) {
       </View>
   );
 };
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onAddUserGender: function (arg) {
+      dispatch({ type: 'ADD_GENDER', gender: arg })
+    }
+  }
+}
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(QuizzGender);
 
 const styles = StyleSheet.create({
   container: {
