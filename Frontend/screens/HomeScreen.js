@@ -1,6 +1,6 @@
 import React from 'react';
-import { Animated, StyleSheet, Text, View, Dimensions, TouchableOpacity } from 'react-native';
-import { Card, ListItem, Button, Icon } from 'react-native-elements'
+import { Animated, StyleSheet, Text, View, Dimensions, TouchableOpacity, Image } from 'react-native';
+import { Card, ListItem, Button, Icon, Badge } from 'react-native-elements'
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
@@ -10,46 +10,53 @@ import {
   Montserrat_800ExtraBold,
 } from "@expo-google-fonts/montserrat";
 import { Ionicons } from '@expo/vector-icons';
-import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
-
 import AppLoading from 'expo-app-loading';
 import ProfilScreen from './ProfilScreen';
 import { ScrollView } from 'react-native-gesture-handler';
 
-const CardToSwipe = [
-        <View style={{width:380}}>
-          <Card >
-            <Card.Title>1ST CARD</Card.Title>
-            <Card.Divider/>
-              <Text style={{marginBottom: 10}}>
-                The idea with React .
-              </Text>
-          </Card>
-          </View>,
-          <View style={{width:380}}>
-          <Card>
-          <Card.Title>2ND CARD</Card.Title>
-          <Card.Divider/>
-            <Text style={{marginBottom: 10}}>
-              The idea with React Native Elements is more about component structure than actual design.
-            </Text>
-          </Card>
-          </View>,
-          <View style={{width:380}}>
-          <Card>
-          <Card.Title>3RD CARD</Card.Title>
-          <Card.Divider/>
-            <Text style={{marginBottom: 10}}>
-              The idea with React Native Elements is more about component structure than actual design.
-            </Text>
-          </Card>
-          </View>
-]
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function HomeScreen(props) {
+
+  const CardToSwipe = [
+    <View style={styles.cardContainer}>
+      <View style={styles.topCard}>
+        <Image source={require('../assets/women_1.png')} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F'}}/>
+        <Text>GIGATANK3000</Text>
+        <Text>Membre depuis le 12 février 2020</Text>
+        <Text><Ionicons name='location' size={30} /> Region de Lille</Text>
+      </View>
+      <View style={styles.problemDesc}>
+        <Text>En quelques mots :</Text>
+        <Text>slrkfjlskjxnr,gmkvscw slrkfjlskjxnrslrkfjlskjxnrslrkfjlskjxnrslrkfjlskjxnrslrkfjlskjxnr slrkfjlskjxnrslrkfjlskjxnr</Text>
+      </View>
+      <View style={styles.problemContainer}>
+        <Text>Type de probleme(s)</Text>
+        <View style={styles.problemBadge}>
+          <Badge value='Scolaire' status='success'></Badge>
+          <Badge value='De la merde' status='success'></Badge>
+          <Badge value='Minaaaable' status='success'></Badge>
+        </View>
+        <View style={{display:'flex',flexDirection:'row', justifyContent:'space-between', width:'100%'}}>
+        <TouchableOpacity 
+                      style={styles.buttonSend}
+                    ><Ionicons name="send" size={25} color="#FFEEDD" style={{alignSelf: 'center', marginLeft:3,marginBottom:5, transform: [{rotate:'-45deg'}]}}/>
+        </TouchableOpacity>
+        <TouchableOpacity 
+                      style={styles.buttonInfo}
+                    ><Text style={{fontSize:25, color:"#FFEEDD", fontFamily: 'Montserrat_700Bold',}}>i</Text>
+        </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+]
 
   let [fontsLoaded] = useFonts({
     Montserrat_700Bold,
@@ -57,8 +64,6 @@ function HomeScreen(props) {
     Montserrat_800ExtraBold,
   });
 
-  const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
 
   var handleSubmit = () => {
   }
@@ -114,5 +119,68 @@ const styles = StyleSheet.create({
   pictures: {
     flexDirection: 'row',
     width: '100%',
+  },
+  cardContainer:{
+    width: windowWidth,
+    display:'flex',
+    flexDirection: 'column',
+    justifyContent:'center',
+    alignItems:'center',
+    borderWidth:1,
+    marginHorizontal:20,
+
+  },
+  topCard:{
+    display:'flex',
+    flexDirection:'column',
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  problemDesc:{
+    display:'flex',
+    flexDirection:'column',
+    justifyContent:'center',
+    alignItems:'flex-start',
+  },
+  problemContainer:{
+    width:'100%',
+    display:'flex',
+    flexDirection:'column',
+    justifyContent:'flex-start',
+    alignItems:'flex-start',
+  },
+  problemBadge:{
+    width:'50%',
+    display:'flex',
+    flexDirection:'row',
+    justifyContent:'flex-start',
+    flexWrap:'wrap'
+  },
+  buttonSend:{
+    backgroundColor: "#5571D7",
+    padding: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 30,
+    borderColor:'#5571D7',
+    shadowColor: "black",
+    shadowOffset: {width: 1, height:1},
+    shadowOpacity: 0.5,
+    display: 'flex',
+    justifyContent:'center',
+    alignItems:'center'
+  },
+  buttonInfo:{
+    backgroundColor: "#5571D7",
+    width: 50,
+    height: 50,
+    borderRadius: 30,
+    borderColor:'#5571D7',
+    shadowColor: "black",
+    shadowOffset: {width: 1, height:1},
+    shadowOpacity: 0.5,
+    display: 'flex',
+    justifyContent:'center',
+    alignItems:'center', 
   }
   })
