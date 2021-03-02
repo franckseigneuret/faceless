@@ -67,10 +67,10 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name='BottomNavigator' component={BottomNavigator} />
           <Stack.Screen name="Registration" component={Registration} />
           <Stack.Screen name="Quizz" component={Quizz} />
           <Stack.Screen name="OptionalQuizz" component={OptionalQuizz} />
-          <Stack.Screen name='BottomNavigator' component={BottomNavigator} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
