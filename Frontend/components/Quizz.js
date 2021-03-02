@@ -99,7 +99,7 @@ function quizz(props) {
 
 
   const handleSubmit = async () => {
-    props.navigation.navigate('OptionalQuizz')
+    props.navigation.navigate('BottomNavigator')
     props.onAddUserInfo({
       email: email,
       password: password,
