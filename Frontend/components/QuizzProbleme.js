@@ -15,15 +15,13 @@ export default function QuizzProbleme(props) {
 
   const [problem, setProblem] = useState("")
 
-  console.log("problem", problem)
+  // console.log("problem", problem)
 
   var handleClick = () => {
-    // props.handleClickParent("problem", problem);
-    console.log("probleme")
+    props.handleClickParent("problem", problem);
   }
 
   var getInputValue = (value) => {
-    console.log("test", value)    
     setProblem(value)
   }
 

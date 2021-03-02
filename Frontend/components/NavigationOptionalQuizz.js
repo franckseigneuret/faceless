@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import { Ionicons } from '@expo/vector-icons'; 
 
-
+import {connect} from 'react-redux';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -19,13 +19,7 @@ import {
 import { startClock } from 'react-native-reanimated';
 
 
-export default function NavigationOptionalQuizz(props) {
-
-  const [count, setcount] = useState(0)
-
-  var handleClick = (type) => {
-    props.handleClickParent(type);
-  }
+function NavigationOptionalQuizz(props) {
 
     let [fontsLoaded] = useFonts({
         Montserrat_700Bold,
@@ -46,7 +40,7 @@ export default function NavigationOptionalQuizz(props) {
             color: '#EC9A1F',
             fontFamily: 'Montserrat_700Bold'
             }}
-            onPress={() => handleClick("prev")}
+            onPress={ ()=>props.onDecrease() }
             />
             <Button 
             iconRight
@@ -59,11 +53,30 @@ export default function NavigationOptionalQuizz(props) {
             color: '#5571D7',
             fontFamily: 'Montserrat_700Bold',
             }}
-            onPress={() => handleClick("next")}
+            onPress={()=>(props.onIncrease()) }
             /> 
         </View>
     );
 };
+function mapStateToProps(state) {
+  return { count: state.count }
+ }
+ 
+function mapDispatchToProps(dispatch) {
+  return {
+    onIncrease: function () {
+      dispatch({ type: 'INCREASE_COUNT'})
+    },
+    onDecrease: function () {
+      dispatch({ type: 'DECREASE_COUNT'})
+    }
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NavigationOptionalQuizz);
 
 const styles = StyleSheet.create({
   container: {

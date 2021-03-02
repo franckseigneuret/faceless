@@ -7,6 +7,8 @@ import 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import user from './reducers/user.reducer';
+import count from './reducers/count.reducer';
+
 //COMPONENTS
 import Quizz from './components/Quizz'
 import OptionalQuizz from './components/OptionalQuizz'
@@ -22,7 +24,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const store = createStore(combineReducers({ user }))
+const store = createStore(combineReducers({ user, count }))
 
 const BottomNavigator = () => {
   return (

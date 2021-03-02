@@ -19,11 +19,12 @@ export default function QuizzLocalisation(props) {
 
   var handleClick = () => {
     props.handleClickParent("localisation", localisation);
-    console.log("Localisation")
+    // console.log("Localisation")
   }
 
-  var getInputValue = (value) => {
+  var getValue = (value) => {
     setLocalisation(value)
+    console.log("lala", value)
   }
 
   let [fontsLoaded] = useFonts({
@@ -39,7 +40,7 @@ export default function QuizzLocalisation(props) {
         style={styles.container}
       >
         <QuizzTitre title="Tu viens d'où ?" />
-        <Geolocalisation />
+        <Geolocalisation getValueParent={getValue}/>
         <BlueButton btnTitle="enregistrer" handleClickParent={handleClick} />
       </KeyboardAvoidingView>
     </View>
