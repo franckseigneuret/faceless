@@ -108,18 +108,19 @@ function quizz(props) {
       problems: problems
     })
     userInfo = props.userDisplay
-    var rawResponse = await fetch('/sign-up-first-step', {
-      method: 'POST',
-      headers: {'Content-Type':'application/x-www-form-urlencoded'},
-      body: `emailFront=${userInfo.email}&passwordFront=${userInfo.password}&pseudoFront=${userInfo.pseudo}&birthDateFront=${userInfo.birthDate}&problemsFront=${userInfo.problems}`
-    });
-    var response = await rawResponse.json();
-    console.log(response)
+    // var rawResponse = await fetch('/sign-up-first-step', {
+    //   method: 'POST',
+    //   headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    //   body: `emailFront=${userInfo.email}&passwordFront=${userInfo.password}&pseudoFront=${userInfo.pseudo}&birthDateFront=${userInfo.birthDate}&problemsFront=${userInfo.problems}`
+    // });
+    // var response = await rawResponse.json();
+    // console.log(response)
     //TOKEN ON STORAGE
     // AsyncStorage.setItem("token", JSON.stringify(response.token))
     console.log(response, '<------ data from back on submit quizz required')
   }
 
+  
 
 
   const handlePressDateBirth = () => {
@@ -159,7 +160,7 @@ function quizz(props) {
             <ProgressStep nextBtnText='valider'
               nextBtnStyle={styles.buttonNext}
               nextBtnTextStyle={styles.buttonNextText}
-              errors={emailStatut}
+              // errors={emailStatut}
             >
               <View style={styles.stepContainer}>
                 <Text style={styles.textTitleQuizz}>Salut,</Text>
@@ -178,7 +179,7 @@ function quizz(props) {
               previousBtnTextStyle={styles.buttonPreviousText}
               previousBtnText='Revoir'
               previousBtnStyle={styles.buttonPrevious}
-              errors={passwordStatut}
+              // errors={passwordStatut}
             >
               <View style={styles.stepContainer}>
                 <Text style={styles.textQuizz}>Créé ton mot de passe</Text>
@@ -196,7 +197,7 @@ function quizz(props) {
               previousBtnTextStyle={styles.buttonPreviousText}
               previousBtnText='Revoir'
               previousBtnStyle={styles.buttonPrevious}
-              errors={pseudoStatut}
+              // errors={pseudoStatut}
             >
               <View style={styles.stepContainer}>
                 <Text style={styles.textQuizz}>Comment veux-tu qu'on t'appelle ?</Text>
