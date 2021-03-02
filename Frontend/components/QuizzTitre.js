@@ -21,9 +21,9 @@ export default function QuizzTitre(props) {
     const[valueInput, setValueInput] = useState("")
     const [isSelected, setIsSelected] = useState(false)
 
-    var getInputValue = (value) => {
-        setValueInput(value)
-        props.getInputValueParent(valueInput);
+    var onChangeContent = (value) => {
+      setValueInput(value)
+      props.getInputValueParent(value);
     }
 
     let [fontsLoaded] = useFonts({
@@ -36,7 +36,7 @@ export default function QuizzTitre(props) {
     if(props.type === "inline"){
         var input = <Input
            placeholder={props.placeholder}
-           onChangeText={(value) => getInputValue(value)}
+           onChangeText={(value) => onChangeContent(value)}
            value={valueInput}
            />  
     }
@@ -46,7 +46,7 @@ export default function QuizzTitre(props) {
         placeholderTextColor='#303030'
         inputContainerStyle={{borderBottomWidth:0}}
         placeholder={props.placeholder}
-        onChangeText={(value) => getInputValue(value)}
+        onChangeText={(value) => onChangeContent(value)}
         value={valueInput}
         />  
     }
