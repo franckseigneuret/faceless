@@ -20,6 +20,16 @@ export default function QuizzGender(props) {
     props.handleClickParent("gender", gender);
   }
 
+  var updateGender = (index) => {
+    if(index === 0){
+      setGender("other")
+    } else if (index === 1){
+      setGender("male")
+    } else if(index === 2){
+      setGender("female")
+    }
+  }
+
   let [fontsLoaded] = useFonts({
       Montserrat_700Bold,
       Montserrat_900Black,
@@ -33,7 +43,7 @@ export default function QuizzGender(props) {
   ];
 
   var image = images.map((img, key) => {
-      return <TouchableOpacity key={key} onPress={() => {setIsSelected(key)}}>
+      return <TouchableOpacity key={key} onPress={() => {setIsSelected(key), updateGender(key)}}>
        {isSelected === key ? img.selected : img.unSelected}
      </TouchableOpacity>
   })

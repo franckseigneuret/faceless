@@ -17,14 +17,13 @@ const windowHeight = Dimensions.get('window').height;
 export default function QuizzAvatar(props) {
 
     const [imgAvatarSelected, setImgAvatarSelected] = useState(require('../assets/avatar_flou.png'))
+    const [imgAvatarUrl, setImgAvatarUrl] = useState("")
     
     var handleClick = () => {
-        props.handleClickParent("avatar", avatar);
-        console.log("avatar")
+        props.handleClickParent("avatar", imgAvatarUrl);
     }
 
     var changeAvatar = (index) => {
-        console.log(imgAvatarSrc[index].src)
         setImgAvatarSelected(imgAvatarSrc[index].src)
     }
 
@@ -40,7 +39,7 @@ export default function QuizzAvatar(props) {
     ]
 
     var imgAvatar = imgAvatarSrc.map((url, key) => {
-        return <TouchableOpacity key={key} url={url} onPress={() => changeAvatar(key)}>
+        return <TouchableOpacity key={key} url={url} onPress={() => {changeAvatar(key), setImgAvatarUrl(url.url)}}>
                     <Image source={url.src} style={{margin: 7}}/>
                 </TouchableOpacity>
     })
