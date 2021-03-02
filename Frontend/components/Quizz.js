@@ -108,15 +108,15 @@ function quizz(props) {
       problems: problems
     })
     userInfo = props.userDisplay
-    // var rawResponse = await fetch('/sign-up-first-step', {
-    //   method: 'POST',
-    //   headers: {'Content-Type':'application/x-www-form-urlencoded'},
-    //   body: `emailFront=${userInfo.email}&passwordFront=${userInfo.password}&pseudoFront=${userInfo.pseudo}&birthDateFront=${userInfo.birthDate}&problemsFront=${userInfo.problems}`
-    // });
-    // var response = await rawResponse.json();
-    // console.log(response)
-    //TOKEN ON STORAGE
-    // AsyncStorage.setItem("token", JSON.stringify(response.token))
+    var rawResponse = await fetch('/sign-up-first-step', {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      body: `emailFront=${userInfo.email}&passwordFront=${userInfo.password}&pseudoFront=${userInfo.pseudo}&birthDateFront=${userInfo.birthDate}&problemsFront=${userInfo.problems}`
+    });
+    var response = await rawResponse.json();
+    console.log(response)
+    
+    AsyncStorage.setItem("token", JSON.stringify(response.token))
     console.log(response, '<------ data from back on submit quizz required')
   }
 
