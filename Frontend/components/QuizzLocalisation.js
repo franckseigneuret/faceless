@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
 
 import QuizzTitre from "./QuizzTitre"
 import BlueButton from './BlueButton';
 
+import Geolocalisation from "./Geolocalisation"
+
 import {
-    useFonts,
-    Montserrat_700Bold,
-    Montserrat_900Black,
-    Montserrat_800ExtraBold,
-  } from "@expo-google-fonts/montserrat";
+  useFonts,
+  Montserrat_700Bold,
+  Montserrat_900Black,
+  Montserrat_800ExtraBold,
+} from "@expo-google-fonts/montserrat";
 
 export default function QuizzLocalisation(props) {
 
@@ -24,26 +26,28 @@ export default function QuizzLocalisation(props) {
     setLocalisation(value)
   }
 
-    let [fontsLoaded] = useFonts({
-        Montserrat_700Bold,
-        Montserrat_900Black,
-        Montserrat_800ExtraBold,
-      });
+  let [fontsLoaded] = useFonts({
+    Montserrat_700Bold,
+    Montserrat_900Black,
+    Montserrat_800ExtraBold,
+  });
 
-    return(
-        <View style={styles.container}>
-            <QuizzTitre title="Tu viens d'où ?" placeholder="ville, région, département..." getInputValueParent={getInputValue} type="border"/>
-            <BlueButton btnTitle="enregistrer" handleClickParent={handleClick}/>
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <QuizzTitre title="Tu viens d'où ?" />
+        <Geolocalisation />
+        <BlueButton btnTitle="enregistrer" handleClickParent={handleClick} />
+      </KeyboardAvoidingView>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF1E2', 
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
   }
 });

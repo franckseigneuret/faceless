@@ -70,52 +70,33 @@ export default function Geolocalisation(props) {
   })
 
   return (
-    <View style={styles.container}>
-      {/* <ScrollView style={styles.scrollView}> */}
-      <Text style={styles.title}>
-        Tu viens d'où ?</Text>
-
+    <View style={styles.view}>
       <TextInput
         style={styles.chooseTown}
         onChangeText={text => onChangeText(text)}
         value={search}
         placeholder={'Votre ville ?'}
       />
-
       {
         TownListComponent.length > 0 && <View style={styles.townsList}>
           {TownListComponent}
         </View>
       }
-      {/* </ScrollView> */}
+      
     </View>
   )
 }
 
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: 'yellow',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: '#FFF1E2',
-    alignItems: 'center',
-    paddingTop: windowHeight / 4, // bof, problem scrollView
-  },
-  title: {
-    color: '#5571D7',
-
-    fontWeight: 'bold',
-    fontFamily: 'Montserrat_800ExtraBold',
-    fontSize: 22,
-    marginBottom: 20,
+  view: {
+    paddingLeft: windowWidth/10,
+    paddingRight: windowWidth/10,
   },
   chooseTown: {
     backgroundColor: '#FFCC99',
     paddingHorizontal: 15,
     height: 40,
-    width: 300,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
@@ -127,7 +108,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   town: {
-    width: 300,
     paddingVertical: 5,
     paddingHorizontal: 15,
     backgroundColor: '#FFCC99',
