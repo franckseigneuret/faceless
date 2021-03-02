@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Image, Text, Switch, 
   TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, 
   TouchableWithoutFeedback, Keyboard } from "react-native";
@@ -24,6 +24,9 @@ export default function ProfilScreen() {
     Montserrat_800ExtraBold,
   });
 
+
+  
+
   // Switch du bottom 
   const toggleSwitchDelete = () => setIsEnabledDelete(previousState => !previousState);
   const toggleSwitchDesactivate = () => setIsEnabledDesactivate(previousState => !previousState);
@@ -48,40 +51,78 @@ export default function ProfilScreen() {
   const [mdpVisible, setMdpVisible] = useState(false);
   const [mdpText, setMdpText] = useState('');
 
+  // Changement de la couleur button enregistrer bottom
+  const [saveButton, setSaveButton] = useState(false)
+
   const handlePressEmail = () => {
     setEmailVisible(!emailVisible)
+    setSaveButton(true)
   }
 
   const handlePressCity = () => {
     setCityVisible(!cityVisible)
+    setSaveButton(true)
   }
 
   const handlePressMdp = () => {
     setMdpVisible(!mdpVisible)
+    setSaveButton(true)
   }
+
+  const handleSaveDescription = () => {
+    setSaveButton(true)
+  }
+
+  const handleSaveChange = () => {
+
+  }
+
+  const handleDisconnect = () => {
+    
+  }
+
 
   var emailToChange;
   var cityToChange;
   var mdpToChange;
   
   if(!emailVisible){
-    emailToChange = <Text style={styles.subtitle}>nicole.kidman@poildecarotte.com </Text>
+    emailToChange = <View style={styles.viewContent}>
+                        <Text style={styles.subtitle}>nicole.kidman@poildecarotte.com</Text>
+                        <TouchableOpacity onPress={handlePressEmail}>
+                          <Ionicons name="pencil" size={18} color="#5571D7" />
+                        </TouchableOpacity>
+                    </View>
   } else {
-    emailToChange = <TextInput style={styles.subtitle} placeholder="Tu peux changer ton email  " onChangeText={emailText => setEmailText(emailText)} defaultValue={emailText} />
+    emailToChange = <View style={styles.viewContent}>
+                        <TextInput style={styles.subtitleChanged} placeholder="Tu peux changer ton email  " onChangeText={emailText => setEmailText(emailText)} defaultValue={emailText} />
+                    </View>
   }
 
   if(!cityVisible){
-    cityToChange = <Text style={styles.subtitle}>Paris </Text>
+    cityToChange = <View style={styles.viewContent}>
+                      <Text style={styles.subtitle}>Paris </Text>
+                      <TouchableOpacity onPress={handlePressCity}>
+                        <Ionicons name="pencil" size={18} color="#5571D7" />
+                      </TouchableOpacity>
+                  </View>
   } else {
-    cityToChange = <TextInput style={styles.subtitle} placeholder="Tu peux changer ta ville  " onChangeText={cityText => setCityText(cityText)} defaultValue={cityText} />
+    cityToChange = <View style={styles.viewContent}>
+                      <TextInput style={styles.subtitleChanged} placeholder="Tu peux changer ta ville  " onChangeText={cityText => setCityText(cityText)} defaultValue={cityText} />
+                    </View>
   }
 
   if(!mdpVisible){
-    mdpToChange = <Text style={styles.subtitle}>Mot de passe : ******* </Text>
+    mdpToChange = <View style={styles.viewContent}>
+                      <Text style={styles.subtitle}>Mot de passe : ******* </Text>
+                      <TouchableOpacity onPress={handlePressMdp}>
+                        <Ionicons name="pencil" size={18} color="#5571D7" />
+                      </TouchableOpacity>
+                  </View>
   } else {
-    mdpToChange = <Text style={styles.subtitle}>Mot de passe : 
-      <TextInput style={styles.input} placeholder="Ton nouveau mot de passe" onChangeText={mdpText => setMdpText(mdpText)} defaultValue={mdpText} />
-    </Text>
+    mdpToChange = <View style={styles.viewContent}>
+                    <TextInput secureTextEntry={true} style={styles.subtitleChanged} placeholder="Ton nouveau mot de passe" onChangeText={mdpText => setMdpText(mdpText)} defaultValue={mdpText} />
+                  </View>
   }
 
   if (!fontsLoaded) {
@@ -107,28 +148,21 @@ export default function ProfilScreen() {
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.viewContent}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.viewContent}>
-              {emailToChange}
-              <TouchableOpacity onPress={handlePressEmail}>
-                <Ionicons name="pencil" size={18} color="#5571D7" />
-              </TouchableOpacity>
-          </View>
+          {emailToChange}
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
 
-      <View style={styles.viewContent}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.viewContent}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           {cityToChange}
-          <TouchableOpacity onPress={handlePressCity}>
-            <Ionicons name="pencil" size={18} color="#5571D7" />
-          </TouchableOpacity>
-      </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
 
-      <View style={styles.viewContent}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.viewContent}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           {mdpToChange}
-          <TouchableOpacity onPress={handlePressMdp}>
-            <Ionicons name="pencil" size={18} color="#5571D7" />
-          </TouchableOpacity>
-      </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
 
       <View style={styles.viewHead}>
         <Text style={styles.subtitle}>Sexe </Text>
@@ -144,8 +178,18 @@ export default function ProfilScreen() {
         </Text>
       </View>
 
-      <Overlay isVisible={visible} onBackdropPress={toggleOverlayDescription} style={styles.overlay}>
-        <Text>En quelques mots:</Text>
+      <Overlay isVisible={visible} onBackdropPress={toggleOverlayDescription} backdropStyle={{opacity: 0.8, backgroundColor: '#FFF1E2'}} overlayStyle={styles.overlay}>
+        <Text style={styles.title}>En quelques mots:</Text>
+        <TextInput style={{backgroundColor: "white", borderRadius: 25, width: "100%"}}> </TextInput>
+        <Button 
+                    title='enregistrer'
+                    type="solid"
+                    buttonStyle={styles.buttonValider}
+                    titleStyle={{
+                    fontFamily: 'Montserrat_700Bold'
+                    }}
+                    onPress={() => handleSaveDescription()}
+            /> 
       </Overlay>
 
       <View style={{ width: "88%"}}>
@@ -157,9 +201,25 @@ export default function ProfilScreen() {
       </View>
 
       <View style={styles.viewSaveDisconnect}>
-        <Text style={styles.buttonSave}>enregistrer </Text>
+        <Button 
+                    title='enregistrer'
+                    type="solid"
+                    buttonStyle={saveButton? styles.buttonValider : styles.buttonValiderBIS}
+                    titleStyle={{
+                    fontFamily: 'Montserrat_700Bold'
+                    }}
+                    onPress={() => handleSaveChange()}
+            /> 
         
-        <Text style={styles.buttonDisconnect}>déconnexion</Text>
+        <Button 
+                    title='déconnexion'
+                    type="solid"
+                    buttonStyle={styles.buttonDisconnect}
+                    titleStyle={{
+                    fontFamily: 'Montserrat_700Bold'
+                    }}
+                    onPress={() => handleDisconnect()}
+            />
       </View>
 
       <View style={styles.viewDeleteDisable}>
@@ -259,6 +319,12 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat_800ExtraBold",
     fontStyle: 'italic',
   },
+  subtitleChanged: {
+    textAlign: "center",
+    color: "#BCC8F0",
+    fontFamily: "Montserrat_800ExtraBold",
+    fontStyle: 'italic',
+  },
   title: {
     color: "#EC9A1F",
     fontFamily: "Montserrat_700Bold",
@@ -276,17 +342,24 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat_800ExtraBold",
     fontSize: 10,
   },
-  buttonSave: {
-    backgroundColor: "#5571D7",
-    borderRadius: 25,
-    color: "#FFF1E2",
+  buttonValider: {
+    backgroundColor: '#5571D7',
+    borderRadius: 86,
+    width: 159,
+    paddingHorizontal: 10,
+    paddingVertical: 3
+  },
+  buttonValiderBIS: {
+    backgroundColor: '#BCC8F0',
+    borderRadius: 86,
+    width: 159,
     paddingHorizontal: 10,
     paddingVertical: 3
   },
   buttonDisconnect: {
-    backgroundColor: "#D75555",
-    borderRadius: 25,
-    color: "#FFF1E2",
+    backgroundColor: '#D75555',
+    borderRadius: 86,
+    width: 159,
     paddingHorizontal: 10,
     paddingVertical: 3
   },
@@ -300,5 +373,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FDEDDC",
     textAlign: "center",
     alignItems: "center",
-  } 
+    width: "80%",
+    borderColor: "#2d3436"
+  }
 });
