@@ -56,8 +56,8 @@ export default function Geolocalisation(props) {
         <Text
           key={i}
           onPress={() => {
-            setSelectedTown(item)
-            setSearch(item)
+            setSelectedTown(item.label)
+            setSearch(item.label)
             setTimeout(() => {
               setTownList([])
             }, 1000);
