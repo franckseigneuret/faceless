@@ -23,6 +23,10 @@ export default function NavigationOptionalQuizz(props) {
 
   const [count, setcount] = useState(0)
 
+  var handleClick = (type) => {
+    props.handleClickParent(type);
+  }
+
     let [fontsLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_900Black,
@@ -42,7 +46,7 @@ export default function NavigationOptionalQuizz(props) {
             color: '#EC9A1F',
             fontFamily: 'Montserrat_700Bold'
             }}
-            onPress={() => props.navigation.navigate('Quizz')}
+            onPress={() => handleClick("prev")}
             />
             <Button 
             iconRight
@@ -55,7 +59,7 @@ export default function NavigationOptionalQuizz(props) {
             color: '#5571D7',
             fontFamily: 'Montserrat_700Bold',
             }}
-            onPress={() => props.navigation.navigate('Quizz')}
+            onPress={() => handleClick("next")}
             /> 
         </View>
     );
