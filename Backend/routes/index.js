@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bcrypt = require('bcrypt');
 var uid2 = require('uid2');
+const UserModel = require('../models/user');
 const cost = 10;
 
 
@@ -27,7 +28,7 @@ router.post('/sign-up-first-step', async function(req, res, next){
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
 
-  var user = await new userModel({
+  var user = await new UserModel({
     token: uid2(32),
     email: req.body.emailFront,
     password: hash,
@@ -75,8 +76,29 @@ router.post('/sign-out', function(req, res, next) {
 query : tokenFront : 1234, birthDateFront : (12/23/1992), problemsTypesFront : String, localisationFront : String, genderFront : String, 
 response : userFiltered : array, pseudo (celui du user connecté) : String
 */
-router.get('/show-card', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/show-card', async function(req, res, next) {
+
+  var user = await UserModel.find({token: req.query.tokenFront})
+  var birthDate = user.birthDate
+  var dateToday = new Date()
+  var dateCompare = dateToday - birthDate
+  var conditionDate = (86400000*365)*18
+  var isAdult = false
+  if((dateToday - dateCompare) > conditionDate) {
+    isAdult = true
+  } else {
+    isAdult = false
+  }
+
+  if(isAdult) {
+    var usersToShow = await UserModel.find({token: !req.query.tokenFront, birthDate: {$gt:conditionDate} })
+  } else {
+    var usersToShow = await UserModel.find({token: !req.query.token, birthDate: {$lt:conditionDate}})
+  }
+  
+
+
+  res.json({usersToShow:usersToShow });
 });
 
 
