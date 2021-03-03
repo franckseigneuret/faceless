@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Dimensions, Image, ScrollView, TouchableOpacity } from 'react-native';
+import {connect} from 'react-redux';
 import { Ionicons } from '@expo/vector-icons'; 
 
 import BlueButton from './BlueButton';
@@ -14,17 +15,16 @@ import {
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-export default function QuizzAvatar(props) {
+function QuizzAvatar(props) {
 
     const [imgAvatarSelected, setImgAvatarSelected] = useState(require('../assets/avatar_flou.png'))
+    const [imgAvatarUrl, setImgAvatarUrl] = useState("")
     
     var handleClick = () => {
-        props.handleClickParent("avatar", avatar);
-        console.log("avatar")
+        props.onAddUserAvatar(imgAvatarUrl)
     }
 
     var changeAvatar = (index) => {
-        console.log(imgAvatarSrc[index].src)
         setImgAvatarSelected(imgAvatarSrc[index].src)
     }
 
@@ -40,7 +40,7 @@ export default function QuizzAvatar(props) {
     ]
 
     var imgAvatar = imgAvatarSrc.map((url, key) => {
-        return <TouchableOpacity key={key} url={url} onPress={() => changeAvatar(key)}>
+        return <TouchableOpacity key={key} url={url} onPress={() => {changeAvatar(key), setImgAvatarUrl(url.url)}}>
                     <Image source={url.src} style={{margin: 7}}/>
                 </TouchableOpacity>
     })
@@ -67,6 +67,19 @@ export default function QuizzAvatar(props) {
         </View>
     );
 };
+
+function mapDispatchToProps(dispatch) {
+    return {
+        onAddUserAvatar: function (arg) {
+            dispatch({ type: 'ADD_AVATAR', avatar: arg })
+        }
+    }
+}
+  
+export default connect(
+    null,
+    mapDispatchToProps
+)(QuizzAvatar);
 
 const styles = StyleSheet.create({
   container: {

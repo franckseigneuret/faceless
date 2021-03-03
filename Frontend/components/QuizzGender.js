@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Image , TouchableOpacity } from 'react-native'; 
+import {connect} from 'react-redux';
 
 import BlueButton from './BlueButton';
 import QuizzTitre from './QuizzTitre';
@@ -11,13 +12,23 @@ import {
     Montserrat_800ExtraBold,
   } from "@expo-google-fonts/montserrat";
 
-export default function QuizzGender(props) {
+function QuizzGender(props) {
   
   const [gender, setGender] = useState("")
   const [isSelected, setIsSelected] = useState(-1)
 
   var handleClick = () => {
-    props.handleClickParent("gender", gender);
+    props.onAddUserGender(gender)
+  }
+
+  var updateGender = (index) => {
+    if(index === 0){
+      setGender("other")
+    } else if (index === 1){
+      setGender("male")
+    } else if(index === 2){
+      setGender("female")
+    }
   }
 
   let [fontsLoaded] = useFonts({
@@ -33,7 +44,7 @@ export default function QuizzGender(props) {
   ];
 
   var image = images.map((img, key) => {
-      return <TouchableOpacity key={key} onPress={() => {setIsSelected(key)}}>
+      return <TouchableOpacity key={key} onPress={() => {setIsSelected(key), updateGender(key)}}>
        {isSelected === key ? img.selected : img.unSelected}
      </TouchableOpacity>
   })
@@ -49,6 +60,19 @@ export default function QuizzGender(props) {
       </View>
   );
 };
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onAddUserGender: function (arg) {
+      dispatch({ type: 'ADD_GENDER', gender: arg })
+    }
+  }
+}
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(QuizzGender);
 
 const styles = StyleSheet.create({
   container: {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
+import {connect} from 'react-redux';
 
 import QuizzTitre from "./QuizzTitre"
 import BlueButton from './BlueButton';
@@ -13,16 +14,15 @@ import {
   Montserrat_800ExtraBold,
 } from "@expo-google-fonts/montserrat";
 
-export default function QuizzLocalisation(props) {
+function QuizzLocalisation(props) {
 
   const [localisation, setLocalisation] = useState("")
 
   var handleClick = () => {
-    props.handleClickParent("localisation", localisation);
-    console.log("Localisation")
+    props.onAddUserLocalisation(localisation)
   }
 
-  var getInputValue = (value) => {
+  var getValue = (value) => {
     setLocalisation(value)
   }
 
@@ -39,12 +39,25 @@ export default function QuizzLocalisation(props) {
         style={styles.container}
       >
         <QuizzTitre title="Tu viens d'où ?" />
-        <Geolocalisation />
+        <Geolocalisation getValueParent={getValue}/>
         <BlueButton btnTitle="enregistrer" handleClickParent={handleClick} />
       </KeyboardAvoidingView>
     </View>
   );
 };
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onAddUserLocalisation: function (arg) {
+      dispatch({ type: 'ADD_LOCALISATION', localisation: arg })
+    }
+  }
+}
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(QuizzLocalisation);
 
 const styles = StyleSheet.create({
   container: {

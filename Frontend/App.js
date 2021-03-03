@@ -7,6 +7,8 @@ import 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import user from './reducers/user.reducer';
+import count from './reducers/count.reducer';
+
 //COMPONENTS
 import Quizz from './components/Quizz'
 import OptionalQuizz from './components/OptionalQuizz'
@@ -22,7 +24,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const store = createStore(combineReducers({ user }))
+const store = createStore(combineReducers({ user, count }))
 
 const BottomNavigator = () => {
   return (
@@ -51,9 +53,10 @@ const BottomNavigator = () => {
         activeTintColor: '#5571D7',
         inactiveTintColor: '#BCC8F0',
         style: {
-          backgroundColor: '#FFF6EF',
+          backgroundColor: '#FFEEDD',
           height: 60,
-        }
+          borderTopWidth:0,
+        },
       }}>
         <Tab.Screen name='ProfilScreen' component={ProfilScreen} />
         <Tab.Screen name='HomeScreen' component={HomeScreen} />

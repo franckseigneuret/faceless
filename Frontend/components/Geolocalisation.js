@@ -28,12 +28,12 @@ export default function Geolocalisation(props) {
     if (search.length > 2) {
 
       const uri = `https://api-adresse.data.gouv.fr/search/?q=${search}&type=municipality&autocomplete=1`
-      console.log(uri)
+      // console.log(uri)
       const data = await fetch(uri)
       const body = await data.json()
       const townsAPI = body.features
       const townsApiName = []
-      console.log(townsAPI)
+      // console.log(townsAPI)
       townsAPI && townsAPI.map((town) => {
         townsApiName.push({
           label: town.properties.label,
@@ -47,7 +47,7 @@ export default function Geolocalisation(props) {
   }
 
   const TownListComponent = townList.map((item, i, arr) => {
-    console.log('i', townList)
+    // console.log('i', townList)
     const styleItem = [styles.town]
     selectedTown === item ? styleItem.push(styles.townSelected) : ''
     arr.length - 1 === i ? styleItem.push(styles.lastItem) : ''
@@ -61,7 +61,7 @@ export default function Geolocalisation(props) {
             setTimeout(() => {
               setTownList([])
             }, 1000);
-
+            props.getValueParent(item);
             // addTownStore(item)
           }}
         >{item.label} ({item.postcode})</Text>
