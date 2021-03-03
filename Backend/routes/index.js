@@ -12,8 +12,7 @@ const cost = 10;
 /* GET home page. */
 router.get('/', async function(req, res, next) {
 
-  res.render('index', {title: 'Test'})
-});
+router.get(`/email-check/?email=`, async function(req, res, next){
 
 router.post('/email-check', async function(req, res, next){
   console.log(req.body.emailFront, '<------ req body')
