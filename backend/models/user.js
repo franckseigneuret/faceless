@@ -1,11 +1,11 @@
 var mongoose = require('mongoose');
 
 var ConversationSchema = mongoose.Schema({
-    with_id : String,
+    with_id : Object,
     archived: Boolean,
     delete: Boolean,
     demand: Boolean,
-    messages: { type: mongoose.Schema.Types.ObjectId, ref: 'message' },
+    messages: { type: mongoose.Schema.Types.ObjectId, ref: 'messages' },
    });
 
 var UserSchema = mongoose.Schema({

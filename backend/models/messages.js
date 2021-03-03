@@ -1,16 +1,16 @@
 var mongoose = require('mongoose');
 
-var MessageSchema = mongoose.Schema({
-    from_id: String,
-    to_id: String,
+var MessagesSchema = mongoose.Schema({
+    from_id: Object,
+    to_id: Object,
     content: String,
-    read_user_id1: String,
-    read_user_id2: String,
-    date: String,
-    delete_user_id1: String,
-    delete_user_id2: String,
+    read_user_id1: Boolean,
+    read_user_id2: Boolean,
+    date: Date,
+    delete_user_id1: Boolean,
+    delete_user_id2: Boolean,
 });
 
-const MessageModel = mongoose.model('users', UserSchema);
+const MessagesModel = mongoose.model('messages', MessagesSchema);
 
-module.exports = MessageModel;
+module.exports = MessagesModel;
