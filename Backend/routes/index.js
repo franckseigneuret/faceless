@@ -1,27 +1,40 @@
 var express = require('express');
 var router = express.Router();
+const UserModel = require('../models/user');
+
 var bcrypt = require('bcrypt');
 var uid2 = require('uid2');
-const UserModel = require('../models/user');
+
 const cost = 10;
 
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', async function(req, res, next) {
+
+  res.render('index', {title: 'Test'})
 });
 
-router.get('/email-check', async function(req, res, next){
+router.post('/email-check', async function(req, res, next){
+  console.log(req.body.emailFront, '<------ req body')
+  var user = await UserModel.find()
+  console.log(user, '<-------- user found ?')
+  // var userFind = user.filter(e => e.email == req.body.emailFront)
+  // let result;
+  // let error;
+  // if(userFind != null) {
+  //   result = true;
+  //   error= 'Cet email appartient déjà à un autre compte'
+  // } else {
+  //   result = false;
+  //   error= 'Email valable pour inscription, pas trouvé en BDD'
+  // }
 
-  var user = await userModel.find({email: req.query.emailFront})
-  let result;
-  let error;
-  if(user) {
-    result = true;
-    error= 'Cet email appartient déjà à un autre compte'
-  }
-  res.json({result: result, error: error})
+  // console.log(user, '<------ user');
+  // console.log(result, '<------- result');
+  // console.log(error, '<------ erro sent')
+
+  res.json({result: true})
 })
 
 router.post('/sign-up-first-step', async function(req, res, next){
