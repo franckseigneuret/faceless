@@ -24,6 +24,9 @@ export default function ProfilScreen() {
     Montserrat_800ExtraBold,
   });
 
+
+  
+
   // Switch du bottom 
   const toggleSwitchDelete = () => setIsEnabledDelete(previousState => !previousState);
   const toggleSwitchDesactivate = () => setIsEnabledDesactivate(previousState => !previousState);

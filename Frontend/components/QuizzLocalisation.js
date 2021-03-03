@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, KeyboardAvoidingView } from 'react-native';
+import {connect} from 'react-redux';
 
 import QuizzTitre from "./QuizzTitre"
 import BlueButton from './BlueButton';
@@ -13,18 +14,16 @@ import {
   Montserrat_800ExtraBold,
 } from "@expo-google-fonts/montserrat";
 
-export default function QuizzLocalisation(props) {
+function QuizzLocalisation(props) {
 
   const [localisation, setLocalisation] = useState("")
 
   var handleClick = () => {
-    props.handleClickParent("localisation", localisation);
-    // console.log("Localisation")
+    props.onAddUserLocalisation(localisation)
   }
 
   var getValue = (value) => {
     setLocalisation(value)
-    console.log("lala", value)
   }
 
   let [fontsLoaded] = useFonts({
@@ -46,6 +45,19 @@ export default function QuizzLocalisation(props) {
     </View>
   );
 };
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onAddUserLocalisation: function (arg) {
+      dispatch({ type: 'ADD_LOCALISATION', localisation: arg })
+    }
+  }
+}
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(QuizzLocalisation);
 
 const styles = StyleSheet.create({
   container: {

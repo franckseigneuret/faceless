@@ -8,9 +8,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
-
 import {
   useFonts,
   Montserrat_700Bold,
@@ -99,7 +96,7 @@ function quizz(props) {
 
 
   const handleSubmit = async () => {
-    props.navigation.navigate('BottomNavigator')
+    props.navigation.navigate('OptionalQuizz')
     props.onAddUserInfo({
       email: email,
       password: password,
