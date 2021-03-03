@@ -1,40 +1,27 @@
 var express = require('express');
 var router = express.Router();
-const UserModel = require('../models/user');
-
 var bcrypt = require('bcrypt');
 var uid2 = require('uid2');
-
+const UserModel = require('../models/user');
 const cost = 10;
 
 
 
 /* GET home page. */
-router.get('/', async function(req, res, next) {
-
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
 });
 
+router.get(`/email-check/?email=`, async function(req, res, next){
 
-router.post('/email-check', async function(req, res, next){
-  console.log(req.body.emailFront, '<------ req body')
-  var user = await UserModel.find()
-  console.log(user, '<-------- user found ?')
-  // var userFind = user.filter(e => e.email == req.body.emailFront)
-  // let result;
-  // let error;
-  // if(userFind != null) {
-  //   result = true;
-  //   error= 'Cet email appartient déjà à un autre compte'
-  // } else {
-  //   result = false;
-  //   error= 'Email valable pour inscription, pas trouvé en BDD'
-  // }
-
-  // console.log(user, '<------ user');
-  // console.log(result, '<------- result');
-  // console.log(error, '<------ erro sent')
-
-  res.json({result: true})
+  var user = await userModel.find({email: req.query.emailFront})
+  let result;
+  let error;
+  if(user) {
+    result = true;
+    error= 'Cet email appartient déjà à un autre compte'
+  }
+  res.json({result: result, error: error})
 })
 
 router.post('/sign-up-first-step', async function(req, res, next){
@@ -91,29 +78,27 @@ response : userFiltered : array, pseudo (celui du user connecté) : String
 */
 router.get('/show-card', async function(req, res, next) {
 
-  var user = await UserModel.findOne({token: req.query.tokenFront})
-  var userToDisplay = await UserModel.find({token: {$ne : req.query.tokenFront}})
-
+  var user = await UserModel.find({token: req.query.tokenFront})
   var birthDate = user.birthDate
   var dateToday = new Date()
   var dateCompare = dateToday - birthDate
   var conditionDate = (86400000*365)*18
-  if((dateToday - dateCompare) > conditionDate && (user.is_adult = false)) {
-    UserModel.updateOne(
-      { is_adult: false },
-      { $set: { is_adult: true },
-    })
-  }
-
-  if(user.is_adult) {
-    var userToShow = userToDisplay.filter(e => e.is_adult == true);
+  var isAdult = false
+  if((dateToday - dateCompare) > conditionDate) {
+    isAdult = true
   } else {
-    var userToShow = userToDisplay.filter(e => e.is_adult == false);
+    isAdult = false
   }
 
-  console.log('Users----->',userToShow)
+  if(isAdult) {
+    var usersToShow = await UserModel.find({token: !req.query.tokenFront, birthDate: {$gt:conditionDate} })
+  } else {
+    var usersToShow = await UserModel.find({token: !req.query.token, birthDate: {$lt:conditionDate}})
+  }
+  
 
-  res.json({user:user, userToShow:userToShow, });
+
+  res.json({usersToShow:usersToShow });
 });
 
 
@@ -263,3 +248,5 @@ router.put('/delete-convers', function(req, res, next) {
 });
 
 module.exports = router;
+
+// temp
