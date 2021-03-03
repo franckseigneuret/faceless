@@ -67,18 +67,34 @@ function quizz(props) {
   const [dateToDisplay, setDateToDisplay] = useState('JJ/MM/AAAA')
 
   const handleOnNextEmail = async () => {
-    console.log("Before Fetch");
-    var rawResponse = await fetch(`http://172.17.1.40:3000/email-check`, {
+    var rawResponse = await fetch(`http://172.20.10.8:3000/email-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}`
     });
-    console.log("Before JSON");
     var response = await rawResponse.json()
-    console.log("After JSON");
-    console.log(response)
-
+    if(response.result == true) {
+      setEmailStatut(true)
+    } else {
+      setEmailStatut(false)
+    }
   }
+
+  const handleOnNextPseudo = async () => {
+
+    var rawResponse = await fetch(`http://172.20.10.8:3000/pseudo-check`, {
+     method: 'POST',
+     headers: {'Content-Type':'application/x-www-form-urlencoded'},
+     body: `pseudoFront=${pseudo}`
+    });
+    var response = await rawResponse.json()
+    if(response.result == true) {
+      setPseudoStatut(true)
+    } else {
+      setPseudoStatut(false)
+    }
+  }
+
 
 
   const handleSelectProblem = (index) => {
@@ -86,7 +102,6 @@ function quizz(props) {
     problemCopy[index] = !problemCopy[index]
     setVisible(problemCopy)
     if (problemCopy[index] == true) {
-      console.log('condition ok')
       setProblems([...problems, problemsContent[index].name])
     };
   }
@@ -105,7 +120,8 @@ function quizz(props) {
     var year = currentDate.getFullYear().toString()
     var dateDisplay = `${day}/${month}/${year}`
     setDateToDisplay(dateDisplay)
-    setBirthDate(currentDate)  
+    setBirthDate(currentDate)
+    console.log(currentDate, '<------ date de naissance sélectionnée')  
   };
 
 
@@ -117,11 +133,42 @@ function quizz(props) {
       password: password,
       pseudo: pseudo, 
       birthDate: birthDate,
-      problems: problems
+      problems: problems,
     })
+    console.log(problems, '<------ state problems')
     userInfo = props.userDisplay
+    var rawResponse = await fetch(`http://172.20.10.8:3000/sign-up-first-step`, {
+     method: 'POST',
+     headers: {'Content-Type':'application/x-www-form-urlencoded'},
+     body: `emailFront=${email}&passwordFront=${password}&pseudoFront=${pseudo}&birthDateFront=${birthDate}&problemsFront=${JSON.stringify(problems)}`
+    });
+    var response = await rawResponse.json()
+    
+    AsyncStorage.setItem("token", response.userSaved.token)
 
-  }
+    var dateNow = new Date()
+    var conditionAge = (86400000*365)*18
+    var differenceDates = (dateNow - birthDate)
+    var isAdult;
+
+    differenceDates > conditionAge ? isAdult = true : isAdult = false // On vérifie age > 18yo, if > => isAdult = true else isAdult = false
+
+    console.log(birthDate, '<---- date de naissance')
+    console.log(problems, '<------- problemes selectionnés');
+    console.log(birthDate.getFullYear(), '');
+
+      isAdult == true ? AsyncStorage.setItem("filter", JSON.stringify({ // si isAdult == true alors on set le min age du filter à l'âge de l'user et le max age à l'age de l'user +10 ans
+        problemsTypes: problems, 
+        gender: 'all', 
+        age: {minAge: Math.floor(differenceDates/(86400000*365)), maxAge: Math.ceil(differenceDates/(86400000*365)+10)},
+        localisation: 'France'
+      })) : AsyncStorage.setItem("filter", JSON.stringify({ // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
+          problemsTypes: problems, 
+          gender: 'all', 
+          age: {minAge: Math.floor(differenceDates/(86400000*365)), maxAge: 18},
+          localisation: 'France'
+        }))
+  } 
 
   
 
@@ -164,7 +211,7 @@ function quizz(props) {
               nextBtnStyle={styles.buttonNext}
               nextBtnTextStyle={styles.buttonNextText}
               onNext={handleOnNextEmail}
-              // errors={emailStatut}
+              errors={emailStatut}
             >
               <View style={styles.stepContainer}>
                 <Text style={styles.textTitleQuizz}>Salut,</Text>
@@ -172,7 +219,7 @@ function quizz(props) {
                 <Input
                   placeholder='helicoptere530@gmail.com'
                   inputContainerStyle={styles.inputQuizz}
-                  onChangeText={email => { setEmail(email); email == '' ? setEmailStatut(true) : setEmailStatut(false) }}
+                  onChangeText={email => {setEmail(email)}}
                 />
               </View>
             </ProgressStep>
@@ -190,7 +237,7 @@ function quizz(props) {
                 <Input
                   placeholder='*****'
                   inputContainerStyle={styles.inputQuizz}
-                  onChangeText={password => { setPassword(password); password == '' ? setPasswordStatut(true) : setPasswordStatut(false) }}
+                  onChangeText={password => {setPassword(password)}}
                 />
               </View>
             </ProgressStep>
@@ -201,6 +248,7 @@ function quizz(props) {
               previousBtnTextStyle={styles.buttonPreviousText}
               previousBtnText='Revoir'
               previousBtnStyle={styles.buttonPrevious}
+              onNext={handleOnNextPseudo}
               // errors={pseudoStatut}
             >
               <View style={styles.stepContainer}>
@@ -208,7 +256,7 @@ function quizz(props) {
                 <Input
                   placeholder='ThermomixMT1820'
                   inputContainerStyle={styles.inputQuizz}
-                  onChangeText={pseudo => { setPseudo(pseudo); pseudo == '' ? setPseudoStatut(true) : setPseudoStatut(false); console.log(pseudo, '<---- pseudo state') }}
+                  onChangeText={pseudo => {setPseudo(pseudo)}}
                   value={pseudo}
                 />
               </View>

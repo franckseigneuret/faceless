@@ -16,26 +16,37 @@ router.get('/', async function(req, res, next) {
 
 
 router.post('/email-check', async function(req, res, next){
-  console.log(req.body.emailFront, '<------ req body')
-  var user = await UserModel.find()
-  console.log(user, '<-------- user found ?')
-  // var userFind = user.filter(e => e.email == req.body.emailFront)
-  // let result;
-  // let error;
-  // if(userFind != null) {
-  //   result = true;
-  //   error= 'Cet email appartient déjà à un autre compte'
-  // } else {
-  //   result = false;
-  //   error= 'Email valable pour inscription, pas trouvé en BDD'
-  // }
 
-  // console.log(user, '<------ user');
-  // console.log(result, '<------- result');
-  // console.log(error, '<------ erro sent')
+  var user = await UserModel.findOne({email: req.body.emailFront})
+  var result;
+  var error;
+  if(user) {
+    result = true;
+    error= 'Cet adresse mail est déjà associée à un compte'
+  } else {
+    result = false;
+    error = 'Aucun email semblable trouvé en BDD, next step'
+  }
 
-  res.json({result: true})
+  res.json({result, error})
 })
+
+
+router.post('/pseudo-check', async function (req, res, next){
+  var user = await UserModel.findOne({pseudo: req.body.pseudoFront})
+  var result;
+  var error;
+  if(user) {
+    result = true;
+    error = 'Ce pseudo est déjà utilisé'
+  } else {
+    result = false;
+    error = 'Ce pseudo est disponible'
+  }
+
+  res.json({result, error})
+});
+
 
 router.post('/sign-up-first-step', async function(req, res, next){
 
@@ -47,11 +58,10 @@ router.post('/sign-up-first-step', async function(req, res, next){
     password: hash,
     pseudo: req.body.pseudoFront,
     birthDate: req.body.birthDateFront,
-    problems_types: req.body.problemsFront
+    problems_types: JSON.parse(req.body.problemsFront)
   })
 
   var userSaved = await user.save()
-  console.log(userSaved, '<------ userSaved on backend')
 
   res.json({userSaved: userSaved})
 })
@@ -61,9 +71,26 @@ router.post('/sign-up-first-step', async function(req, res, next){
       REQUIRED ---> emailFront : (quentin@gmail.com), passwordFront : (XXXXXX), pseudoFront : (HelicoptèreDeCombat), birthDateFront : (12/23/1992) --> vérification majorité , problemsTypesFront : String
       OPTIONALE --> problemDescriptionFront : String, localisationFront : String, genderFront : StringFront, avatarFront : String, 
   Response : result (true), token (1234), birthDate : (12/23/1992), problems_types : String, localisation : String
-*/
-router.post('/sign-up-second-step', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+problemDescriptionFront=${props.userDisplay}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation.coordinates)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${tokenOnLocalStorage}
+  */
+router.post('/sign-up-second-step', async function(req, res, next) {
+
+  console.log(req.body.tokenFront, '----> token front')
+
+  var user = await UserModel.updateOne(
+    { token: req.body.tokenFront}, // ciblage à gauche de la virgule
+    { 
+      problem_description: req.body.problemDescriptionFront,
+      gender: req.body.genderFront,
+      localisation: JSON.parse(req.body.localisationFront),
+      avatar: req.body.avatarFront,
+     }
+);
+
+  var result;
+  user ? result = true : result = false
+  
+  res.json({result: result});
 });
 
 
