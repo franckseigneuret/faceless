@@ -213,11 +213,36 @@ router.post('/signalement-help', function(req, res, next) {
 });
 
 /* update-profil : mettre à jour les information en BDD de l'utilisateur qui modifie son profil.
-body: emailFront: hervé@gmail.com, localisationFront: Saint-Dié, genre: 'Female', passwordFront: 'camionpompier75', descriptionProblemFront: 'urticaire', problemsFront: ['Familiale', 'Physique']
+body: emailFront: hervé@gmail.com, localisationFront: Saint-Dié, genderFront: 'Female', passwordFront: 'camionpompier75', descriptionProblemFront: 'urticaire', problemsFront: ['Familiale', 'Physique']
 response: userSaved
 */
-router.put('/update-profil', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.put("/update-profil", async function (req, res, next) {
+
+  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  console.log(userBeforeUpdate, '<---- userBeforeUpdate')
+
+  // ajout du genre et descriptionProblemFront
+  var userUpdate = await UserModel.updateOne(
+    { token: req.body.tokenFront },
+    {
+      emailFront: req.body.emailFront,
+      localisationFront: req.body.localisationFront,
+      passwordFront: req.body.passwordFront,
+      genderFront: req.body.genderFront,
+      descriptionProblemFront: req.body.descriptionProblemFront
+    }
+  );
+
+
+  var userAfterUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  console.log(userAfterUpdate, '<---- userAfterUpdate')
+
+  res.json({ userFromBack: userBeforeUpdate });
+});
+
+router.post('/loadProfil', async function(req, res, next) {
+  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  res.json({ userFromBack: userBeforeUpdate });
 });
 
 /* show-profil : montrer le profil de l'utilisateur au clic sur l'icône user de la bottom tab 
