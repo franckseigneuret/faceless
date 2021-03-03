@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
-import { Animated, StyleSheet, Text, View, Dimensions, TouchableOpacity, Image } from 'react-native';
-import { ListItem, Button, Icon, Badge } from 'react-native-elements'
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Image } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold} from "@expo-google-fonts/montserrat";
 import { Ionicons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
-import ProfilScreen from './ProfilScreen';
 import { ScrollView } from 'react-native-gesture-handler';
-import CardStack, { Card } from 'react-native-card-stack-swiper';
-import { FocusScrollView } from 'react-native-focus-scroll';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
 
 function HomeScreen(props) {
 
@@ -56,67 +51,7 @@ function HomeScreen(props) {
         </TouchableOpacity>
         </View>
       </View>
-    </View>,
-    <View style={styles.cardContainer}>
-    <View style={styles.topCard}>
-      <Image source={require('../assets/women_1.png')} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F'}}/>
-      <Text style={styles.pseudo}>Gigatank3000</Text>
-      <Text style={styles.member}>Membre depuis le 12 février 2020</Text>
-      <Text style={{marginTop: 5}}><Ionicons name='location' size={15} /> Region de Lille</Text>
     </View>
-    <View style={styles.problemDesc}>
-      <Text style={styles.subtitle}>En quelques mots :</Text>
-      <Text style={{ textAlign: "left", color: "#264653", fontFamily: "Montserrat_400Regular",}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut felis venenatis arcu dapibus efficitur at sit amet ligula. Proin cursus neque pretium enim semper, vitae feugiat nisi faucibus.</Text>
-    </View>
-    <View style={styles.problemContainer}>
-      <Text style={styles.subtitle}>Type de probleme(s)</Text>
-      <View style={styles.problemBadge}>
-        <View style={styles.badge}><Text style={styles.fontBadge}>Scolaire</Text></View>
-        <View style={styles.badge}><Text style={styles.fontBadge}>Je suis super moche</Text></View>
-        <View style={styles.badge}><Text style={styles.fontBadge}>Suicide</Text></View>
-      </View>
-      <View style={{display:'flex',flexDirection:'row', justifyContent:'space-between', width:'100%', padding:20}}>
-      <TouchableOpacity 
-                    style={styles.buttonInfo}
-                  ><Text style={{fontSize:25, color:"#FFEEDD", fontFamily: 'Montserrat_700Bold',}}>i</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
-                    style={styles.buttonSend}
-                  ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
-      </TouchableOpacity>
-      </View>
-    </View>
-  </View>,
-  <View style={styles.cardContainer}>
-  <View style={styles.topCard}>
-    <Image source={require('../assets/women_1.png')} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F'}}/>
-    <Text style={styles.pseudo}>Gigatank3000</Text>
-    <Text style={styles.member}>Membre depuis le 12 février 2020</Text>
-    <Text style={{marginTop: 5}}><Ionicons name='location' size={15} /> Region de Lille</Text>
-  </View>
-  <View style={styles.problemDesc}>
-    <Text style={styles.subtitle}>En quelques mots :</Text>
-    <Text style={{ textAlign: "left", color: "#264653", fontFamily: "Montserrat_400Regular",}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut felis venenatis arcu dapibus efficitur at sit amet ligula. Proin cursus neque pretium enim semper, vitae feugiat nisi faucibus.</Text>
-  </View>
-  <View style={styles.problemContainer}>
-    <Text style={styles.subtitle}>Type de probleme(s)</Text>
-    <View style={styles.problemBadge}>
-      <View style={styles.badge}><Text style={styles.fontBadge}>Scolaire</Text></View>
-      <View style={styles.badge}><Text style={styles.fontBadge}>Je suis super moche</Text></View>
-      <View style={styles.badge}><Text style={styles.fontBadge}>Suicide</Text></View>
-    </View>
-    <View style={{display:'flex',flexDirection:'row', justifyContent:'space-between', width:'100%', padding:20}}>
-    <TouchableOpacity 
-                  style={styles.buttonInfo}
-                ><Text style={{fontSize:25, color:"#FFEEDD", fontFamily: 'Montserrat_700Bold',}}>i</Text>
-    </TouchableOpacity>
-    <TouchableOpacity 
-                  style={styles.buttonSend}
-                ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
-    </TouchableOpacity>
-    </View>
-  </View>
-</View>
 ]
 
   
@@ -130,7 +65,6 @@ function HomeScreen(props) {
   } else {
 
     return (
-     
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor:'#FFEEDD'}}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent:'space-between', marginTop: 40, marginBottom:20, width: '65%', left:40}}>
         <Text style={styles.textTitle}>
@@ -140,17 +74,12 @@ function HomeScreen(props) {
           <Ionicons name="funnel" size={25} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
         </TouchableOpacity>
         </View>
-        <FocusScrollView threshold={100} snapToInterval={windowWidth} decelerationRate='fast' horizontal >
+        <ScrollView  snapToInterval={windowWidth} decelerationRate='fast' horizontal >
           {CardToSwipe}
-        </FocusScrollView >
-
-        {/* <CardStack style={{flex:1, alignItems: 'center', justifyContent: 'center',}} ref={swiper => { this.swiper = swiper }}>
-          {CardToSwipe}
-        </CardStack> */}
+        </ScrollView >
       </View>
- 
     )};
-   }
+}
 
 export default HomeScreen;
 
@@ -175,8 +104,9 @@ const styles = StyleSheet.create({
     color: '#5571D7',
   },
   cardContainer:{
-    width: windowWidth-50,
-    margin:10,
+    width: windowWidth-40,
+    marginHorizontal:20,
+    marginVertical:10,
     backgroundColor: "#FFEEDD",
     display:'flex',
     flexDirection: 'column',
