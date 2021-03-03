@@ -78,27 +78,29 @@ response : userFiltered : array, pseudo (celui du user connecté) : String
 */
 router.get('/show-card', async function(req, res, next) {
 
-  var user = await UserModel.find({token: req.query.tokenFront})
+  var user = await UserModel.findOne({token: req.query.tokenFront})
+  var userToDisplay = await UserModel.find({token: {$ne : req.query.tokenFront}})
+
   var birthDate = user.birthDate
   var dateToday = new Date()
   var dateCompare = dateToday - birthDate
   var conditionDate = (86400000*365)*18
-  var isAdult = false
-  if((dateToday - dateCompare) > conditionDate) {
-    isAdult = true
-  } else {
-    isAdult = false
+  if((dateToday - dateCompare) > conditionDate && (user.is_adult = false)) {
+    UserModel.updateOne(
+      { is_adult: false },
+      { $set: { is_adult: true },
+    })
   }
 
-  if(isAdult) {
-    var usersToShow = await UserModel.find({token: !req.query.tokenFront, birthDate: {$gt:conditionDate} })
+  if(user.is_adult) {
+    var userToShow = userToDisplay.filter(e => e.is_adult == true);
   } else {
-    var usersToShow = await UserModel.find({token: !req.query.token, birthDate: {$lt:conditionDate}})
+    var userToShow = userToDisplay.filter(e => e.is_adult == false);
   }
-  
 
+  console.log('Users----->',userToShow)
 
-  res.json({usersToShow:usersToShow });
+  res.json({user:user, userToShow:userToShow, });
 });
 
 
