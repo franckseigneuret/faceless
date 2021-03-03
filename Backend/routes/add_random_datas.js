@@ -1,8 +1,52 @@
 var express = require('express');
 var router = express.Router();
 
-
 var userModel = require('../models/user')
+var msgModel = require('../models/messages')
+
+router.get('/random-msg', async function (req, res, next) {
+
+  var users = await userModel.find()
+
+  var one = users.splice(Math.floor(Math.random() * users.length), 1)
+  var two = users.splice(Math.floor(Math.random() * users.length), 1)
+  // console.log(one[0]._id)
+  // console.log(two)
+
+  for (let i = 0; i < 10; i++) {
+
+
+    let who1 = Math.random() > .5 ? one : two
+    let who2 = who1 === one ? two : one
+
+    var newMsg = new msgModel({
+      from_id: who1[0]._id,
+      to_id: who2[0]._id,
+      content: 'lorem ' + Math.random(),
+      read_user_id1: false,
+      read_user_id2: false,
+      date: new Date(),
+      delete_user_id1: false,
+      delete_user_id2: false,
+    })
+    let msg = await newMsg.save()
+    console.log('msg = ', msg)
+
+    let majUser1 = userModel.updateOne(
+      {
+        id: msg.from_id,
+      },
+      {
+        with_id: msg.to_id,
+        archived: false,
+        delete: false,
+        demande: false,
+      })
+  }
+
+
+  res.render('index', { title: 'Save messages between 2 users' });
+})
 router.get('/random-users', async function (req, res, next) {
 
   var users = ["Tony", "Matteo", "Maud", "Ines", "Jeremy", "Antoine", "Emeline", "Zoe", "Alan", "Alexis", "Maelle", "Lena",
@@ -26,7 +70,7 @@ router.get('/random-users', async function (req, res, next) {
     randomBirthday = date[Math.floor(Math.random() * Math.floor(users.length))]
     randomDesc = desc[Math.floor(Math.random() * Math.floor(users.length))]
 
-    var doesUserNameExist = await userModel.find({ pseudo: randomUsers })
+    var doesUserNameExist = await userModel.findOne({ pseudo: randomUsers })
 
     if (doesUserNameExist.length === 0) {
 
@@ -50,10 +94,8 @@ router.get('/random-users', async function (req, res, next) {
       let s = await newUser.save();
       console.log('s = ', s)
     }
-
-
   }
-  res.render('index', { title: 'Save' });
+  res.render('index', { title: 'Save users' });
 });
 
 module.exports = router;

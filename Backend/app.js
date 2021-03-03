@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/random', addRandomDatasRouter); // ajout users sur http://172.17.1.161:3000/random/random-users
+app.use('/random', addRandomDatasRouter); // ajout users sur http://172.17.1.161:3000/random/random-users (changer votre IP)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
