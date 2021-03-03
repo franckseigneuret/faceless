@@ -1,52 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-var userModel = require('../models/user')
-var msgModel = require('../models/messages')
+var UserModel = require('../models/users')
+var MessagesModel = require('../models/messages')
+var ConversationsModel = require('../models/conversations')
 
-router.get('/random-msg', async function (req, res, next) {
-
-  var users = await userModel.find()
-
-  var one = users.splice(Math.floor(Math.random() * users.length), 1)
-  var two = users.splice(Math.floor(Math.random() * users.length), 1)
-  // console.log(one[0]._id)
-  // console.log(two)
-
-  for (let i = 0; i < 10; i++) {
-
-
-    let who1 = Math.random() > .5 ? one : two
-    let who2 = who1 === one ? two : one
-
-    var newMsg = new msgModel({
-      from_id: who1[0]._id,
-      to_id: who2[0]._id,
-      content: 'lorem ' + Math.random(),
-      read_user_id1: false,
-      read_user_id2: false,
-      date: new Date(),
-      delete_user_id1: false,
-      delete_user_id2: false,
-    })
-    let msg = await newMsg.save()
-    console.log('msg = ', msg)
-
-    let majUser1 = userModel.updateOne(
-      {
-        id: msg.from_id,
-      },
-      {
-        with_id: msg.to_id,
-        archived: false,
-        delete: false,
-        demande: false,
-      })
-  }
-
-
-  res.render('index', { title: 'Save messages between 2 users' });
-})
 router.get('/random-users', async function (req, res, next) {
 
   var users = ["Tony", "Matteo", "Maud", "Ines", "Jeremy", "Antoine", "Emeline", "Zoe", "Alan", "Alexis", "Maelle", "Lena",
@@ -70,11 +28,11 @@ router.get('/random-users', async function (req, res, next) {
     randomBirthday = date[Math.floor(Math.random() * Math.floor(users.length))]
     randomDesc = desc[Math.floor(Math.random() * Math.floor(users.length))]
 
-    var doesUserNameExist = await userModel.findOne({ pseudo: randomUsers })
+    var doesUserNameExist = await UserModel.findOne({ pseudo: randomUsers })
 
     if (doesUserNameExist.length === 0) {
 
-      var newUser = new userModel({
+      var newUser = new UserModel({
         email: randomUsers + '@gmail.com',
         password: 'azerty',
         pseudo: randomUsers,
@@ -84,11 +42,10 @@ router.get('/random-users', async function (req, res, next) {
         problem_description: randomDesc,
         localisation: randomUsers,
         gender: Math.random() > .5 ? 'male' : 'femelle',
-        avatar: 'avatar',
+        avatar: 'women' + Math.ceil(Math.random() * 8) + '.png',
         statut: 'statut',
         blocked_user_id: 'blocked_user_id',
         blocked_by_id: 'blocked_by_id',
-        // conversations: 'conversations',
       });
 
       let s = await newUser.save();
@@ -97,5 +54,72 @@ router.get('/random-users', async function (req, res, next) {
   }
   res.render('index', { title: 'Save users' });
 });
+
+
+router.get('/random-conversations', async function (req, res, next) {
+
+  var users = await UserModel.find()
+
+  var one = users.splice(Math.floor(Math.random() * users.length), 1)
+  var two = users.splice(Math.floor(Math.random() * users.length), 1)
+
+  var conv = await new ConversationsModel({
+    participants: [one[0]._id, two[0]._id]
+  })
+
+  let convSave = await conv.save()
+  console.log('convSave = ', convSave)
+
+  res.render('index', { title: 'Save conversations' });
+})
+
+router.get('/random-msg', async function (req, res, next) {
+
+  var conv = await ConversationsModel.find()
+
+  var oneConv = conv.splice(Math.floor(Math.random() * conv.length), 1)[0]
+
+  // console.log(one[0]._id)
+  console.log(oneConv)
+
+  var msgRandom = [
+    'pellentesque tempus. Sed id ipsum',
+    'ultrices ex. Proin convallis dui ',
+    'dapibus purus sit amet, mollis',
+    'Quisque cursus quam venenatis finibus ali',
+    'ultricies lacus quis lacus feugiat t',
+    's efficitur sem sit amet',
+    'Sed in bibendum enim',
+    'Phasellus leo diam,',
+    'enim metus. Quisque',
+    'nas ultricies lacus quis lacus',
+  ]
+
+  for (let i = 0; i < 10; i++) {
+
+
+    let who1 = Math.random() > .5 ? oneConv.participants[0] : oneConv.participants[1]
+    let who2 = who1 === oneConv.participants[0] ? oneConv.participants[1] : oneConv.participants[0]
+
+    var newMsg = new MessagesModel({
+      conversation_id: oneConv._id,
+      from_id: who1,
+      to_id: who2,
+      content: msgRandom[Math.floor(Math.random() * msgRandom.length)],
+      read_user_id1: false,
+      read_user_id2: false,
+      date: new Date(),
+      delete_user_id1: false,
+      delete_user_id2: false,
+    })
+    let msg = await newMsg.save()
+    console.log('msg = ', msg)
+
+  }
+
+
+  res.render('index', { title: 'Save messages between 2 users' });
+})
+
 
 module.exports = router;
