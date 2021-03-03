@@ -1,11 +1,14 @@
 var express = require('express');
 var router = express.Router();
-const UserModel = require('../models/user');
+const UserModel = require('../models/users');
+const MessagesModel = require('../models/messages')
+const ConversationsModel = require('../models/conversations')
 
 var bcrypt = require('bcrypt');
 var uid2 = require('uid2');
 
 const cost = 10;
+
 
 
 
@@ -115,11 +118,31 @@ router.get('/show-card', async function(req, res, next) {
 });
 
 
-/* show-msg -> afficher les différentes conversations avec les users.
-query : tokenFront: 1234
-response : [{pseudo (sender) : String, date (dernier message) : date, avatar (sender) : String, last_message : String, demande : boolean, is_read (nombre de messages non-lus) : Number, delete : boolean, conversation_id : 1234}]
-*/
-router.get('/show-msg', function(req, res, next) {
+/**
+ * show-msg -> afficher les différentes conversations avec les users.
+ * query : tokenFront: 1234
+ * response : [{pseudo (sender) : String, date (dernier message) : date, avatar (sender) : String, last_message : String, demande : boolean, is_read (nombre de messages non-lus) : Number, delete : boolean, conversation_id : 1234}] 
+ **/
+router.get('/show-msg', async function(req, res, next) {
+  
+  var allMyConversations = await ConversationsModel.find(
+    {participants: { $in: ["603f618c78727809c7e1ad9b"]}}
+  );
+
+  // console.log(allMyConversations)
+
+  //construit un tableau listant les 5 derniers messages par user
+  let messagesPerPerson = []
+
+  await Promise.all(allMyConversations.map( async (element, index) => {
+    var allMsg = await MessagesModel.find(
+      {conversation_id: element._id}
+    ).limit(5)
+    messagesPerPerson.push(allMsg)
+  }))
+
+  // console.log("messagesPerPerson",messagesPerPerson)
+
   res.render('index', { title: 'Express' });
 });
 
