@@ -8,9 +8,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
-
 import {
   useFonts,
   Montserrat_700Bold,
@@ -69,6 +66,21 @@ function quizz(props) {
   const [showDate, setShowDate] = useState(false);
   const [dateToDisplay, setDateToDisplay] = useState('JJ/MM/AAAA')
 
+  const handleOnNextEmail = async () => {
+    console.log("Before Fetch");
+    var rawResponse = await fetch(`http://172.17.1.40:3000/email-check`, {
+     method: 'POST',
+     headers: {'Content-Type':'application/x-www-form-urlencoded'},
+     body: `emailFront=${email}`
+    });
+    console.log("Before JSON");
+    var response = await rawResponse.json()
+    console.log("After JSON");
+    console.log(response)
+
+  }
+
+
   const handleSelectProblem = (index) => {
     const problemCopy = [...visible]
     problemCopy[index] = !problemCopy[index]
@@ -99,7 +111,7 @@ function quizz(props) {
 
 
   const handleSubmit = async () => {
-    props.navigation.navigate('BottomNavigator')
+    props.navigation.navigate('OptionalQuizz')
     props.onAddUserInfo({
       email: email,
       password: password,
@@ -108,6 +120,7 @@ function quizz(props) {
       problems: problems
     })
     userInfo = props.userDisplay
+
   }
 
   
@@ -150,6 +163,7 @@ function quizz(props) {
             <ProgressStep nextBtnText='valider'
               nextBtnStyle={styles.buttonNext}
               nextBtnTextStyle={styles.buttonNextText}
+              onNext={handleOnNextEmail}
               // errors={emailStatut}
             >
               <View style={styles.stepContainer}>

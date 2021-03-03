@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button } from 'react-native-elements';
 import { StyleSheet, View } from 'react-native';
+import {connect} from 'react-redux';
+
 
 import {
     useFonts,
@@ -9,10 +11,11 @@ import {
     Montserrat_800ExtraBold,
   } from "@expo-google-fonts/montserrat";
 
-export default function BlueButton(props) {
+function BlueButton(props) {
 
   var handleClick = () => {
       props.handleClickParent();
+      props.onIncrease();
   }
 
     let [fontsLoaded] = useFonts({
@@ -35,6 +38,19 @@ export default function BlueButton(props) {
         </View>
     );
 };
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onIncrease: function () {
+      dispatch({ type: 'INCREASE_COUNT'})
+    }
+  }
+}
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(BlueButton);
 
 const styles = StyleSheet.create({
   buttonValider: {

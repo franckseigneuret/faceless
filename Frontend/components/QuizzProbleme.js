@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import {connect} from 'react-redux';
+
 
 import QuizzTitre from "./QuizzTitre"
 import BlueButton from './BlueButton';
@@ -11,14 +13,12 @@ import {
     Montserrat_800ExtraBold,
   } from "@expo-google-fonts/montserrat";
 
-export default function QuizzProbleme(props) {
+function QuizzProbleme(props) {
 
   const [problem, setProblem] = useState("")
 
-  // console.log("problem", problem)
-
   var handleClick = () => {
-    props.handleClickParent("problem", problem);
+    props.onAddUserProblem(problem)
   }
 
   var getInputValue = (value) => {
@@ -38,6 +38,19 @@ export default function QuizzProbleme(props) {
         </View>
     );
 };
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onAddUserProblem: function (arg) {
+      dispatch({ type: 'ADD_PROBLEM', problem: arg })
+    }
+  }
+}
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(QuizzProbleme);
 
 const styles = StyleSheet.create({
   container: {

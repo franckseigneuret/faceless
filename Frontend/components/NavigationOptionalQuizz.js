@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Input, Button } from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
-import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import { Ionicons } from '@expo/vector-icons'; 
 
 import {connect} from 'react-redux';
@@ -58,9 +57,6 @@ function NavigationOptionalQuizz(props) {
         </View>
     );
 };
-function mapStateToProps(state) {
-  return { count: state.count }
- }
  
 function mapDispatchToProps(dispatch) {
   return {
@@ -74,7 +70,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(NavigationOptionalQuizz);
 
