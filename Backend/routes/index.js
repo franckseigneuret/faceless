@@ -118,27 +118,29 @@ response : userFiltered : array, pseudo (celui du user connecté) : String
 */
 router.get('/show-card', async function(req, res, next) {
 
-  var user = await UserModel.find({token: req.query.tokenFront})
+  var user = await UserModel.findOne({token: req.query.tokenFront})
+  var userToDisplay = await UserModel.find({token: {$ne : req.query.tokenFront}})
+
   var birthDate = user.birthDate
   var dateToday = new Date()
   var dateCompare = dateToday - birthDate
   var conditionDate = (86400000*365)*18
-  var isAdult = false
-  if((dateToday - dateCompare) > conditionDate) {
-    isAdult = true
-  } else {
-    isAdult = false
+  if((dateToday - dateCompare) > conditionDate && (user.is_adult = false)) {
+    UserModel.updateOne(
+      { is_adult: false },
+      { $set: { is_adult: true },
+    })
   }
 
-  if(isAdult) {
-    var usersToShow = await UserModel.find({token: !req.query.tokenFront, birthDate: {$gt:conditionDate} })
+  if(user.is_adult) {
+    var userToShow = userToDisplay.filter(e => e.is_adult == true);
   } else {
-    var usersToShow = await UserModel.find({token: !req.query.token, birthDate: {$lt:conditionDate}})
+    var userToShow = userToDisplay.filter(e => e.is_adult == false);
   }
-  
 
+  console.log('Users----->',userToShow)
 
-  res.json({usersToShow:usersToShow });
+  res.json({user:user, userToShow:userToShow, });
 });
 
 
@@ -240,11 +242,36 @@ router.post('/signalement-help', function(req, res, next) {
 });
 
 /* update-profil : mettre à jour les information en BDD de l'utilisateur qui modifie son profil.
-body: emailFront: hervé@gmail.com, localisationFront: Saint-Dié, genre: 'Female', passwordFront: 'camionpompier75', descriptionProblemFront: 'urticaire', problemsFront: ['Familiale', 'Physique']
+body: emailFront: hervé@gmail.com, localisationFront: Saint-Dié, genderFront: 'Female', passwordFront: 'camionpompier75', descriptionProblemFront: 'urticaire', problemsFront: ['Familiale', 'Physique']
 response: userSaved
 */
-router.put('/update-profil', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.put("/update-profil", async function (req, res, next) {
+
+  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  console.log(userBeforeUpdate, '<---- userBeforeUpdate')
+
+  // ajout du genre et descriptionProblemFront
+  var userUpdate = await UserModel.updateOne(
+    { token: req.body.tokenFront },
+    {
+      emailFront: req.body.emailFront,
+      localisationFront: req.body.localisationFront,
+      passwordFront: req.body.passwordFront,
+      genderFront: req.body.genderFront,
+      descriptionProblemFront: req.body.descriptionProblemFront
+    }
+  );
+
+
+  var userAfterUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  console.log(userAfterUpdate, '<---- userAfterUpdate')
+
+  res.json({ userFromBack: userBeforeUpdate });
+});
+
+router.post('/loadProfil', async function(req, res, next) {
+  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  res.json({ userFromBack: userBeforeUpdate });
 });
 
 /* show-profil : montrer le profil de l'utilisateur au clic sur l'icône user de la bottom tab 

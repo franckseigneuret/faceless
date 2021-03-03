@@ -1,11 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Image, Text, Switch, 
-  TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, 
-  TouchableWithoutFeedback, Keyboard } from "react-native";
-import { Button, Overlay } from 'react-native-elements';
-import AppLoading from 'expo-app-loading';
+import {
+  StyleSheet,
+  View,
+  Image,
+  Text,
+  Switch,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ScrollView,
+  Dimensions,
+} from "react-native";
+import { Button, Overlay } from "react-native-elements";
+import AppLoading from "expo-app-loading";
 
-import { Ionicons } from '@expo/vector-icons'; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { Ionicons } from "@expo/vector-icons";
 
 import {
   useFonts,
@@ -15,8 +29,10 @@ import {
   Montserrat_800ExtraBold,
 } from "@expo-google-fonts/montserrat";
 
-export default function ProfilScreen() {
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
 
+export default function ProfilScreen() {
   let [fontsLoaded] = useFonts({
     Montserrat_400Regular,
     Montserrat_700Bold,
@@ -24,106 +40,195 @@ export default function ProfilScreen() {
     Montserrat_800ExtraBold,
   });
 
+  // Switch du bottom
+  const toggleSwitchDelete = () =>
+    setIsEnabledDelete((previousState) => !previousState);
+  const toggleSwitchDesactivate = () =>
+    setIsEnabledDesactivate((previousState) => !previousState);
 
-  
-
-  // Switch du bottom 
-  const toggleSwitchDelete = () => setIsEnabledDelete(previousState => !previousState);
-  const toggleSwitchDesactivate = () => setIsEnabledDesactivate(previousState => !previousState);
-
-  // Overlay 
+  // Overlay
   const [visible, setVisible] = useState(false);
 
   const toggleOverlayDescription = () => {
     setVisible(!visible);
   };
 
+  // State user from token
+  //{pseudo, mail, ville , mdp , gender, pblDescription, prblType}
+  const [pseudo, setPseudo] = useState("");
+  const [email, setEmail] = useState("");
+  const [localisation, setLocalisation] = useState("");
+  const [password, setPassword] = useState("");
+  const [genderFromToken, setGenderFromToken] = useState("");
+  const [problemDescription, setProblemDescription] = useState("");
+  const [problemType, setProblemType] = useState("");
+
   // State pour les modifs de profils
   const [isEnabledDelete, setIsEnabledDelete] = useState(false);
   const [isEnabledDesactivate, setIsEnabledDesactivate] = useState(false);
 
   const [emailVisible, setEmailVisible] = useState(false);
-  const [emailText, setEmailText] = useState('');
+  const [emailText, setEmailText] = useState("");
 
   const [cityVisible, setCityVisible] = useState(false);
-  const [cityText, setCityText] = useState('');
+  const [cityText, setCityText] = useState("");
 
   const [mdpVisible, setMdpVisible] = useState(false);
-  const [mdpText, setMdpText] = useState('');
+  const [mdpText, setMdpText] = useState("");
+
+  const [descriptionText, setDescriptionText] = useState("");
 
   // Changement de la couleur button enregistrer bottom
-  const [saveButton, setSaveButton] = useState(false)
+  const [saveButton, setSaveButton] = useState(false);
+
+  const [gender, setGender] = useState("");
+  const [isSelected, setIsSelected] = useState(-1);
 
   const handlePressEmail = () => {
-    setEmailVisible(!emailVisible)
-    setSaveButton(true)
-  }
+    setEmailVisible(!emailVisible);
+    setSaveButton(true);
+  };
 
   const handlePressCity = () => {
-    setCityVisible(!cityVisible)
-    setSaveButton(true)
-  }
+    setCityVisible(!cityVisible);
+    setSaveButton(true);
+  };
 
   const handlePressMdp = () => {
-    setMdpVisible(!mdpVisible)
-    setSaveButton(true)
-  }
+    setMdpVisible(!mdpVisible);
+    setSaveButton(true);
+  };
 
   const handleSaveDescription = () => {
-    setSaveButton(true)
-  }
+    setVisible(!visible);
+  };
 
   const handleSaveChange = () => {
+    // AsyncStorage.getItem("tokenFromStorage", function(error, data) {
+    //   console.log(data);
+    // });
+    console.log(emailText, "<--- email changé");
+    async function updateUser() {
+      await fetch("http://172.17.1.196:3000/update-profil", {
+        method: "PUT",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `tokenFront=123456789&emailFront=${emailText}&localisationFront=${cityText}&passwordFront=${mdpText}&genderFront=${gender}descriptionProblemFront=`,
+      });
+    }
+    updateUser();
+  };
 
-  }
+  const handleDisconnect = () => {};
 
-  const handleDisconnect = () => {
-    
-  }
+  useEffect(() => {
+    console.log("app load");
 
+    async function loadDATA() {
+      var rawResponse = await fetch("http://172.17.1.196:3000/loadProfil", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "tokenFront=z9iNwb7cTgGOhUrrvndz9rOHJCkxGAqo",
+      });
+      var response = await rawResponse.json();
+      console.log(response.userFromBack, "response ");
 
-  var emailToChange;
-  var cityToChange;
-  var mdpToChange;
-  
-  if(!emailVisible){
-    emailToChange = <View style={styles.viewContent}>
-                        <Text style={styles.subtitle}>nicole.kidman@poildecarotte.com</Text>
-                        <TouchableOpacity onPress={handlePressEmail}>
-                          <Ionicons name="pencil" size={18} color="#5571D7" />
-                        </TouchableOpacity>
-                    </View>
-  } else {
-    emailToChange = <View style={styles.viewContent}>
-                        <TextInput style={styles.subtitleChanged} placeholder="Tu peux changer ton email  " onChangeText={emailText => setEmailText(emailText)} defaultValue={emailText} />
-                    </View>
-  }
+      var pseudo = response.userFromBack.pseudo;
+      setPseudo(pseudo);
 
-  if(!cityVisible){
-    cityToChange = <View style={styles.viewContent}>
-                      <Text style={styles.subtitle}>Paris </Text>
-                      <TouchableOpacity onPress={handlePressCity}>
-                        <Ionicons name="pencil" size={18} color="#5571D7" />
-                      </TouchableOpacity>
-                  </View>
-  } else {
-    cityToChange = <View style={styles.viewContent}>
-                      <TextInput style={styles.subtitleChanged} placeholder="Tu peux changer ta ville  " onChangeText={cityText => setCityText(cityText)} defaultValue={cityText} />
-                    </View>
-  }
+      var email = response.userFromBack.email;
+      setEmail(email);
 
-  if(!mdpVisible){
-    mdpToChange = <View style={styles.viewContent}>
-                      <Text style={styles.subtitle}>Mot de passe : ******* </Text>
-                      <TouchableOpacity onPress={handlePressMdp}>
-                        <Ionicons name="pencil" size={18} color="#5571D7" />
-                      </TouchableOpacity>
-                  </View>
-  } else {
-    mdpToChange = <View style={styles.viewContent}>
-                    <TextInput secureTextEntry={true} style={styles.subtitleChanged} placeholder="Ton nouveau mot de passe" onChangeText={mdpText => setMdpText(mdpText)} defaultValue={mdpText} />
-                  </View>
-  }
+      var localisation = response.userFromBack.localisation;
+      setLocalisation(localisation);
+
+      var password = response.userFromBack.password;
+      setPassword(password);
+
+      var gender = response.userFromBack.gender;
+      setGenderFromToken(gender);
+
+      var problemDescription = response.userFromBack.problem_description;
+      setProblemDescription(problemDescription);
+
+      var problemType = response.userFromBack.problems_types;
+      setProblemType(problemType);
+    }
+    loadDATA();
+
+    // recuperer les infos du user grace au fetch
+    // creer des variables {pseudo, mail, ville , mdp , gender, pblDescription, prblType}
+    // set states de ces infos
+    //
+  }, []);
+
+  var updateGender = (index) => {
+    if (index === 0) {
+      setGender("other");
+    } else if (index === 1) {
+      setGender("male");
+    } else if (index === 2) {
+      setGender("female");
+    }
+  };
+  console.log(gender);
+
+  var images = [
+    {
+      unSelected: (
+        <Image
+          source={require("../assets/gender_1.png")}
+          style={styles.sizeImg}
+        />
+      ),
+      selected: (
+        <Image
+          source={require("../assets/gender_1_selected.png")}
+          style={styles.sizeImg}
+        />
+      ),
+    },
+    {
+      unSelected: (
+        <Image
+          source={require("../assets/gender_male.png")}
+          style={styles.sizeImg}
+        />
+      ),
+      selected: (
+        <Image
+          source={require("../assets/gender_male_selected.png")}
+          style={styles.sizeImg}
+        />
+      ),
+    },
+    {
+      unSelected: (
+        <Image
+          source={require("../assets/gender_female.png")}
+          style={styles.sizeImg}
+        />
+      ),
+      selected: (
+        <Image
+          source={require("../assets/gender_female_selected.png")}
+          style={styles.sizeImg}
+        />
+      ),
+    },
+  ];
+
+  var image = images.map((img, key) => {
+    return (
+      <TouchableOpacity
+        key={key}
+        onPress={() => {
+          setIsSelected(key), updateGender(key);
+        }}
+      >
+        {isSelected === key ? img.selected : img.unSelected}
+      </TouchableOpacity>
+    );
+  });
 
   if (!fontsLoaded) {
     return <AppLoading />;
@@ -131,95 +236,195 @@ export default function ProfilScreen() {
 
   return (
     <View style={styles.container}>
-      
       {/* UPPER SECTION  ---> Info */}
 
       <View>
         <Text style={styles.titleHome}>Mon Profil</Text>
       </View>
 
-      <View style={{marginTop: 15}} >
-        <Image source={require('../assets/women_2.png')}/>
+      <View style={{ marginTop: 15 }}>
+        <Image source={require("../assets/women_2.png")} />
       </View>
 
       <View style={styles.viewHead}>
-        <Text style={styles.pseudo}>GigaTank3000 <Ionicons name="lock-closed" size={18} color="#5571D7" /></Text>
+        <Text style={styles.pseudo}>
+          {pseudo}
+          <Ionicons name="lock-closed" size={18} color="#5571D7" />
+        </Text>
       </View>
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.viewContent}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.viewContent}
+      >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          {emailToChange}
+          <View style={styles.viewContent}>
+            {!emailVisible ? (
+              <>
+                <Text style={styles.subtitle}>{email}</Text>
+                <TouchableOpacity onPress={handlePressEmail}>
+                  <Ionicons name="pencil" size={18} color="#5571D7" />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <TextInput
+                  style={styles.subtitleChanged}
+                  placeholder={emailText}
+                  onChangeText={(value) => {
+                    setEmailText(value);
+                  }}
+                  defaultValue={emailText}
+                />
+              </>
+            )}
+          </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.viewContent}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.viewContent}
+      >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          {cityToChange}
+          <View style={styles.viewContent}>
+            {!cityVisible ? (
+              <>
+                <Text style={styles.subtitle}>{localisation} </Text>
+                <TouchableOpacity onPress={handlePressCity}>
+                  <Ionicons name="pencil" size={18} color="#5571D7" />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <TextInput
+                  style={styles.subtitleChanged}
+                  placeholder="Tu peux changer ta ville  "
+                  onChangeText={(value) => setCityText(value)}
+                  defaultValue={cityText}
+                />
+              </>
+            )}
+          </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.viewContent}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.viewContent}
+      >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          {mdpToChange}
+          <View style={styles.viewContent}>
+            {!mdpVisible ? (
+              <>
+                <Text style={styles.subtitle}>Mot de passe : {password} </Text>
+                <TouchableOpacity onPress={handlePressMdp}>
+                  <Ionicons name="pencil" size={18} color="#5571D7" />
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <TextInput
+                  secureTextEntry={true}
+                  style={styles.subtitleChanged}
+                  placeholder="Ton nouveau mot de passe"
+                  onChangeText={(value) => setMdpText(value)}
+                  defaultValue={mdpText}
+                />
+              </>
+            )}
+          </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
 
-      <View style={styles.viewHead}>
-        <Text style={styles.subtitle}>Sexe </Text>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+        }}
+      >
+        {image}
       </View>
 
       {/* BELOW SECTION  ---> Description & type of problem */}
 
       <View style={styles.viewTitleOrange}>
-        <Text style={styles.title}>En quelques mots: 
+        <Text style={styles.title}>
+          En quelques mots:
           <TouchableOpacity onPress={toggleOverlayDescription}>
             <Ionicons name="pencil" size={18} color="#5571D7" />
           </TouchableOpacity>
         </Text>
       </View>
 
-      <Overlay isVisible={visible} onBackdropPress={toggleOverlayDescription} backdropStyle={{opacity: 0.8, backgroundColor: '#FFF1E2'}} overlayStyle={styles.overlay}>
+      <ScrollView>
+        <View style={{ width: "88%" }}>
+          <Text style={styles.text}>{problemDescription}</Text>
+        </View>
+      </ScrollView>
+
+      <Overlay
+        isVisible={visible}
+        onBackdropPress={toggleOverlayDescription}
+        backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
+        overlayStyle={styles.overlay}
+      >
         <Text style={styles.title}>En quelques mots:</Text>
-        <TextInput style={{backgroundColor: "white", borderRadius: 25, width: "100%"}}> </TextInput>
-        <Button 
-                    title='enregistrer'
-                    type="solid"
-                    buttonStyle={styles.buttonValider}
-                    titleStyle={{
-                    fontFamily: 'Montserrat_700Bold'
-                    }}
-                    onPress={() => handleSaveDescription()}
-            /> 
+        <TextInput
+          onChangeText={(value) => {
+            setDescriptionText(value);
+          }}
+          style={{
+            backgroundColor: "white",
+            borderRadius: 25,
+            width: "100%",
+            paddingVertical: 40,
+            marginVertical: 15,
+          }}
+        ></TextInput>
+        <Button
+          title="enregistrer"
+          type="solid"
+          buttonStyle={styles.buttonValider}
+          titleStyle={{
+            fontFamily: "Montserrat_700Bold",
+          }}
+          onPress={() => handleSaveDescription()}
+        />
       </Overlay>
 
-      <View style={{ width: "88%"}}>
-        <Text style={styles.text}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ut felis venenatis arcu dapibus efficitur at sit amet ligula. Proin cursus neque pretium enim semper, vitae feugiat nisi faucibus. </Text>
-      </View>
-
+      <ScrollView>
+        <View style={{ width: "88%" }}>
+          <Text style={styles.text}>{descriptionText}</Text>
+        </View>
+      </ScrollView>
       <View style={styles.viewTitleOrange}>
         <Text style={styles.title}>Type de problème(s): </Text>
       </View>
 
       <View style={styles.viewSaveDisconnect}>
-        <Button 
-                    title='enregistrer'
-                    type="solid"
-                    buttonStyle={saveButton? styles.buttonValider : styles.buttonValiderBIS}
-                    titleStyle={{
-                    fontFamily: 'Montserrat_700Bold'
-                    }}
-                    onPress={() => handleSaveChange()}
-            /> 
-        
-        <Button 
-                    title='déconnexion'
-                    type="solid"
-                    buttonStyle={styles.buttonDisconnect}
-                    titleStyle={{
-                    fontFamily: 'Montserrat_700Bold'
-                    }}
-                    onPress={() => handleDisconnect()}
-            />
+        <Button
+          title="enregistrer"
+          type="solid"
+          buttonStyle={
+            saveButton ? styles.buttonValider : styles.buttonValiderBIS
+          }
+          titleStyle={{
+            fontFamily: "Montserrat_700Bold",
+          }}
+          onPress={handleSaveChange}
+        />
+
+        <Button
+          title="déconnexion"
+          type="solid"
+          buttonStyle={styles.buttonDisconnect}
+          titleStyle={{
+            fontFamily: "Montserrat_700Bold",
+          }}
+          onPress={() => handleDisconnect()}
+        />
       </View>
 
       <View style={styles.viewDeleteDisable}>
@@ -250,55 +455,58 @@ export default function ProfilScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex : {
-    flex: 1
+  flex: {
+    flex: 1,
   },
   container: {
     flex: 1,
     backgroundColor: "#FFF1E2",
     alignItems: "center",
+    height: windowHeight,
+    flexDirection: "column",
   },
   viewHead: {
-    display: "flex", 
-    flexDirection: "row", 
+    display: "flex",
+    flexDirection: "row",
     alignItems: "center",
-    width: "100%", 
+    width: "100%",
     justifyContent: "center",
-    marginTop: 10, 
+    marginTop: 10,
   },
   viewContent: {
-    display: "flex", 
-    flexDirection: "row", 
-    alignItems: "center", 
-    width: "100%", 
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
     justifyContent: "center",
-    marginTop: 3, 
+    marginTop: 3,
   },
   viewTitleOrange: {
-    alignItems: "flex-start", 
-    width: "88%", 
-    marginTop: 15, 
+    alignItems: "flex-start",
+    width: "88%",
+    marginTop: 15,
     marginBottom: 10,
   },
   viewSaveDisconnect: {
-    flexDirection: "row", 
-    width: "100%", 
-    justifyContent: "space-around",  
-    marginTop: 15, 
-    marginBottom: 5
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-around",
+    alignItems: "flex-end",
+    marginTop: 15,
+    marginBottom: 5,
   },
   viewDeleteDisable: {
-    flexDirection: "row", 
-    width: "100%", 
-    justifyContent: "space-around",  
-    marginTop: 15, 
-    marginBottom: 5
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-around",
+    marginTop: 15,
+    marginBottom: 5,
   },
   viewToggle: {
-    flexDirection: "row", 
-    width: "100%", 
-    justifyContent: "space-around",  
-    marginTop: 15, 
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-around",
+    marginTop: 15,
     marginBottom: 5,
   },
   titleHome: {
@@ -317,13 +525,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#303030",
     fontFamily: "Montserrat_800ExtraBold",
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   subtitleChanged: {
     textAlign: "center",
     color: "#BCC8F0",
     fontFamily: "Montserrat_800ExtraBold",
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   title: {
     color: "#EC9A1F",
@@ -342,26 +550,32 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat_800ExtraBold",
     fontSize: 10,
   },
+  sizeImg: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
+    marginTop: 5,
+  },
   buttonValider: {
-    backgroundColor: '#5571D7',
+    backgroundColor: "#5571D7",
     borderRadius: 86,
     width: 159,
     paddingHorizontal: 10,
-    paddingVertical: 3
+    paddingVertical: 3,
   },
   buttonValiderBIS: {
-    backgroundColor: '#BCC8F0',
+    backgroundColor: "#BCC8F0",
     borderRadius: 86,
     width: 159,
     paddingHorizontal: 10,
-    paddingVertical: 3
+    paddingVertical: 3,
   },
   buttonDisconnect: {
-    backgroundColor: '#D75555',
+    backgroundColor: "#D75555",
     borderRadius: 86,
     width: 159,
     paddingHorizontal: 10,
-    paddingVertical: 3
+    paddingVertical: 3,
   },
   input: {
     height: 40,
@@ -374,6 +588,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     alignItems: "center",
     width: "80%",
-    borderColor: "#2d3436"
-  }
+    borderColor: "#2d3436",
+  },
 });
