@@ -7,6 +7,7 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function MessageScreen(props) {
+  
   return (
 
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white' }}>
