@@ -15,30 +15,30 @@ function ConversationScreen(props) {
     const [currentMsg, setCurrentMsg] = useState("")
     const [myContactId, setMyContactId] = useState("")
     const [pseudo, setPseudo] = useState("")
-    const [avatar, setAvatar] = useState("")
+    const [avatar, setAvatar] = useState("https://i.imgur.com/P3rBF8E.png")
+    const scrollViewRef = useRef();
+
+    async function loadMsg() {
+        var rawResponse = await fetch(`${HTTP_IP_DEV}/show-convers?convId=${props.route.params.convId}&myContactId=${props.route.params.myContactId}`, {method: 'GET'});
+        var response = await rawResponse.json();
+        setData(response.allMessagesWithOneUser)
+        setPseudo(response.pseudo)
+        setAvatar(response.avatar)
+        setMyContactId(props.route.params.myContactId)
+    }
     
     useEffect(  () => {
-        async function loadData() {
-            console.log("LOLO")
-            var rawResponse = await fetch(`${HTTP_IP_DEV}/show-convers?convId=${props.route.params.convId}&myContactId=${props.route.params.myContactId}`, {method: 'GET'});
-            var response = await rawResponse.json();
-            setData(response.allMessagesWithOneUser)
-            setPseudo(response.pseudo)
-            setAvatar(response.avatar)
-            setMyContactId(props.route.params.myContactId)
-            console.log("RESPONSE", response)
-        }
-        loadData()
-
+        loadMsg()
     }, [props.route.params.convId])
 
     var sendMsg =  async () => {
-        console.log(currentMsg)
         await fetch(`${HTTP_IP_DEV}/send-msg`, {
             method: 'POST',
             headers: {'Content-Type':'application/x-www-form-urlencoded'},
             body: `msg=${currentMsg}&myContactId=${myContactId}`
         });
+        setCurrentMsg("")
+        loadMsg()
     }
 
     var tabMsg = data.map((item)=>{
@@ -72,12 +72,16 @@ function ConversationScreen(props) {
                 <Ionicons name="search" size={30} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
                 </TouchableOpacity>
             </View>
-            <ScrollView style={{flex:1, width: "90%"}} showsVerticalScrollIndicator={false}>
-            {tabMsg}
+            <ScrollView style={{flex:1, width: "90%"}} showsVerticalScrollIndicator={false} 
+                onMomentumScrollEnd ={()=> loadMsg()}
+                ref={scrollViewRef}
+                onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}
+                >
+                {tabMsg}
             </ScrollView>
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{width: "80%", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
                 <Input
-              containerStyle = {{marginBottom: 5, borderWidth: 2,minHeight: 30, maxHeight: 100,  borderColor: "#8C8C8C", borderRadius: 20, backgroundColor: "white" }}
+              containerStyle = {{marginBottom: 5, borderWidth: 2,minHeight: 40, maxHeight: 100,  borderColor: "#8C8C8C", borderRadius: 20, backgroundColor: "white" }}
               placeholder='Your message'
               inputContainerStyle={{borderBottomWidth:0}}
               multiline={true}

@@ -183,20 +183,13 @@ router.get('/show-convers', async function (req, res, next) {
   var infoContact = await UserModel.findOne(
     {_id: req.query.myContactId}
     )
-
-    console.log("infoContact", infoContact)
     
     var pseudo = infoContact.pseudo
     var avatar = infoContact.avatar
-
-    console.log("pseudo", pseudo)
-    console.log("pseudo", pseudo)
   
   var allMessagesWithOneUser = await MessagesModel.find(
     { conversation_id: req.query.convId }
-  ).limit(5);
-
-  console.log("allMessagesWithOneUser", allMessagesWithOneUser)
+  );
 
   res.json({ allMessagesWithOneUser, pseudo, avatar })
 });
@@ -214,16 +207,14 @@ body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, content
 response : newMessageData
 */
 router.post('/send-msg', async function (req, res, next) {
-  console.log("MSG", req.body.msg)
-  console.log("ID", req.body.myContactId)
 
-  const searchConvWithUser = await ConversationsModel.find({
+  const searchConvWithUser = await ConversationsModel.findOne({
     participants: { $all: ['603f618c78727809c7e1ad9a', req.body.myContactId] }
   })
 
   var msg = await new MessagesModel({
     conversation_id: searchConvWithUser._id,
-    from_id: myToken,
+    from_id: '603f618c78727809c7e1ad9a',
     to_id: req.body.myContactId,
     content: req.body.msg,
     date: new Date(),
@@ -231,8 +222,9 @@ router.post('/send-msg', async function (req, res, next) {
 
   var mewMsg = await msg.save()
 
-  console.log("searchConvWithUser", searchConvWithUser)
-
+  var msgs = await MessagesModel.find(
+    { conversation_id: searchConvWithUser._id }
+  );
 
   res.json({result: true});
 });
