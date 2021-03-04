@@ -13,12 +13,12 @@ const cost = 10;
 
 
 /* GET home page. */
-router.get('/', async function(req, res, next) {
+router.get('/', async function (req, res, next) {
 
 });
 
 
-router.post('/email-check', async function(req, res, next){
+router.post('/email-check', async function (req, res, next) {
   console.log(req.body.emailFront, '<------ req body')
   var user = await UserModel.find()
   console.log(user, '<-------- user found ?')
@@ -37,10 +37,10 @@ router.post('/email-check', async function(req, res, next){
   // console.log(result, '<------- result');
   // console.log(error, '<------ erro sent')
 
-  res.json({result: true})
+  res.json({ result: true })
 })
 
-router.post('/sign-up-first-step', async function(req, res, next){
+router.post('/sign-up-first-step', async function (req, res, next) {
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
 
@@ -56,7 +56,7 @@ router.post('/sign-up-first-step', async function(req, res, next){
   var userSaved = await user.save()
   console.log(userSaved, '<------ userSaved on backend')
 
-  res.json({userSaved: userSaved})
+  res.json({ userSaved: userSaved })
 })
 
 /* Sign-up -> Inscription 
@@ -65,7 +65,7 @@ router.post('/sign-up-first-step', async function(req, res, next){
       OPTIONALE --> problemDescriptionFront : String, localisationFront : String, genderFront : StringFront, avatarFront : String, 
   Response : result (true), token (1234), birthDate : (12/23/1992), problems_types : String, localisation : String
 */
-router.post('/sign-up-second-step', function(req, res, next) {
+router.post('/sign-up-second-step', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -74,7 +74,7 @@ router.post('/sign-up-second-step', function(req, res, next) {
 body : emailFront : (quentin@gmail.com), passwordFront : (XXXXXX)
 response : result (true), token : 1234
 */
-router.post('/sign-in', function(req, res, next) {
+router.post('/sign-in', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -83,7 +83,7 @@ router.post('/sign-in', function(req, res, next) {
 body : tokenFront : 1234, 
 response : result (true), 
 */
-router.post('/sign-out', function(req, res, next) {
+router.post('/sign-out', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -92,29 +92,29 @@ router.post('/sign-out', function(req, res, next) {
 query : tokenFront : 1234, birthDateFront : (12/23/1992), problemsTypesFront : String, localisationFront : String, genderFront : String, 
 response : userFiltered : array, pseudo (celui du user connecté) : String
 */
-router.get('/show-card', async function(req, res, next) {
+router.get('/show-card', async function (req, res, next) {
 
-  var user = await UserModel.find({token: req.query.tokenFront})
+  var user = await UserModel.find({ token: req.query.tokenFront })
   var birthDate = user.birthDate
   var dateToday = new Date()
   var dateCompare = dateToday - birthDate
-  var conditionDate = (86400000*365)*18
+  var conditionDate = (86400000 * 365) * 18
   var isAdult = false
-  if((dateToday - dateCompare) > conditionDate) {
+  if ((dateToday - dateCompare) > conditionDate) {
     isAdult = true
   } else {
     isAdult = false
   }
 
-  if(isAdult) {
-    var usersToShow = await UserModel.find({token: !req.query.tokenFront, birthDate: {$gt:conditionDate} })
+  if (isAdult) {
+    var usersToShow = await UserModel.find({ token: !req.query.tokenFront, birthDate: { $gt: conditionDate } })
   } else {
-    var usersToShow = await UserModel.find({token: !req.query.token, birthDate: {$lt:conditionDate}})
+    var usersToShow = await UserModel.find({ token: !req.query.token, birthDate: { $lt: conditionDate } })
   }
-  
 
 
-  res.json({usersToShow:usersToShow });
+
+  res.json({ usersToShow: usersToShow });
 });
 
 
@@ -123,14 +123,14 @@ router.get('/show-card', async function(req, res, next) {
  * query : tokenFront: 1234
  * response : [{pseudo (sender) : String, date (dernier message) : date, avatar (sender) : String, last_message : String, demande : boolean, is_read (nombre de messages non-lus) : Number, delete : boolean, conversation_id : 1234}] 
  **/
-router.get('/show-msg', async function(req, res, next) {
+router.get('/show-msg', async function (req, res, next) {
 
   const myConnectedId = '603f67380ce5ea52ee401325'
-  
+
   // load les conversations avec mes contacts
   const allMyConversations = await ConversationsModel.find(
     {
-      participants: { $in: [myConnectedId]}
+      participants: { $in: [myConnectedId] }
     }
   );
 
@@ -138,25 +138,31 @@ router.get('/show-msg', async function(req, res, next) {
 
   let messagesPerPerson = []
   let friendsData = []
-  
-  await Promise.all(allMyConversations.map( async (element, index) => {
+  let conversations = []
+
+  await Promise.all(allMyConversations.map(async (element, index) => {
     // 1/ construit un tableau listant le dernier message de chaque conversation
     var allMsg = await MessagesModel.find(
       { conversation_id: element._id }
-    ).limit(1)
+    )
+      .sort({ datefield: -1 })
+      .limit(1)
     messagesPerPerson.push(allMsg)
-    
+
     // 2/ construit un tableau des infos de mes contacts (avatar, pseudo...)
     const notMe = element.participants[0] === myConnectedId ? element.participants[0] : element.participants[1]
     const myFriends = await UserModel.findById(notMe)
-    console.log('myFriends', myFriends)
+    // console.log('myFriends', myFriends)
     friendsData.push(myFriends)
+
+    conversations.push({
+      lastMessage: allMsg[0],
+      friendsDatas: myFriends
+    })
   }))
-  
 
   res.json({
-    result: messagesPerPerson,
-    friendsData
+    conversations
   })
 });
 
@@ -165,41 +171,41 @@ router.get('/show-msg', async function(req, res, next) {
 query : conversationIdFront : 1234     ou     tokenFront : 1234
 response : collection message qui est liée et conversation_id.    OU : variable contenant 10 objets (10 dernières conv) contenant avatar, pseudo, contenu du message
 */
-router.get('/show-convers', async function(req, res, next) {
+router.get('/show-convers', async function (req, res, next) {
 
-  var user = await userModel.find({token: req.body.tokenFront})
-  
+  var user = await userModel.find({ token: req.body.tokenFront })
+
   var lastConvId = []
   var toUsersId = []
   var usersData = []
-  var messagesId =  []
+  var messagesId = []
   var conversationsDisplay = []
 
   // idée de fonctionnement :
   // cherche dans les 10 dernières conversations, l'avatar de chaque user trouvé grâce au from_to_id, et le dernier message de chaque conversation
 
-  for (var i = user.conversation_list_id.length ; (i = user.conversation_list_id.length - 10) ; i--) {
+  for (var i = user.conversation_list_id.length; (i = user.conversation_list_id.length - 10); i--) {
     lastConvId.push(user.conversation_list_id[i]);
   }
 
-  var conversations = await conversationsModel.find({_id: lastConvId.map(e => e), demande_receiver: true, delete: false}); // ne sait pas si cette methode pour find fonctionne
+  var conversations = await conversationsModel.find({ _id: lastConvId.map(e => e), demande_receiver: true, delete: false }); // ne sait pas si cette methode pour find fonctionne
 
   toUsersId = conversations.map(e => e.to_id);
-  
-  var toUsersData = await userModel.find({_id: toUsersId.map(e => e)})
+
+  var toUsersData = await userModel.find({ _id: toUsersId.map(e => e) })
 
   usersData = toUsersData.map((e) => ({
     avatar: e.avatar,
     pseudo: e.pseudo
   }))
 
-  for (var i = 0; i< conversations.length ; i++) {
-    messagesId.push(conversations[i].messages_id[message_id.length-1])
+  for (var i = 0; i < conversations.length; i++) {
+    messagesId.push(conversations[i].messages_id[message_id.length - 1])
   }
 
-  var messagesData = await messagesModel.find({_id: messagesId.map(e => e)})
+  var messagesData = await messagesModel.find({ _id: messagesId.map(e => e) })
 
-  for (var i =0; i<lastConvId.length ; i++) {
+  for (var i = 0; i < lastConvId.length; i++) {
     conversationsDisplay.push({
       avatar: avatarData[i].avatar,
       pseudo: avatarData[i].pseudo,
@@ -208,14 +214,14 @@ router.get('/show-convers', async function(req, res, next) {
   }
 
 
-  res.json({conversationsDisplay})
+  res.json({ conversationsDisplay })
 });
 
 /* first-message -> création de la convers en base.
 body : idReceiverFront: 1234, tokenSenderFront: 1234, avatarReceiverFront : 'exemple.jpg', pseudoReceiverFront: 'gigatank3000', 
 response : new_conversation_data
 */
-router.post('/first-msg', function(req, res, next) {
+router.post('/first-msg', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -223,7 +229,7 @@ router.post('/first-msg', function(req, res, next) {
 body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, contentFront: 'il est né le divin enfant'
 response : newMessageData
 */
-router.post('/send-msg', function(req, res, next) {
+router.post('/send-msg', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -235,7 +241,7 @@ le local storage et on redirige vers la page card-show qui aura un useEffect per
 fonction du local storage.
 
 */
-router.put('/update-filter', function(req, res, next) {
+router.put('/update-filter', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -245,7 +251,7 @@ body: idUserSignaledFront: 1234, warningSignalFront: 1234
 response: result: true ? message: Nous avons bien pris en compte votre signalement : message: 'Erreur, l'utilisateur n'a pas pu être signalé, vous
 pouvez nous envoyer un email à l'adresse mail....'
  */
-router.post('/signalement-help', function(req, res, next) {
+router.post('/signalement-help', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -253,7 +259,7 @@ router.post('/signalement-help', function(req, res, next) {
 body: emailFront: hervé@gmail.com, localisationFront: Saint-Dié, genre: 'Female', passwordFront: 'camionpompier75', descriptionProblemFront: 'urticaire', problemsFront: ['Familiale', 'Physique']
 response: userSaved
 */
-router.put('/update-profil', function(req, res, next) {
+router.put('/update-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -261,7 +267,7 @@ router.put('/update-profil', function(req, res, next) {
 body: tokenFront: 1243
 response: userFind
 */
-router.get('/show-my-profil', function(req, res, next) {
+router.get('/show-my-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -269,7 +275,7 @@ router.get('/show-my-profil', function(req, res, next) {
 body: idUserSelectedFront: 1234
 response: userSelected
  */
-router.get('/show-user-profil', function(req, res, next) {
+router.get('/show-user-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -277,7 +283,7 @@ router.get('/show-user-profil', function(req, res, next) {
 body: tokenFront : 1234,
 response: result: true
 */
-router.delete('/delete-my-profil', function(req, res, next) {
+router.delete('/delete-my-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -285,7 +291,7 @@ router.delete('/delete-my-profil', function(req, res, next) {
 body: idMessageFront: 1234
 response: messagesUpdated
  */
-router.put('/delete-msg', function(req, res, next) {
+router.put('/delete-msg', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -293,7 +299,7 @@ router.put('/delete-msg', function(req, res, next) {
 body: idConversFront: 1234
 response: conversationsUpdated
 */
-router.put('/delete-convers', function(req, res, next) {
+router.put('/delete-convers', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
