@@ -1,6 +1,6 @@
 import HTTP_IP_DEV from '../mon_ip'
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Image } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SwitchSelector from "react-native-switch-selector";
@@ -16,8 +16,12 @@ function MessageScreen(props) {
 
   useEffect(() => {
 
+    // const myConnectedId = '603f67380ce5ea52ee401325'
+    const myConnectedId = '603f618c78727809c7e1ad9a'
+
+
     const getDialogues = async () => {
-      const dialogues = await fetch(HTTP_IP_DEV + '/show-msg', { method: 'GET' })
+      const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myConnectedId, { method: 'GET' })
 
       const dialoguesWithFriends = await dialogues.json()
       console.log('dialoguesWithFriends = ', dialoguesWithFriends)
@@ -32,20 +36,33 @@ function MessageScreen(props) {
   const items = msgFriends.map((el, i) => {
 
     if (el.lastMessage && el.friendsDatas) {
+      console.log(el.friendsDatas.avatar)
       let when = new Date(el.lastMessage.date)
       let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
         + ' à ' + when.toLocaleTimeString('fr-FR')
 
       return <View key={i} style={styles.conversations}>
-        <Text style={styles.friend}>
-          {el.friendsDatas.pseudo}
-        </Text>
-        <Text style={styles.date}>
-          {whenFormat}
-        </Text>
-        <Text style={styles.msg} numberOfLines={4} ellipsizeMode='tail'>
-          {el.lastMessage.content}
-        </Text>
+        <View style={styles.lastMessage}>
+          <Text style={styles.friend}>
+            {el.friendsDatas.pseudo}
+          </Text>
+          <Text style={styles.date}>
+            {whenFormat}
+          </Text>
+          <Text style={styles.msg} numberOfLines={4} ellipsizeMode='tail'>
+            {el.lastMessage.content}
+          </Text>
+
+        </View>
+        <View style={styles.avatar}>
+          {
+            el.friendsDatas.avatar && el.friendsDatas.avatar !== undefined && el.friendsDatas.avatar !== '' ?
+
+              <Image source={{ uri: el.friendsDatas.avatar }} style={{ width: 75, height: 75, margin: 7 }} />
+              :
+              <Text />
+          }
+        </View>
       </View>
     }
 
@@ -100,6 +117,8 @@ const styles = StyleSheet.create({
     marginVertical: 40,
   },
   conversations: {
+    flexDirection:'row',
+    justifyContent:'space-between',
     height: 115,
     width: 340,
     marginBottom: 20,
@@ -117,6 +136,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
 
     elevation: 5,
+  },
+  lastMessage: {
+  },
+  avatar: {
   },
   friend: {
     color: '#5571D7',

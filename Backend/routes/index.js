@@ -125,20 +125,25 @@ router.get('/show-card', async function (req, res, next) {
  **/
 router.get('/show-msg', async function (req, res, next) {
 
-  const myConnectedId = '603f67380ce5ea52ee401325'
-
-  // load les conversations avec mes contacts
-  const allMyConversations = await ConversationsModel.find(
-    {
-      participants: { $in: [myConnectedId] }
-    }
-  );
-
-  // console.log('allMyConversations = ', allMyConversations)
-
   let messagesPerPerson = []
   let friendsData = []
   let conversations = []
+
+  if (req.query && req.query.user_id === '') {
+    res.json({
+      conversations
+    })
+  }
+
+  const myConnectedId = req.query.user_id
+
+  // load les conversations avec mes contacts
+  const allMyConversations = await ConversationsModel.find({
+    participants: { $in: [myConnectedId] }
+  })
+
+  // console.log('allMyConversations = ', allMyConversations)
+
 
   await Promise.all(allMyConversations.map(async (element, index) => {
     // 1/ construit un tableau listant le dernier message de chaque conversation
@@ -152,7 +157,7 @@ router.get('/show-msg', async function (req, res, next) {
     // 2/ construit un tableau des infos de mes contacts (avatar, pseudo...)
     const notMe = element.participants[0] === myConnectedId ? element.participants[0] : element.participants[1]
     const myFriends = await UserModel.findById(notMe)
-    // console.log('myFriends', myFriends)
+    console.log('myFriends', myFriends)
     friendsData.push(myFriends)
 
     conversations.push({
