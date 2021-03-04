@@ -41,7 +41,7 @@ function HomeScreen(props) {
   var CardToSwipe = userToDisplay.map((e, i) => {
     console.log(e.problem_description,'<---- avatar')
      
-      return (<Animatable.View animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
+      return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
                 <View style={styles.topCard}>
                   <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
                   <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
@@ -56,7 +56,7 @@ function HomeScreen(props) {
                   <Text style={styles.subtitle}>Type de probleme(s)</Text>
                   <View style={styles.problemBadge}>
                     {e.problems_types.map((arg, i) => {
-                      return ( <View style={styles.badge}><Text style={styles.fontBadge}>{arg}</Text></View>)
+                      return ( <View style={styles.badge} key={i}><Text style={styles.fontBadge}>{arg}</Text></View>)
                     })}
                   </View>
                   <View style={{display:'flex',flexDirection:'row', justifyContent:'space-between', width:'100%', padding:20}}>

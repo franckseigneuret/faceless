@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView, Di
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SwitchSelector from "react-native-switch-selector";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -12,14 +13,26 @@ const windowSize = Dimensions.get('window');
 
 function MessageScreen(props) {
 
+  const [token, setToken] = useState(null)
+  const [myId, setMyId] = useState(null)
   const [countFriends, setCountFriends] = useState(0)
   const [msgFriends, setMsgFriends] = useState([])
   const [friends, setFriends] = useState([])
 
-  const myConnectedId = '603f67380ce5ea52ee401325'
+  // const myConnectedId = '603f67380ce5ea52ee401325'
   // const myConnectedId = '603f618c78727809c7e1ad9a'
 
   useEffect(() => {
+    AsyncStorage.getItem("token", function (error, data) {
+      setToken(data)
+    })
+    
+    const getId = async () => {
+      const idRaw = await fetch(HTTP_IP_DEV + '/get-id-from-token?token=' + token, { method: 'GET' })
+      await idRaw.json()
+    }
+    const myConnectedId = getId()
+
     const getDialogues = async () => {
       const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myConnectedId, { method: 'GET' })
 
@@ -31,7 +44,7 @@ function MessageScreen(props) {
     }
     getDialogues()
 
-  }, [])
+  }, [token])
 
   const items = msgFriends.map((el, i) => {
 
@@ -43,6 +56,7 @@ function MessageScreen(props) {
       return <TouchableOpacity
         key={i}
         onPress={() => props.navigation.navigate('ConversationScreen', {
+          token,
           myId: myConnectedId,
           myContactId: el.friendsDatas._id,
         })}>

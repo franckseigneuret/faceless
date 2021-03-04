@@ -18,28 +18,28 @@ router.get('/', async function (req, res, next) {
 });
 
 
-router.post('/email-check', async function(req, res, next){
+router.post('/email-check', async function (req, res, next) {
 
-  var user = await UserModel.findOne({email: req.body.emailFront})
+  var user = await UserModel.findOne({ email: req.body.emailFront })
   var result;
   var error;
-  if(user) {
+  if (user) {
     result = true;
-    error= 'Cet adresse mail est déjà associée à un compte'
+    error = 'Cet adresse mail est déjà associée à un compte'
   } else {
     result = false;
     error = 'Aucun email semblable trouvé en BDD, next step'
   }
 
-  res.json({result, error})
+  res.json({ result, error })
 })
 
 
-router.post('/pseudo-check', async function (req, res, next){
-  var user = await UserModel.findOne({pseudo: req.body.pseudoFront})
+router.post('/pseudo-check', async function (req, res, next) {
+  var user = await UserModel.findOne({ pseudo: req.body.pseudoFront })
   var result;
   var error;
-  if(user) {
+  if (user) {
     result = true;
     error = 'Ce pseudo est déjà utilisé'
   } else {
@@ -47,11 +47,11 @@ router.post('/pseudo-check', async function (req, res, next){
     error = 'Ce pseudo est disponible'
   }
 
-  res.json({result, error})
+  res.json({ result, error })
 });
 
 
-router.post('/sign-up-first-step', async function(req, res, next){
+router.post('/sign-up-first-step', async function (req, res, next) {
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
 
@@ -76,24 +76,24 @@ router.post('/sign-up-first-step', async function(req, res, next){
   Response : result (true), token (1234), birthDate : (12/23/1992), problems_types : String, localisation : String
 problemDescriptionFront=${props.userDisplay}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation.coordinates)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${tokenOnLocalStorage}
   */
-router.post('/sign-up-second-step', async function(req, res, next) {
+router.post('/sign-up-second-step', async function (req, res, next) {
 
   console.log(req.body.tokenFront, '----> token front')
 
   var user = await UserModel.updateOne(
-    { token: req.body.tokenFront}, // ciblage à gauche de la virgule
-    { 
+    { token: req.body.tokenFront }, // ciblage à gauche de la virgule
+    {
       problem_description: req.body.problemDescriptionFront,
       gender: req.body.genderFront,
       localisation: JSON.parse(req.body.localisationFront),
       avatar: req.body.avatarFront,
-     }
-);
+    }
+  );
 
   var result;
   user ? result = true : result = false
-  
-  res.json({result: result});
+
+  res.json({ result: result });
 });
 
 
@@ -121,31 +121,55 @@ response : userFiltered : array, pseudo (celui du user connecté) : String
 */
 router.get('/show-card', async function (req, res, next) {
 
-  var user = await UserModel.findOne({token: req.query.tokenFront})
-  var userToDisplay = await UserModel.find({token: {$ne : req.query.tokenFront}})
+  var user = await UserModel.findOne({ token: req.query.tokenFront })
+  var userToDisplay = await UserModel.find({ token: { $ne: req.query.tokenFront } })
 
   var birthDate = user.birthDate
   var dateToday = new Date()
   var dateCompare = dateToday - birthDate
-  var conditionDate = (86400000*365)*18
-  if((dateToday - dateCompare) > conditionDate && (user.is_adult = false)) {
+  var conditionDate = (86400000 * 365) * 18
+  if ((dateToday - dateCompare) > conditionDate && (user.is_adult = false)) {
     UserModel.updateOne(
       { is_adult: false },
-      { $set: { is_adult: true },
-    })
+      {
+        $set: { is_adult: true },
+      })
   }
 
-  if(user.is_adult) {
+  if (user.is_adult) {
     var userToShow = userToDisplay.filter(e => e.is_adult == true);
   } else {
     var userToShow = userToDisplay.filter(e => e.is_adult == false);
   }
 
-  console.log('Users----->',userToShow)
+  console.log('Users----->', userToShow)
 
-  res.json({user:user, userToShow:userToShow, });
+  res.json({ user: user, userToShow: userToShow, });
 });
 
+
+/**
+ * récupère l'id utilisateur à partir du token
+ */
+router.get('/get-id-from-token', async function (req, res, next) {
+
+  if (req.query && req.query.token === '') {
+    res.json({
+      error: true
+    })
+  }
+
+  const me = await UserModel.findOne({
+    token: req.query.token
+  })
+
+  res.json({
+    error: false,
+    id: me._id
+  })
+
+
+})
 
 /**
  * show-msg -> afficher les différentes conversations avec les users.
@@ -301,8 +325,8 @@ router.post('/signalement-help', function (req, res, next) {
 });
 
 /* loadProfil : mettre à jour les information en BDD de l'utilisateur qui modifie son profil. */
-router.post('/loadProfil', async function(req, res, next) {
-  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+router.post('/loadProfil', async function (req, res, next) {
+  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   res.json({ userFromBack: userBeforeUpdate });
 });
 
@@ -312,7 +336,7 @@ response: userSaved
 */
 router.put("/update-profil", async function (req, res, next) {
 
-  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   console.log(userBeforeUpdate, '<---- userBeforeUpdate')
 
   // ajout du genre et descriptionProblemFront
@@ -327,7 +351,7 @@ router.put("/update-profil", async function (req, res, next) {
     }
   );
 
-  var userAfterUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  var userAfterUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   console.log(userAfterUpdate, '<---- userAfterUpdate')
 
   res.json({ user: userBeforeUpdate });
