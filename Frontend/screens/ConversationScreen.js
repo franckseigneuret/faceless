@@ -15,7 +15,10 @@ function ConversationScreen(props) {
     const [currentMsg, setCurrentMsg] = useState("")
     const [myId, setMyId] = useState("")
     const [pseudo, setPseudo] = useState("")
-
+    
+    console.log('props', props)
+    console.log('myId', props.route.params.myId)
+    console.log('myContactId', props.route.params.myContactId)
     
     useEffect(  () => {
         async function loadData() {
@@ -60,7 +63,7 @@ function ConversationScreen(props) {
 
         <View style={{ flex: 1, alignItems: 'center',justifyContent: "space-between", backgroundColor: '#FFEEDD', paddingTop: 20, height: "100%"}}>
             <View style={styles.header}>
-                <TouchableOpacity style={styles.button} onPress={()=>props.navigation.navigate('MessageScreen')}>
+                <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate('MessageScreen')}>
                 <Ionicons name="chevron-back" size={30} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
                 </TouchableOpacity>
                 <View>

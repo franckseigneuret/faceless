@@ -1,6 +1,6 @@
 import HTTP_IP_DEV from '../mon_ip'
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button, Image } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, TouchableOpacity } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SwitchSelector from "react-native-switch-selector";
@@ -14,12 +14,12 @@ function MessageScreen(props) {
   const [msgFriends, setMsgFriends] = useState([])
   const [friends, setFriends] = useState([])
 
+  // const myConnectedId = '603f67380ce5ea52ee401325'
+  const myConnectedId = '603f618c78727809c7e1ad9a'
+
+
+
   useEffect(() => {
-
-    const myConnectedId = '603f67380ce5ea52ee401325'
-    // const myConnectedId = '603f618c78727809c7e1ad9a'
-
-
     const getDialogues = async () => {
       const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myConnectedId, { method: 'GET' })
 
@@ -36,34 +36,41 @@ function MessageScreen(props) {
   const items = msgFriends.map((el, i) => {
 
     if (el.lastMessage && el.friendsDatas) {
-      console.log(el.friendsDatas.avatar)
       let when = new Date(el.lastMessage.date)
       let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
         + ' à ' + when.toLocaleTimeString('fr-FR')
 
-      return <View key={i} style={styles.conversations}>
-        <View style={styles.lastMessage}>
-          <Text style={styles.friend}>
-            {el.friendsDatas.pseudo}
-          </Text>
-          <Text style={styles.date}>
-            {whenFormat}
-          </Text>
-          <Text style={styles.msg} numberOfLines={4} ellipsizeMode='tail'>
-            {el.lastMessage.content}
-          </Text>
+      return <TouchableOpacity
+        onPress={() => props.navigation.navigate('ConversationScreen', {
+          myId: myConnectedId,
+          myContactId: el.friendsDatas._id,
+        })}>
+        <View key={i} style={styles.conversations}>
+          <View style={styles.lastMessage}>
+            <Text style={styles.friend}>
+              {el.friendsDatas.pseudo}
+            </Text>
+            <Text style={styles.date}>
+              {whenFormat}
+            </Text>
+            <Text style={styles.msg} numberOfLines={4} ellipsizeMode='tail'>
+              {el.lastMessage.content}
+            </Text>
 
-        </View>
-        <View style={styles.avatar}>
-          {
-            el.friendsDatas.avatar && el.friendsDatas.avatar !== undefined && el.friendsDatas.avatar !== '' ?
+          </View>
+          <View style={styles.avatar}>
+            {
+              el.friendsDatas.avatar && el.friendsDatas.avatar !== undefined && el.friendsDatas.avatar !== '' ?
 
-              <Image source={{ uri: el.friendsDatas.avatar }} style={{ width: 75, height: 75, margin: 7 }} />
-              :
-              <Text />
-          }
+                <Image source={{ uri: el.friendsDatas.avatar }} style={{ width: 75, height: 75, margin: 7 }} />
+                :
+                <Text />
+            }
+          </View>
         </View>
-      </View>
+
+      </TouchableOpacity>
+
     }
 
   })
@@ -117,8 +124,8 @@ const styles = StyleSheet.create({
     marginVertical: 40,
   },
   conversations: {
-    flexDirection:'row',
-    justifyContent:'space-between',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     height: 115,
     width: 340,
     marginBottom: 20,
