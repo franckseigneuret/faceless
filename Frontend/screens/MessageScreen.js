@@ -24,7 +24,7 @@ function MessageScreen(props) {
       const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myConnectedId, { method: 'GET' })
 
       const dialoguesWithFriends = await dialogues.json()
-      console.log('dialoguesWithFriends = ', dialoguesWithFriends)
+      // console.log('dialoguesWithFriends = ', dialoguesWithFriends)
       setCountFriends(dialoguesWithFriends.conversations.length)
       setMsgFriends(dialoguesWithFriends.conversations)
       // setFriends(dialoguesWithFriends.friendsData)
@@ -44,6 +44,7 @@ function MessageScreen(props) {
         onPress={() => props.navigation.navigate('ConversationScreen', {
           myId: myConnectedId,
           myContactId: el.friendsDatas._id,
+          convId: el.lastMessage.conversation_id,
         })}>
         <View key={i} style={styles.conversations}>
           <View style={styles.lastMessage}>

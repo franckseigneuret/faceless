@@ -179,60 +179,26 @@ query : conversationIdFront : 1234     ou     tokenFront : 1234
 response : collection message qui est liée et conversation_id.    OU : variable contenant 10 objets (10 dernières conv) contenant avatar, pseudo, contenu du message
 */
 router.get('/show-convers', async function (req, res, next) {
+  
+  var infoContact = await UserModel.findOne(
+    {_id: req.query.myContactId}
+    )
 
-  // var user = await userModel.find({ token: req.body.tokenFront })
+    console.log("infoContact", infoContact)
+    
+    var pseudo = infoContact.pseudo
+    var avatar = infoContact.avatar
 
-  // var user = await userModel.find({token: req.body.tokenFront})
-
-  // var lastConvId = []
-  // var toUsersId = []
-  // var usersData = []
-  // var messagesId =  []
-  // var conversationsDisplay = []
-
-  // // idée de fonctionnement :
-  // // cherche dans les 10 dernières conversations, l'avatar de chaque user trouvé grâce au from_to_id, et le dernier message de chaque conversation
-
-  // for (var i = user.conversation_list_id.length ; (i = user.conversation_list_id.length - 10) ; i--) {
-  //   lastConvId.push(user.conversation_list_id[i]);
-  // }
-
-  // var conversations = await conversationsModel.find({_id: lastConvId.map(e => e), demande_receiver: true, delete: false}); // ne sait pas si cette methode pour find fonctionne
-
-  // toUsersId = conversations.map(e => e.to_id);
-
-  // var toUsersData = await userModel.find({_id: toUsersId.map(e => e)})
-
-  // usersData = toUsersData.map((e) => ({
-  //   avatar: e.avatar,
-  //   pseudo: e.pseudo
-  // }))
-
-  // for (var i = 0; i< conversations.length ; i++) {
-  //   messagesId.push(conversations[i].messages_id[message_id.length-1])
-  // }
-
-  // var messagesData = await messagesModel.find({_id: messagesId.map(e => e)})
-
-  // for (var i =0; i<lastConvId.length ; i++) {
-  //   conversationsDisplay.push({
-  //     avatar: avatarData[i].avatar,
-  //     pseudo: avatarData[i].pseudo,
-  //     lastMessage: messagesData[i],
-  //   })
-  // }
-
-  var pseudo = "Alexis"
-  var avatar = "../assets/women_4.png"
-  var id = "603f67380ce5ea52ee401325"
-
+    console.log("pseudo", pseudo)
+    console.log("pseudo", pseudo)
+  
   var allMessagesWithOneUser = await MessagesModel.find(
-    { conversation_id: "603f98460ced2c1ed9fe2e6b" }
+    { conversation_id: req.query.convId }
   ).limit(5);
 
   console.log("allMessagesWithOneUser", allMessagesWithOneUser)
 
-  res.json({ allMessagesWithOneUser, pseudo, avatar, id })
+  res.json({ allMessagesWithOneUser, pseudo, avatar })
 });
 
 /* first-message -> création de la convers en base.
@@ -248,7 +214,13 @@ body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, content
 response : newMessageData
 */
 router.post('/send-msg', function (req, res, next) {
-  console.log(req.body.msg)
+  console.log("MSG", req.body.msg)
+  console.log("ID", req.body.myContactId)
+
+  const allMyConversations = await ConversationsModel.find({
+    participants: { $all: [myConnectedId, req.body.myContactId] }
+  })
+
   res.json({result: true});
 });
 

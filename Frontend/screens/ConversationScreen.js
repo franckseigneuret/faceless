@@ -13,36 +13,36 @@ function ConversationScreen(props) {
 
     const [data, setData] = useState([])
     const [currentMsg, setCurrentMsg] = useState("")
-    const [myId, setMyId] = useState("")
+    const [myContactId, setMyContactId] = useState("")
     const [pseudo, setPseudo] = useState("")
-    
-    console.log('props', props)
-    console.log('myId', props.route.params.myId)
-    console.log('myContactId', props.route.params.myContactId)
+    const [avatar, setAvatar] = useState("")
     
     useEffect(  () => {
         async function loadData() {
-            var rawResponse = await fetch(`${HTTP_IP_DEV}/show-convers`);
+            console.log("LOLO")
+            var rawResponse = await fetch(`${HTTP_IP_DEV}/show-convers?convId=${props.route.params.convId}&myContactId=${props.route.params.myContactId}`, {method: 'GET'});
             var response = await rawResponse.json();
             setData(response.allMessagesWithOneUser)
-            setMyId(response.id)
             setPseudo(response.pseudo)
+            setAvatar(response.avatar)
+            setMyContactId(props.route.params.myContactId)
+            console.log("RESPONSE", response)
         }
         loadData()
 
-    }, [])
+    }, [props.route.params.convId])
 
     var sendMsg =  async () => {
         console.log(currentMsg)
         await fetch(`${HTTP_IP_DEV}/send-msg`, {
             method: 'POST',
             headers: {'Content-Type':'application/x-www-form-urlencoded'},
-            body: `msg=${currentMsg}`
+            body: `msg=${currentMsg}&myContactId=${myContactId}`
         });
     }
 
     var tabMsg = data.map((item)=>{
-        if(item.from_id === myId){
+        if(item.to_id === myContactId){
             return <View style={styles.blocRight}>
                         <View style={styles.msgRight}>
                             <Text style={styles.textRight} >{item.content}</Text>
@@ -56,8 +56,6 @@ function ConversationScreen(props) {
                     </View>
         }
     })
-    
-    // console.log("data", myId)
 
     return (
 
@@ -66,8 +64,8 @@ function ConversationScreen(props) {
                 <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate('MessageScreen')}>
                 <Ionicons name="chevron-back" size={30} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
                 </TouchableOpacity>
-                <View>
-                    <Image source={require("../assets/women_4.png")} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F'}}/>
+                <View style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                    <Image source={{uri: avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width: 75, height: 75}}/>
                     <Text style={styles.pseudo}>{pseudo}</Text>
                 </View>
                 <TouchableOpacity style={styles.button}>
@@ -75,7 +73,6 @@ function ConversationScreen(props) {
                 </TouchableOpacity>
             </View>
             <ScrollView style={{flex:1, width: "90%"}} showsVerticalScrollIndicator={false}>
-            {tabMsg}
             {tabMsg}
             </ScrollView>
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{width: "80%", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
