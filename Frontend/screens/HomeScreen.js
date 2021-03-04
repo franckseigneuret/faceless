@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Animatable from 'react-native-animatable';
+import  HTTP_IP_DEV from '../mon_ip'
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -23,7 +24,7 @@ function HomeScreen(props) {
 
   useEffect(() => {
   const handleData = async () => {
-      var rawResponse = await fetch('http://172.17.1.81:3000/show-card?tokenFront=123456789');
+      var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=123456789`);
       var response = await rawResponse.json();
       setUserToDisplay(response.userToShow)
       setPseudo(response.user.pseudo)

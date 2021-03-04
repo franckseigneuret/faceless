@@ -7,6 +7,9 @@ import AppLoading from 'expo-app-loading';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import  HTTP_IP_DEV from '../mon_ip'
+
+
 
 import {
   useFonts,
@@ -67,7 +70,8 @@ function quizz(props) {
   const [dateToDisplay, setDateToDisplay] = useState('JJ/MM/AAAA')
 
   const handleOnNextEmail = async () => {
-    var rawResponse = await fetch(`http://${}/email-check`, {
+    console.log("Before Fetch");
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/email-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}`
@@ -82,7 +86,7 @@ function quizz(props) {
 
   const handleOnNextPseudo = async () => {
 
-    var rawResponse = await fetch(`http://172.20.10.8:3000/pseudo-check`, {
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/pseudo-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `pseudoFront=${pseudo}`
@@ -137,7 +141,7 @@ function quizz(props) {
     })
     console.log(problems, '<------ state problems')
     userInfo = props.userDisplay
-    var rawResponse = await fetch(`http://172.20.10.8:3000/sign-up-first-step`, {
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/sign-up-first-step`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}&passwordFront=${password}&pseudoFront=${pseudo}&birthDateFront=${birthDate}&problemsFront=${JSON.stringify(problems)}`
