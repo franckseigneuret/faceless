@@ -15,9 +15,10 @@ function ConversationScreen(props) {
     const [value, setValue] = useState("")
     const [myId, setMyId] = useState("")
     const [pseudo, setPseudo] = useState("")
-
-    const test = useRef(null);
-
+    
+    console.log('props', props)
+    console.log('myId', props.route.params.myId)
+    console.log('myContactId', props.route.params.myContactId)
     
     useEffect(  () => {
         async function loadData() {
@@ -28,7 +29,6 @@ function ConversationScreen(props) {
             setPseudo(response.pseudo)
         }
         loadData()
-        test.scrollToEnd({animated: true})
 
     }, [])
 
@@ -48,13 +48,13 @@ function ConversationScreen(props) {
         }
     })
     
-    console.log("data", myId)
+    // console.log("data", myId)
 
     return (
 
         <View style={{ flex: 1, alignItems: 'center',justifyContent: "space-between", backgroundColor: '#FFEEDD', paddingTop: 20, height: "100%"}}>
             <View style={styles.header}>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate('MessageScreen')}>
                 <Ionicons name="chevron-back" size={30} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
                 </TouchableOpacity>
                 <View>
@@ -65,7 +65,7 @@ function ConversationScreen(props) {
                 <Ionicons name="search" size={30} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
                 </TouchableOpacity>
             </View>
-            <ScrollView style={{flex:1, width: "90%"}} showsVerticalScrollIndicator={false} ref="scrollView">
+            <ScrollView style={{flex:1, width: "90%"}} showsVerticalScrollIndicator={false}>
             {tabMsg}
             {tabMsg}
             </ScrollView>

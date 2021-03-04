@@ -178,10 +178,10 @@ response : collection message qui est liée et conversation_id.    OU : variable
 */
 router.get('/show-convers', async function (req, res, next) {
 
-  var user = await userModel.find({ token: req.body.tokenFront })
+  // var user = await userModel.find({ token: req.body.tokenFront })
 
   // var user = await userModel.find({token: req.body.tokenFront})
-  
+
   // var lastConvId = []
   // var toUsersId = []
   // var usersData = []
@@ -198,7 +198,7 @@ router.get('/show-convers', async function (req, res, next) {
   // var conversations = await conversationsModel.find({_id: lastConvId.map(e => e), demande_receiver: true, delete: false}); // ne sait pas si cette methode pour find fonctionne
 
   // toUsersId = conversations.map(e => e.to_id);
-  
+
   // var toUsersData = await userModel.find({_id: toUsersId.map(e => e)})
 
   // usersData = toUsersData.map((e) => ({
@@ -225,12 +225,12 @@ router.get('/show-convers', async function (req, res, next) {
   var id = "603f67380ce5ea52ee401325"
 
   var allMessagesWithOneUser = await MessagesModel.find(
-    {conversation_id: "603f98460ced2c1ed9fe2e6b"}
+    { conversation_id: "603f98460ced2c1ed9fe2e6b" }
   ).limit(5);
 
   console.log("allMessagesWithOneUser", allMessagesWithOneUser)
 
-  res.json({allMessagesWithOneUser, pseudo, avatar, id})
+  res.json({ allMessagesWithOneUser, pseudo, avatar, id })
 });
 
 /* first-message -> création de la convers en base.
