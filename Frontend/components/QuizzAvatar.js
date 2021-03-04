@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Dimensions, Image, ScrollView, TouchableOpacity } from 'react-native';
 import {connect} from 'react-redux';
 import { Ionicons } from '@expo/vector-icons'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import BlueButton from './BlueButton';
 
@@ -17,31 +18,43 @@ const windowHeight = Dimensions.get('window').height;
 
 function QuizzAvatar(props) {
 
-    const [imgAvatarSelected, setImgAvatarSelected] = useState(require('../assets/avatar_flou.png'))
+    const [imgAvatarSelected, setImgAvatarSelected] = useState('https://i.imgur.com/P3rBF8E.png')
     const [imgAvatarUrl, setImgAvatarUrl] = useState("")
+    const [token, setToken] = useState('')
     
-    var handleClick = () => {
-        props.onAddUserAvatar(imgAvatarUrl)
+    AsyncStorage.getItem("token", function(error, data) {
+        setToken(data)
+    });
+    AsyncStorage.getItem("filter", function(error, data) {
+        console.log(JSON.parse(data),'<------<-------<------<----- filter on store')
+    });
+
+    var handleClick = async () => {
+    var rawResponse = await fetch(`http://172.20.10.8:3000/sign-up-second-step`, {
+     method: 'POST',
+     headers: {'Content-Type':'application/x-www-form-urlencoded'},
+     body: `problemDescriptionFront=${props.userDisplay.problem_description}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation.coordinates)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${token}`
+    });
+    var response = await rawResponse.json()
     }
 
     var changeAvatar = (index) => {
-        setImgAvatarSelected(imgAvatarSrc[index].src)
+        setImgAvatarSelected(imgAvatarSrc[index])
     }
 
     var imgAvatarSrc = [
-        {src: require('../assets/women_1.png'), url: '../assets/women_1.png'},
-        {src: require('../assets/women_2.png'), url: '../assets/women_2.png'},
-        {src: require('../assets/women_3.png'), url: '../assets/women_3.png'},
-        {src: require('../assets/women_4.png'), url: '../assets/women_4.png'},
-        {src: require('../assets/women_5.png'), url: '../assets/women_5.png'},
-        {src: require('../assets/women_6.png'), url: '../assets/women_6.png'},
-        {src: require('../assets/women_7.png'), url: '../assets/women_7.png'},
-        {src: require('../assets/women_8.png'), url: '../assets/women_8.png'}
+        'https://i.imgur.com/Xqf1Ilk.png',
+        'https://i.imgur.com/w9g1N3c.png',
+        'https://i.imgur.com/lbx9ygk.png',
+        'https://i.imgur.com/Fl632zM.png',
+        'https://i.imgur.com/uC9E6zE.png',
+        'https://i.imgur.com/FbL66Lc.png',
+        'https://i.imgur.com/3X0bsrQ.png',
     ]
 
     var imgAvatar = imgAvatarSrc.map((url, key) => {
-        return <TouchableOpacity key={key} url={url} onPress={() => {changeAvatar(key), setImgAvatarUrl(url.url)}}>
-                    <Image source={url.src} style={{margin: 7}}/>
+        return <TouchableOpacity key={key} url={url} onPress={() => {changeAvatar(key), setImgAvatarUrl(url); props.onAddUserAvatar(url)}}>
+                    <Image source={{uri: url}} style={{margin: 7}} style={{width: 100, height:100, marginHorizontal: 5}}/>
                 </TouchableOpacity>
     })
 
@@ -54,7 +67,7 @@ function QuizzAvatar(props) {
     return(
         <View style={styles.container} >
             <View style={{flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
-                <Image source={imgAvatarSelected} style={{width: 200, height: 200 }}/>
+                <Image source={{uri: imgAvatarSelected}} style={{width: 200, height: 200}}/>
             </View>
             <View style={styles.avatar}>
                 <Ionicons name="chevron-back-outline" size={40} color="#5571D7" />
@@ -75,9 +88,15 @@ function mapDispatchToProps(dispatch) {
         }
     }
 }
-  
+
+function mapStateToProps(state) {
+    return { 
+      userDisplay: state.user
+     }
+   }
+
 export default connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(QuizzAvatar);
 
@@ -94,6 +113,6 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row", 
         justifyContent: "center", 
-        alignItems: "center"
+        alignItems: "center",
     }
 });
