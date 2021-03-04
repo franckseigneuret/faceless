@@ -14,7 +14,7 @@ import {
 
 function QuizzGender(props) {
   
-  const [gender, setGender] = useState("")
+
   const [isSelected, setIsSelected] = useState(-1)
 
   var handleClick = () => {

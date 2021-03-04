@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Image } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold} from "@expo-google-fonts/montserrat";
 import { Ionicons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Animatable from 'react-native-animatable';
+import  HTTP_IP_DEV from '../mon_ip'
 
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+
 
 function HomeScreen(props) {
 
@@ -23,7 +21,7 @@ function HomeScreen(props) {
 
   useEffect(() => {
   const handleData = async () => {
-      var rawResponse = await fetch('http://172.17.1.81:3000/show-card?tokenFront=123456789');
+      var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=123456789`);
       var response = await rawResponse.json();
       setUserToDisplay(response.userToShow)
       setPseudo(response.user.pseudo)
@@ -43,10 +41,10 @@ function HomeScreen(props) {
   var CardToSwipe = userToDisplay.map((e, i) => {
     console.log(e.problem_description,'<---- avatar')
      
-      return (<Animatable.View animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
+      return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
                 <View style={styles.topCard}>
                   <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
-                  <Text style={styles.pseudo}>{e.pseudo}</Text>
+                  <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
                   <Text style={styles.member}>Membre depuis le 12 février 2020</Text>
                   <Text style={{marginTop: 5}}><Ionicons name='location' size={15} /> Region de {e.localisation}</Text>
                 </View>
@@ -58,7 +56,7 @@ function HomeScreen(props) {
                   <Text style={styles.subtitle}>Type de probleme(s)</Text>
                   <View style={styles.problemBadge}>
                     {e.problems_types.map((arg, i) => {
-                      return ( <View style={styles.badge}><Text style={styles.fontBadge}>{arg}</Text></View>)
+                      return ( <View style={styles.badge} key={i}><Text style={styles.fontBadge}>{arg}</Text></View>)
                     })}
                   </View>
                   <View style={{display:'flex',flexDirection:'row', justifyContent:'space-between', width:'100%', padding:20}}>
@@ -76,6 +74,7 @@ function HomeScreen(props) {
 });
 
   var handleSubmit = () => {
+    props.navigation.navigate('Filter')
   }
 
   if (!fontsLoaded) {
@@ -88,7 +87,7 @@ function HomeScreen(props) {
           <Text style={styles.textTitle}>
             Salut {pseudo} !
           </Text>
-          <TouchableOpacity style={styles.buttonDate} onPress={ handleSubmit()}>
+          <TouchableOpacity style={styles.buttonDate} onPress={() => handleSubmit()}>
             <Ionicons name="funnel" size={25} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
           </TouchableOpacity>
         </View>

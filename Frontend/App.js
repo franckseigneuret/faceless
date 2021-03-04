@@ -13,6 +13,7 @@ import count from './reducers/count.reducer';
 import Quizz from './components/Quizz'
 import OptionalQuizz from './components/OptionalQuizz'
 import Registration from './components/Registration'
+import Filter from './components/Filter'
 import MessageScreen from './screens/MessageScreen'
 import HomeScreen from './screens/HomeScreen'
 import ProfilScreen from './screens/ProfilScreen'
@@ -71,11 +72,13 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name='BottomNavigator' component={BottomNavigator} />
           <Stack.Screen name="Registration" component={Registration} />
           <Stack.Screen name="Quizz" component={Quizz} />
           <Stack.Screen name="OptionalQuizz" component={OptionalQuizz} />
-          <Stack.Screen name="ConversationScreen" component={ConversationScreen} />
+          <Stack.Screen name='BottomNavigator' component={BottomNavigator} />
+          <Stack.Screen name='ConversationScreen' component={ConversationScreen} />
+          <Stack.Screen name='Filter' component={Filter} />
+
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
