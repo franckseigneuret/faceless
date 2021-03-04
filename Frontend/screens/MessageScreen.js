@@ -1,6 +1,6 @@
 import HTTP_IP_DEV from '../mon_ip'
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SwitchSelector from "react-native-switch-selector";
@@ -8,23 +8,23 @@ import SwitchSelector from "react-native-switch-selector";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+const windowSize = Dimensions.get('window');
+
 function MessageScreen(props) {
 
   const [countFriends, setCountFriends] = useState(0)
   const [msgFriends, setMsgFriends] = useState([])
   const [friends, setFriends] = useState([])
 
-  // const myConnectedId = '603f67380ce5ea52ee401325'
-  const myConnectedId = '603f618c78727809c7e1ad9a'
-
-
+  const myConnectedId = '603f67380ce5ea52ee401325'
+  // const myConnectedId = '603f618c78727809c7e1ad9a'
 
   useEffect(() => {
     const getDialogues = async () => {
       const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myConnectedId, { method: 'GET' })
 
       const dialoguesWithFriends = await dialogues.json()
-      console.log('dialoguesWithFriends = ', dialoguesWithFriends)
+      // console.log('dialoguesWithFriends = ', dialoguesWithFriends)
       setCountFriends(dialoguesWithFriends.conversations.length)
       setMsgFriends(dialoguesWithFriends.conversations)
       // setFriends(dialoguesWithFriends.friendsData)
@@ -41,11 +41,13 @@ function MessageScreen(props) {
         + ' à ' + when.toLocaleTimeString('fr-FR')
 
       return <TouchableOpacity
+        key={i}
         onPress={() => props.navigation.navigate('ConversationScreen', {
           myId: myConnectedId,
           myContactId: el.friendsDatas._id,
         })}>
-        <View key={i} style={styles.conversations}>
+
+        <View style={styles.conversations}>
           <View style={styles.lastMessage}>
             <Text style={styles.friend}>
               {el.friendsDatas.pseudo}
@@ -56,13 +58,12 @@ function MessageScreen(props) {
             <Text style={styles.msg} numberOfLines={4} ellipsizeMode='tail'>
               {el.lastMessage.content}
             </Text>
-
           </View>
-          <View style={styles.avatar}>
+          <View>
             {
               el.friendsDatas.avatar && el.friendsDatas.avatar !== undefined && el.friendsDatas.avatar !== '' ?
 
-                <Image source={{ uri: el.friendsDatas.avatar }} style={{ width: 75, height: 75, margin: 7 }} />
+                <Image style={styles.avatar} source={{ uri: el.friendsDatas.avatar }} />
                 :
                 <Text />
             }
@@ -77,10 +78,10 @@ function MessageScreen(props) {
 
   return (
 
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffeddb' }}>
+    <View style={styles.container}>
       {
         countFriends > 0 ?
-          <View>
+          <View style={styles.main}>
             <Text style={styles.mainTitle}>Messagerie</Text>
             <SwitchSelector style={styles.switch}
               initial={0}
@@ -97,7 +98,9 @@ function MessageScreen(props) {
                 { label: "Demandes (0)", value: "d" },
               ]}
             />
-            {items}
+            <ScrollView showsVerticalScrollIndicator={true} style={styles.ScrollView}>
+              {items}
+            </ScrollView>
           </View>
           :
           <Text>
@@ -114,6 +117,18 @@ function MessageScreen(props) {
 export default MessageScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 60,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: '#ffeddb'
+  },
+  main: {
+    // borderWidth: 1,
+    // borderColor: "#CCC",
+    height: windowSize.height * .9,
+  },
   mainTitle: {
     fontSize: 26,
     fontWeight: 'bold',
@@ -141,20 +156,29 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-
     elevation: 5,
   },
+  scrollView: {
+    height: windowSize.height * .7,
+  },
   lastMessage: {
+    width: '70%',
   },
   avatar: {
+    width: 75,
+    height: 75,
+    borderRadius: 75 / 2,
+    borderWidth: 3,
+    borderColor: "#EC9A1F",
   },
   friend: {
     color: '#5571D7',
     fontSize: 20,
+    fontWeight: 'bold',
   },
   date: {
     marginBottom: 5,
-    color: '#AAA',
+    color: '#888',
     fontSize: 10,
   },
   msg: {
