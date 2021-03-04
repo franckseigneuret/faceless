@@ -17,6 +17,8 @@ import {
 import { Button, Overlay } from "react-native-elements";
 import AppLoading from "expo-app-loading";
 
+import  HTTP_IP_DEV from '../mon_ip'
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -54,6 +56,9 @@ export default function ProfilScreen() {
   };
 
   // State user from token
+
+  const [tokenAsync, setTokenAsync] = useState('')
+
   //{pseudo, mail, ville , mdp , gender, pblDescription, prblType}
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
@@ -61,11 +66,9 @@ export default function ProfilScreen() {
   const [password, setPassword] = useState("");
   const [genderFromToken, setGenderFromToken] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
-  const [problemType, setProblemType] = useState("");
+  const [problemType, setProblemType] = useState([]);
 
   // State pour les modifs de profils
-  const [isEnabledDelete, setIsEnabledDelete] = useState(false);
-  const [isEnabledDesactivate, setIsEnabledDesactivate] = useState(false);
 
   const [emailVisible, setEmailVisible] = useState(false);
   const [emailText, setEmailText] = useState("");
@@ -77,6 +80,9 @@ export default function ProfilScreen() {
   const [mdpText, setMdpText] = useState("");
 
   const [descriptionText, setDescriptionText] = useState("");
+
+  const [isEnabledDelete, setIsEnabledDelete] = useState(false);
+  const [isEnabledDesactivate, setIsEnabledDesactivate] = useState(false);
 
   // Changement de la couleur button enregistrer bottom
   const [saveButton, setSaveButton] = useState(false);
@@ -104,33 +110,72 @@ export default function ProfilScreen() {
   };
 
   const handleSaveChange = () => {
+    // // Permet de recevoir le token de l'async
     // AsyncStorage.getItem("tokenFromStorage", function(error, data) {
     //   console.log(data);
     // });
     console.log(emailText, "<--- email changé");
+
     async function updateUser() {
-      await fetch("http://172.17.1.196:3000/update-profil", {
+      rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `tokenFront=123456789&emailFront=${emailText}&localisationFront=${cityText}&passwordFront=${mdpText}&genderFront=${gender}descriptionProblemFront=`,
+        body: `emailFront=${emailText}&localisationFront=${cityText}&passwordFront=${mdpText}&genderFront=${gender}`,
+      // tokenFront=${tokenAsync}&
       });
+      response = await rawResponse.json();
+      console.log(response, "-------- RESPONSE --------");
+      if (response.userSaved.email) {
+        setEmail(response.userSaved.email);
+        setEmailVisible(false);
+      }
+
+      if (response.userSaved.localisation) {
+        setLocalisation(response.userSaved.localisation);
+        setCityVisible(false);
+      }
+
+      if (response.userSaved.password) {
+        setPassword(response.userSaved.password);
+        setMdpVisible(false);
+      }
+
+      if (response.userSaved.gender) {
+        setGenderFromToken(response.userSaved.gender);
+      }
+
+      if (response.userSaved.problem_description) {
+        setProblemDescription(response.userSaved.problem_description);
+        setCityVisible(false);
+      }
+
+      // FAIRE LES TYPES DE PROBLEMES
+
     }
     updateUser();
   };
 
-  const handleDisconnect = () => {};
+  const handleDisconnect = () => {
+    AsyncStorage.removeItem("token")
+  };
 
   useEffect(() => {
     console.log("app load");
 
+    AsyncStorage.getItem("token", function(error, data) {
+      var userData = data
+      console.log(userData, "<--- userData pour le token du async"); 
+      // setTokenAsync(userData.token) 
+    });
+
+
     async function loadDATA() {
-      var rawResponse = await fetch("http://172.17.1.196:3000/loadProfil", {
+      var rawResponse = await fetch(`${HTTP_IP_DEV}/loadProfil`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "tokenFront=z9iNwb7cTgGOhUrrvndz9rOHJCkxGAqo",
+        body: `tokenFront=${tokenAsync}`,
       });
       var response = await rawResponse.json();
-      console.log(response.userFromBack, "response ");
 
       var pseudo = response.userFromBack.pseudo;
       setPseudo(pseudo);
@@ -138,27 +183,29 @@ export default function ProfilScreen() {
       var email = response.userFromBack.email;
       setEmail(email);
 
-      var localisation = response.userFromBack.localisation;
+      var localisation = response.userFromBack.localisation.label;
       setLocalisation(localisation);
 
       var password = response.userFromBack.password;
       setPassword(password);
 
       var gender = response.userFromBack.gender;
-      setGenderFromToken(gender);
-
+      if (gender == "other") {
+        setIsSelected(0);
+      }
+      if (gender == "male") {
+        setIsSelected(1);
+      }
+      if (gender == "female") {
+        setIsSelected(2);
+      }
       var problemDescription = response.userFromBack.problem_description;
       setProblemDescription(problemDescription);
 
-      var problemType = response.userFromBack.problems_types;
-      setProblemType(problemType);
+      var problemBack = response.userFromBack.problems_types;
+      setProblemType(problemBack);
     }
     loadDATA();
-
-    // recuperer les infos du user grace au fetch
-    // creer des variables {pseudo, mail, ville , mdp , gender, pblDescription, prblType}
-    // set states de ces infos
-    //
   }, []);
 
   var updateGender = (index) => {
@@ -170,7 +217,6 @@ export default function ProfilScreen() {
       setGender("female");
     }
   };
-  console.log(gender);
 
   var images = [
     {
@@ -235,222 +281,257 @@ export default function ProfilScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      {/* UPPER SECTION  ---> Info */}
+    <ScrollView>
+      <View style={styles.container}>
+        {/* UPPER SECTION  ---> Info */}
 
-      <View>
-        <Text style={styles.titleHome}>Mon Profil</Text>
-      </View>
-
-      <View style={{ marginTop: 15 }}>
-        <Image source={require("../assets/women_2.png")} />
-      </View>
-
-      <View style={styles.viewHead}>
-        <Text style={styles.pseudo}>
-          {pseudo}
-          <Ionicons name="lock-closed" size={18} color="#5571D7" />
-        </Text>
-      </View>
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.viewContent}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.viewContent}>
-            {!emailVisible ? (
-              <>
-                <Text style={styles.subtitle}>{email}</Text>
-                <TouchableOpacity onPress={handlePressEmail}>
-                  <Ionicons name="pencil" size={18} color="#5571D7" />
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <TextInput
-                  style={styles.subtitleChanged}
-                  placeholder={emailText}
-                  onChangeText={(value) => {
-                    setEmailText(value);
-                  }}
-                  defaultValue={emailText}
-                />
-              </>
-            )}
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.viewContent}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.viewContent}>
-            {!cityVisible ? (
-              <>
-                <Text style={styles.subtitle}>{localisation} </Text>
-                <TouchableOpacity onPress={handlePressCity}>
-                  <Ionicons name="pencil" size={18} color="#5571D7" />
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <TextInput
-                  style={styles.subtitleChanged}
-                  placeholder="Tu peux changer ta ville  "
-                  onChangeText={(value) => setCityText(value)}
-                  defaultValue={cityText}
-                />
-              </>
-            )}
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.viewContent}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.viewContent}>
-            {!mdpVisible ? (
-              <>
-                <Text style={styles.subtitle}>Mot de passe : {password} </Text>
-                <TouchableOpacity onPress={handlePressMdp}>
-                  <Ionicons name="pencil" size={18} color="#5571D7" />
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <TextInput
-                  secureTextEntry={true}
-                  style={styles.subtitleChanged}
-                  placeholder="Ton nouveau mot de passe"
-                  onChangeText={(value) => setMdpText(value)}
-                  defaultValue={mdpText}
-                />
-              </>
-            )}
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-        }}
-      >
-        {image}
-      </View>
-
-      {/* BELOW SECTION  ---> Description & type of problem */}
-
-      <View style={styles.viewTitleOrange}>
-        <Text style={styles.title}>
-          En quelques mots:
-          <TouchableOpacity onPress={toggleOverlayDescription}>
-            <Ionicons name="pencil" size={18} color="#5571D7" />
-          </TouchableOpacity>
-        </Text>
-      </View>
-
-      <ScrollView>
-        <View style={{ width: "88%" }}>
-          <Text style={styles.text}>{problemDescription}</Text>
+        <View>
+          <Text style={styles.titleHome}>Mon Profil</Text>
         </View>
-      </ScrollView>
 
-      <Overlay
-        isVisible={visible}
-        onBackdropPress={toggleOverlayDescription}
-        backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
-        overlayStyle={styles.overlay}
-      >
-        <Text style={styles.title}>En quelques mots:</Text>
-        <TextInput
-          onChangeText={(value) => {
-            setDescriptionText(value);
-          }}
+        <View style={{ marginTop: 15 }}>
+          <Image source={require("../assets/women_2.png")} />
+        </View>
+
+        <View style={styles.viewHead}>
+          <Text style={styles.pseudo}>
+            {pseudo}
+            <Ionicons name="lock-closed" size={18} color="#5571D7" />
+          </Text>
+        </View>
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.viewContent}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.viewContent}>
+              {!emailVisible ? (
+                <>
+                  <Text style={styles.subtitle}>{email}</Text>
+                  <TouchableOpacity onPress={handlePressEmail}>
+                    <Ionicons name="pencil" size={18} color="#5571D7" />
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <TextInput
+                    style={styles.subtitleChanged}
+                    placeholder={email}
+                    onChangeText={(value) => {
+                      setEmailText(value);
+                    }}
+                    defaultValue={emailText}
+                  />
+                </>
+              )}
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.viewContent}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.viewContent}>
+              {!cityVisible ? (
+                <>
+                  <Text style={styles.subtitle}>{localisation} </Text>
+                  <TouchableOpacity onPress={handlePressCity}>
+                    <Ionicons name="pencil" size={18} color="#5571D7" />
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <TextInput
+                    style={styles.subtitleChanged}
+                    placeholder="Tu peux changer ta ville  "
+                    onChangeText={(value) => setCityText(value)}
+                    defaultValue={cityText}
+                  />
+                </>
+              )}
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.viewContent}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.viewContent}>
+              {!mdpVisible ? (
+                <>
+                  <Text style={styles.subtitle}>Mot de passe</Text>
+                  <TouchableOpacity onPress={handlePressMdp}>
+                    <Ionicons name="pencil" size={18} color="#5571D7" />
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <TextInput
+                    secureTextEntry={true}
+                    style={styles.subtitleChanged}
+                    placeholder="Ton nouveau mot de passe"
+                    onChangeText={(value) => setMdpText(value)}
+                    defaultValue={mdpText}
+                  />
+                </>
+              )}
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+
+        <View
           style={{
-            backgroundColor: "white",
-            borderRadius: 25,
-            width: "100%",
-            paddingVertical: 40,
-            marginVertical: 15,
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
           }}
-        ></TextInput>
-        <Button
-          title="enregistrer"
-          type="solid"
-          buttonStyle={styles.buttonValider}
-          titleStyle={{
-            fontFamily: "Montserrat_700Bold",
-          }}
-          onPress={() => handleSaveDescription()}
-        />
-      </Overlay>
-
-      <ScrollView>
-        <View style={{ width: "88%" }}>
-          <Text style={styles.text}>{descriptionText}</Text>
+        >
+          {image}
         </View>
-      </ScrollView>
-      <View style={styles.viewTitleOrange}>
-        <Text style={styles.title}>Type de problème(s): </Text>
+
+        {/* BELOW SECTION  ---> Description & type of problem */}
+
+        <View style={styles.viewTitleOrange}>
+          <Text style={styles.title}>
+            En quelques mots:
+            <TouchableOpacity onPress={toggleOverlayDescription}>
+              <Ionicons name="pencil" size={18} color="#5571D7" />
+            </TouchableOpacity>
+          </Text>
+        </View>
+
+        <ScrollView style={{ width: "88%" }}>
+          <Text style={styles.text} numberOfLines={4}>
+            {problemDescription}
+          </Text>
+        </ScrollView>
+
+        <Overlay
+          isVisible={visible}
+          onBackdropPress={toggleOverlayDescription}
+          backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
+          overlayStyle={styles.overlay}
+        >
+          <Text style={styles.title}>En quelques mots:</Text>
+          <TextInput
+            onChangeText={(value) => {
+              setDescriptionText(value);
+            }}
+            style={{
+              backgroundColor: "white",
+              borderRadius: 25,
+              width: "100%",
+              paddingVertical: 40,
+              marginVertical: 15,
+            }}
+          ></TextInput>
+          <Button
+            title="enregistrer"
+            type="solid"
+            buttonStyle={styles.buttonValider}
+            titleStyle={{
+              fontFamily: "Montserrat_700Bold",
+            }}
+            onPress={() => handleSaveDescription()}
+          />
+        </Overlay>
+
+        <ScrollView>
+          <View style={{ width: "88%" }}>
+            <Text style={styles.text}>{descriptionText}</Text>
+          </View>
+        </ScrollView>
+
+        <View style={styles.viewTitleOrange}>
+          <Text style={styles.title}>Type de problème(s): </Text>
+        </View>
+
+        <View style={styles.problemBadge}>
+          {problemType.map((arg, index) => {
+            return (
+              <View style={styles.badge} index={index}>
+                <Text style={styles.fontBadge}>{arg}</Text>
+              </View>
+            );
+          })}
+        </View>
+
+        <View style={styles.viewSaveDisconnect}>
+          <Button
+            title="enregistrer"
+            type="solid"
+            buttonStyle={
+              saveButton ? styles.buttonValider : styles.buttonValiderBIS
+            }
+            titleStyle={{
+              fontFamily: "Montserrat_700Bold",
+            }}
+            onPress={handleSaveChange}
+          />
+
+          <Button
+            title="déconnexion"
+            type="solid"
+            buttonStyle={styles.buttonDisconnect}
+            titleStyle={{
+              fontFamily: "Montserrat_700Bold",
+            }}
+            onPress={() => handleDisconnect()}
+          />
+        </View>
+
+        <View style={styles.viewSaveDisconnect}>
+          <Button
+            title="Désactiver mon compte"
+            type="solid"
+            buttonStyle={styles.buttonEnd}
+            titleStyle={{
+              fontFamily: "Montserrat_700Bold",
+            }}
+            onPress={() => handleDeactivate()}
+          />
+
+          <Button
+            title="Supprimer mon compte"
+            type="solid"
+            buttonStyle={styles.buttonEnd}
+            titleStyle={{
+              fontFamily: "Montserrat_700Bold",
+            }}
+            onPress={() => handleDeactivate()}
+          />
+        </View>
+
+        {/* <View style={styles.viewDeleteDisable}>
+          <Text style={styles.textFin}>Supprimer mon compte </Text>
+
+          <Text style={styles.textFin}> Désactiver mon compte</Text>
+        </View>
+
+        <View style={styles.viewToggle}>
+          <Switch
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={isEnabledDelete ? "#f5dd4b" : "#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleSwitchDelete}
+            value={isEnabledDelete}
+          />
+
+          <Switch
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={isEnabledDesactivate ? "#f5dd4b" : "#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleSwitchDesactivate}
+            value={isEnabledDesactivate}
+          />
+        </View> */}
       </View>
-
-      <View style={styles.viewSaveDisconnect}>
-        <Button
-          title="enregistrer"
-          type="solid"
-          buttonStyle={
-            saveButton ? styles.buttonValider : styles.buttonValiderBIS
-          }
-          titleStyle={{
-            fontFamily: "Montserrat_700Bold",
-          }}
-          onPress={handleSaveChange}
-        />
-
-        <Button
-          title="déconnexion"
-          type="solid"
-          buttonStyle={styles.buttonDisconnect}
-          titleStyle={{
-            fontFamily: "Montserrat_700Bold",
-          }}
-          onPress={() => handleDisconnect()}
-        />
-      </View>
-
-      <View style={styles.viewDeleteDisable}>
-        <Text style={styles.textFin}>Supprimer mon compte </Text>
-
-        <Text style={styles.textFin}> Désactiver mon compte</Text>
-      </View>
-
-      <View style={styles.viewToggle}>
-        <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={isEnabledDelete ? "#f5dd4b" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitchDelete}
-          value={isEnabledDelete}
-        />
-
-        <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={isEnabledDesactivate ? "#f5dd4b" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitchDesactivate}
-          value={isEnabledDesactivate}
-        />
-      </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -550,6 +631,25 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat_800ExtraBold",
     fontSize: 10,
   },
+  problemBadge: {
+    width: "90%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    flexWrap: "wrap",
+  },
+  badge: {
+    backgroundColor: "#5571D7",
+    margin: 2,
+    fontSize: 10,
+    borderRadius: 30,
+  },
+  fontBadge: {
+    color: "white",
+    marginHorizontal: 15,
+    marginVertical: 5,
+    fontFamily: "Montserrat_700Bold",
+  },
   sizeImg: {
     width: 40,
     height: 40,
@@ -572,6 +672,13 @@ const styles = StyleSheet.create({
   },
   buttonDisconnect: {
     backgroundColor: "#D75555",
+    borderRadius: 86,
+    width: 159,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  buttonEnd: {
+    backgroundColor: "#5571D7",
     borderRadius: 86,
     width: 159,
     paddingHorizontal: 10,

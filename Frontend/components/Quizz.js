@@ -7,6 +7,9 @@ import AppLoading from 'expo-app-loading';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import  HTTP_IP_DEV from '../mon_ip'
+
+
 
 import {
   useFonts,
@@ -68,7 +71,7 @@ function quizz(props) {
 
   const handleOnNextEmail = async () => {
     console.log("Before Fetch");
-    var rawResponse = await fetch(`http://172.17.1.40:3000/email-check`, {
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/email-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}`
