@@ -299,7 +299,8 @@ body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, content
 response : newMessageData
 */
 router.post('/send-msg', function (req, res, next) {
-  res.render('index', { title: 'Express' });
+  console.log(req.body.msg)
+  res.json({result: true});
 });
 
 
@@ -354,7 +355,12 @@ router.put("/update-profil", async function (req, res, next) {
   var userAfterUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   console.log(userAfterUpdate, '<---- userAfterUpdate')
 
-  res.json({ user: userBeforeUpdate });
+  res.json({ userFromBack: userBeforeUpdate });
+});
+
+router.post('/loadProfil', async function(req, res, next) {
+  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  res.json({ userFromBack: userBeforeUpdate });
 });
 
 /* show-profil : montrer le profil de l'utilisateur au clic sur l'icône user de la bottom tab 
