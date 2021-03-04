@@ -10,6 +10,7 @@
   "dependencies": {
     "@expo-google-fonts/montserrat": "^0.1.0",
     "@khanshamshad32/carousel": "^1.0.1",
+    "@ptomasroos/react-native-multi-slider": "^2.2.2",
     "@react-native-async-storage/async-storage": "^1.14.1",
     "@react-native-community/datetimepicker": "3.0.4",
     "@react-native-community/masked-view": "0.1.10",
