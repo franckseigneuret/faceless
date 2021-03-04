@@ -1,13 +1,5 @@
 var mongoose = require('mongoose');
 
-var ConversationSchema = mongoose.Schema({
-    with_id : Object,
-    archived: Boolean,
-    delete: Boolean,
-    demand: Boolean,
-    messages: { type: mongoose.Schema.Types.ObjectId, ref: 'messages' },
-   });
-
 var UserSchema = mongoose.Schema({
     token: String,
     email : String,
@@ -23,7 +15,6 @@ var UserSchema = mongoose.Schema({
     statut: String,
     blocked_user_id: String,
     blocked_by_id: String,
-    conversations: [ConversationSchema],
 });
 
 const UserModel = mongoose.model('users', UserSchema);

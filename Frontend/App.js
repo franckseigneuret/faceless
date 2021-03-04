@@ -20,6 +20,7 @@ import ProfilScreen from './screens/ProfilScreen'
 import { NavigationContainer, useIsFocused } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import ConversationScreen from './screens/ConversationScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -61,6 +62,7 @@ const BottomNavigator = () => {
         <Tab.Screen name='ProfilScreen' component={ProfilScreen} />
         <Tab.Screen name='HomeScreen' component={HomeScreen} />
         <Tab.Screen name='MessageScreen' component={MessageScreen} />
+        {/* <Tab.Screen name='ConversationScreen' component={ConversationScreen} /> */}
       </Tab.Navigator>
   );
 }
