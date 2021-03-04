@@ -62,7 +62,6 @@ const BottomNavigator = () => {
         <Tab.Screen name='ProfilScreen' component={ProfilScreen} />
         <Tab.Screen name='HomeScreen' component={HomeScreen} />
         <Tab.Screen name='MessageScreen' component={MessageScreen} />
-        <Tab.Screen name='ConversationScreen' component={ConversationScreen} />
       </Tab.Navigator>
   );
 }
@@ -76,6 +75,7 @@ export default function App() {
           <Stack.Screen name="Registration" component={Registration} />
           <Stack.Screen name="Quizz" component={Quizz} />
           <Stack.Screen name="OptionalQuizz" component={OptionalQuizz} />
+          <Stack.Screen name="ConversationScreen" component={ConversationScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

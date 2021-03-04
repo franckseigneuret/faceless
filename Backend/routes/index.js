@@ -213,13 +213,26 @@ router.post('/first-msg', function (req, res, next) {
 body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, contentFront: 'il est né le divin enfant'
 response : newMessageData
 */
-router.post('/send-msg', function (req, res, next) {
+router.post('/send-msg', async function (req, res, next) {
   console.log("MSG", req.body.msg)
   console.log("ID", req.body.myContactId)
 
-  const allMyConversations = await ConversationsModel.find({
-    participants: { $all: [myConnectedId, req.body.myContactId] }
+  const searchConvWithUser = await ConversationsModel.find({
+    participants: { $all: ['603f618c78727809c7e1ad9a', req.body.myContactId] }
   })
+
+  var msg = await new MessagesModel({
+    conversation_id: searchConvWithUser._id,
+    from_id: myToken,
+    to_id: req.body.myContactId,
+    content: req.body.msg,
+    date: new Date(),
+  })
+
+  var mewMsg = await msg.save()
+
+  console.log("searchConvWithUser", searchConvWithUser)
+
 
   res.json({result: true});
 });
