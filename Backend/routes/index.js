@@ -13,12 +13,12 @@ const cost = 10;
 
 
 /* GET home page. */
-router.get('/', async function(req, res, next) {
+router.get('/', async function (req, res, next) {
 
 });
 
 
-router.post('/email-check', async function(req, res, next){
+router.post('/email-check', async function (req, res, next) {
   console.log(req.body.emailFront, '<------ req body')
   var user = await UserModel.find()
   console.log(user, '<-------- user found ?')
@@ -37,10 +37,10 @@ router.post('/email-check', async function(req, res, next){
   // console.log(result, '<------- result');
   // console.log(error, '<------ erro sent')
 
-  res.json({result: true})
+  res.json({ result: true })
 })
 
-router.post('/sign-up-first-step', async function(req, res, next){
+router.post('/sign-up-first-step', async function (req, res, next) {
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
 
@@ -56,7 +56,7 @@ router.post('/sign-up-first-step', async function(req, res, next){
   var userSaved = await user.save()
   console.log(userSaved, '<------ userSaved on backend')
 
-  res.json({userSaved: userSaved})
+  res.json({ userSaved: userSaved })
 })
 
 /* Sign-up -> Inscription 
@@ -65,7 +65,7 @@ router.post('/sign-up-first-step', async function(req, res, next){
       OPTIONALE --> problemDescriptionFront : String, localisationFront : String, genderFront : StringFront, avatarFront : String, 
   Response : result (true), token (1234), birthDate : (12/23/1992), problems_types : String, localisation : String
 */
-router.post('/sign-up-second-step', function(req, res, next) {
+router.post('/sign-up-second-step', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -74,7 +74,7 @@ router.post('/sign-up-second-step', function(req, res, next) {
 body : emailFront : (quentin@gmail.com), passwordFront : (XXXXXX)
 response : result (true), token : 1234
 */
-router.post('/sign-in', function(req, res, next) {
+router.post('/sign-in', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -83,7 +83,7 @@ router.post('/sign-in', function(req, res, next) {
 body : tokenFront : 1234, 
 response : result (true), 
 */
-router.post('/sign-out', function(req, res, next) {
+router.post('/sign-out', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -92,7 +92,7 @@ router.post('/sign-out', function(req, res, next) {
 query : tokenFront : 1234, birthDateFront : (12/23/1992), problemsTypesFront : String, localisationFront : String, genderFront : String, 
 response : userFiltered : array, pseudo (celui du user connecté) : String
 */
-router.get('/show-card', async function(req, res, next) {
+router.get('/show-card', async function (req, res, next) {
 
   var user = await UserModel.findOne({token: req.query.tokenFront})
   var userToDisplay = await UserModel.find({token: {$ne : req.query.tokenFront}})
@@ -125,27 +125,52 @@ router.get('/show-card', async function(req, res, next) {
  * query : tokenFront: 1234
  * response : [{pseudo (sender) : String, date (dernier message) : date, avatar (sender) : String, last_message : String, demande : boolean, is_read (nombre de messages non-lus) : Number, delete : boolean, conversation_id : 1234}] 
  **/
-router.get('/show-msg', async function(req, res, next) {
-  
-  var allMyConversations = await ConversationsModel.find(
-    {participants: { $in: ["603f618c78727809c7e1ad9b"]}}
-  );
+router.get('/show-msg', async function (req, res, next) {
 
-  // console.log(allMyConversations)
-
-  //construit un tableau listant les 5 derniers messages par user
   let messagesPerPerson = []
+  let friendsData = []
+  let conversations = []
 
-  await Promise.all(allMyConversations.map( async (element, index) => {
+  if (req.query && req.query.user_id === '') {
+    res.json({
+      conversations
+    })
+  }
+
+  const myConnectedId = req.query.user_id
+
+  // load les conversations avec mes contacts
+  const allMyConversations = await ConversationsModel.find({
+    participants: { $in: [myConnectedId] }
+  })
+
+  // console.log('allMyConversations = ', allMyConversations)
+
+
+  await Promise.all(allMyConversations.map(async (element, index) => {
+    // 1/ construit un tableau listant le dernier message de chaque conversation
     var allMsg = await MessagesModel.find(
-      {conversation_id: element._id}
-    ).limit(5)
+      { conversation_id: element._id }
+    )
+      .sort({ datefield: -1 })
+      .limit(1)
     messagesPerPerson.push(allMsg)
+
+    // 2/ construit un tableau des infos de mes contacts (avatar, pseudo...)
+    const notMe = element.participants[0] === myConnectedId ? element.participants[0] : element.participants[1]
+    const myFriends = await UserModel.findById(notMe)
+    console.log('myFriends', myFriends)
+    friendsData.push(myFriends)
+
+    conversations.push({
+      lastMessage: allMsg[0],
+      friendsDatas: myFriends
+    })
   }))
 
-  console.log("messagesPerPerson",messagesPerPerson)
-
-  res.render('index', { title: 'Express' });
+  res.json({
+    conversations
+  })
 });
 
 
@@ -153,7 +178,9 @@ router.get('/show-msg', async function(req, res, next) {
 query : conversationIdFront : 1234     ou     tokenFront : 1234
 response : collection message qui est liée et conversation_id.    OU : variable contenant 10 objets (10 dernières conv) contenant avatar, pseudo, contenu du message
 */
-router.get('/show-convers', async function(req, res, next) {
+router.get('/show-convers', async function (req, res, next) {
+
+  var user = await userModel.find({ token: req.body.tokenFront })
 
   // var user = await userModel.find({token: req.body.tokenFront})
   
@@ -212,7 +239,7 @@ router.get('/show-convers', async function(req, res, next) {
 body : idReceiverFront: 1234, tokenSenderFront: 1234, avatarReceiverFront : 'exemple.jpg', pseudoReceiverFront: 'gigatank3000', 
 response : new_conversation_data
 */
-router.post('/first-msg', function(req, res, next) {
+router.post('/first-msg', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -220,7 +247,7 @@ router.post('/first-msg', function(req, res, next) {
 body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, contentFront: 'il est né le divin enfant'
 response : newMessageData
 */
-router.post('/send-msg', function(req, res, next) {
+router.post('/send-msg', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -232,7 +259,7 @@ le local storage et on redirige vers la page card-show qui aura un useEffect per
 fonction du local storage.
 
 */
-router.put('/update-filter', function(req, res, next) {
+router.put('/update-filter', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -242,7 +269,7 @@ body: idUserSignaledFront: 1234, warningSignalFront: 1234
 response: result: true ? message: Nous avons bien pris en compte votre signalement : message: 'Erreur, l'utilisateur n'a pas pu être signalé, vous
 pouvez nous envoyer un email à l'adresse mail....'
  */
-router.post('/signalement-help', function(req, res, next) {
+router.post('/signalement-help', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -283,7 +310,7 @@ router.post('/loadProfil', async function(req, res, next) {
 body: tokenFront: 1243
 response: userFind
 */
-router.get('/show-my-profil', function(req, res, next) {
+router.get('/show-my-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -291,7 +318,7 @@ router.get('/show-my-profil', function(req, res, next) {
 body: idUserSelectedFront: 1234
 response: userSelected
  */
-router.get('/show-user-profil', function(req, res, next) {
+router.get('/show-user-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -299,7 +326,7 @@ router.get('/show-user-profil', function(req, res, next) {
 body: tokenFront : 1234,
 response: result: true
 */
-router.delete('/delete-my-profil', function(req, res, next) {
+router.delete('/delete-my-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -307,7 +334,7 @@ router.delete('/delete-my-profil', function(req, res, next) {
 body: idMessageFront: 1234
 response: messagesUpdated
  */
-router.put('/delete-msg', function(req, res, next) {
+router.put('/delete-msg', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -315,7 +342,7 @@ router.put('/delete-msg', function(req, res, next) {
 body: idConversFront: 1234
 response: conversationsUpdated
 */
-router.put('/delete-convers', function(req, res, next) {
+router.put('/delete-convers', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
