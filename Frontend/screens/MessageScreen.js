@@ -16,8 +16,8 @@ function MessageScreen(props) {
 
   useEffect(() => {
 
-    // const myConnectedId = '603f67380ce5ea52ee401325'
-    const myConnectedId = '603f618c78727809c7e1ad9a'
+    const myConnectedId = '603f67380ce5ea52ee401325'
+    // const myConnectedId = '603f618c78727809c7e1ad9a'
 
 
     const getDialogues = async () => {

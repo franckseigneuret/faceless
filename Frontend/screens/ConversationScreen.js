@@ -12,11 +12,9 @@ const Stack = createStackNavigator();
 function ConversationScreen(props) {
 
     const [data, setData] = useState([])
-    const [value, setValue] = useState("")
+    const [currentMsg, setCurrentMsg] = useState("")
     const [myId, setMyId] = useState("")
     const [pseudo, setPseudo] = useState("")
-
-    const test = useRef(null);
 
     
     useEffect(  () => {
@@ -28,9 +26,17 @@ function ConversationScreen(props) {
             setPseudo(response.pseudo)
         }
         loadData()
-        test.scrollToEnd({animated: true})
 
     }, [])
+
+    var sendMsg =  async () => {
+        console.log(currentMsg)
+        await fetch(`${HTTP_IP_DEV}/send-msg`, {
+            method: 'POST',
+            headers: {'Content-Type':'application/x-www-form-urlencoded'},
+            body: `msg=${currentMsg}`
+        });
+    }
 
     var tabMsg = data.map((item)=>{
         if(item.from_id === myId){
@@ -48,13 +54,13 @@ function ConversationScreen(props) {
         }
     })
     
-    console.log("data", myId)
+    // console.log("data", myId)
 
     return (
 
         <View style={{ flex: 1, alignItems: 'center',justifyContent: "space-between", backgroundColor: '#FFEEDD', paddingTop: 20, height: "100%"}}>
             <View style={styles.header}>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={()=>props.navigation.navigate('MessageScreen')}>
                 <Ionicons name="chevron-back" size={30} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
                 </TouchableOpacity>
                 <View>
@@ -65,20 +71,22 @@ function ConversationScreen(props) {
                 <Ionicons name="search" size={30} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
                 </TouchableOpacity>
             </View>
-            <ScrollView style={{flex:1, width: "90%"}} showsVerticalScrollIndicator={false} ref="scrollView">
+            <ScrollView style={{flex:1, width: "90%"}} showsVerticalScrollIndicator={false}>
             {tabMsg}
             {tabMsg}
             </ScrollView>
-            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{width: "90%"}}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{width: "80%", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
                 <Input
               containerStyle = {{marginBottom: 5, borderWidth: 2,minHeight: 30, maxHeight: 100,  borderColor: "#8C8C8C", borderRadius: 20, backgroundColor: "white" }}
               placeholder='Your message'
               inputContainerStyle={{borderBottomWidth:0}}
               multiline={true}
-
-            //   value={currentMsg}
-            //   onChangeText={(val) => setCurrentMsg(val)}
-                />
+              value={currentMsg}
+              onChangeText={(val) => setCurrentMsg(val)}
+            />
+            <TouchableOpacity style={styles.buttonSend} onPress={()=> sendMsg()}>
+                <Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
+            </TouchableOpacity>
             </KeyboardAvoidingView>
         </View>
   );
@@ -152,4 +160,25 @@ const styles = StyleSheet.create({
         color: "#FFFFFF", 
         fontFamily: "Montserrat_400Regular",
       },
+      buttonSend:{
+        backgroundColor: "#5571D7",
+        padding: 10,
+        width: 50,
+        height: 50,
+        borderRadius: 30,
+        borderColor:'#5571D7',
+        shadowColor: "black",
+        shadowOffset: {width: 1, height:1},
+        shadowOpacity: 0.5,
+        display: 'flex',
+        justifyContent:'center',
+        alignItems:'center',
+        marginLeft: 10
+      },
+      sendButton: {
+        alignSelf: 'center',
+        marginLeft:3,
+        marginBottom:5,
+        transform: [{rotate:'-45deg'}]
+      }
     })

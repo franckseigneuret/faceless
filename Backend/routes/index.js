@@ -248,7 +248,8 @@ body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, content
 response : newMessageData
 */
 router.post('/send-msg', function (req, res, next) {
-  res.render('index', { title: 'Express' });
+  console.log(req.body.msg)
+  res.json({result: true});
 });
 
 
