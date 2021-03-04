@@ -3,6 +3,7 @@ import { Button } from 'react-native-elements';
 import { StyleSheet, View, Dimensions, Image } from 'react-native';
 import AppLoading from 'expo-app-loading';
 
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 

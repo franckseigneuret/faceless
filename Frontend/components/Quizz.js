@@ -67,7 +67,7 @@ function quizz(props) {
   const [dateToDisplay, setDateToDisplay] = useState('JJ/MM/AAAA')
 
   const handleOnNextEmail = async () => {
-    var rawResponse = await fetch(`http://172.20.10.8:3000/email-check`, {
+    var rawResponse = await fetch(`http://${}/email-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}`
