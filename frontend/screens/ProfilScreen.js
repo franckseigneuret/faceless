@@ -120,8 +120,7 @@ export default function ProfilScreen() {
       rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `emailFront=${emailText}&localisationFront=${cityText}&passwordFront=${mdpText}&genderFront=${gender}`,
-      // tokenFront=${tokenAsync}&
+        body: `tokenFront=${tokenAsync}&emailFront=${emailText}&localisationFront=${cityText}&passwordFront=${mdpText}&genderFront=${gender}`,
       });
       response = await rawResponse.json();
       console.log(response, "-------- RESPONSE --------");
@@ -165,7 +164,7 @@ export default function ProfilScreen() {
     AsyncStorage.getItem("token", function(error, data) {
       var userData = data
       console.log(userData, "<--- userData pour le token du async"); 
-      // setTokenAsync(userData.token) 
+      setTokenAsync(userData.token) 
     });
 
 
