@@ -1,7 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Button } from 'react-native-elements';
 import { StyleSheet, View, Dimensions, Image } from 'react-native';
 import AppLoading from 'expo-app-loading';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -15,6 +17,23 @@ import {
 
 
 export default function registration(props) {
+
+  var alreadyIn;
+
+  useEffect(() => {
+    const handleData = async () => {
+      AsyncStorage.getItem("token", function(error, data) {
+        console.log(data,'<------<-------<------<----- token on local storage')
+        data != null ? alreadyIn = true : alreadyIn = false
+
+        if(alreadyIn === true){
+         props.navigation.navigate('BottomNavigator', { screen: 'HomeScreen' })
+        }      
+    });
+       };
+       handleData()
+       console.log(alreadyIn, '<------ alreadyIn')
+    }, []);
 
     let [fontsLoaded] = useFonts({
         Montserrat_700Bold,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Dimensions, Image, ScrollView, TouchableOpacity } from 'react-native';
 import {connect} from 'react-redux';
-import { Ionicons } from '@expo/vector-icons'; 
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import  HTTP_IP_DEV from '../mon_ip'
 
@@ -35,7 +35,7 @@ function QuizzAvatar(props) {
     var rawResponse = await fetch(`${HTTP_IP_DEV}/sign-up-second-step`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
-     body: `problemDescriptionFront=${props.userDisplay.problem_description}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation.coordinates)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${token}`
+     body: `problemDescriptionFront=${props.userDisplay.problem_description}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${token}`
     });
     var response = await rawResponse.json()
     }
