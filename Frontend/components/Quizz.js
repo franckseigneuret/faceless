@@ -67,7 +67,7 @@ function quizz(props) {
   const [dateToDisplay, setDateToDisplay] = useState('JJ/MM/AAAA')
 
   const handleOnNextEmail = async () => {
-    var rawResponse = await fetch(`http://172.20.10.8:3000/email-check`, {
+    var rawResponse = await fetch(`http://172.17.1.40:3000/email-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}`
@@ -82,7 +82,7 @@ function quizz(props) {
 
   const handleOnNextPseudo = async () => {
 
-    var rawResponse = await fetch(`http://172.20.10.8:3000/pseudo-check`, {
+    var rawResponse = await fetch(`http://172.17.1.40:3000/pseudo-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `pseudoFront=${pseudo}`
@@ -137,7 +137,7 @@ function quizz(props) {
     })
     console.log(problems, '<------ state problems')
     userInfo = props.userDisplay
-    var rawResponse = await fetch(`http://172.20.10.8:3000/sign-up-first-step`, {
+    var rawResponse = await fetch(`http://172.17.1.40:3000/sign-up-first-step`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}&passwordFront=${password}&pseudoFront=${pseudo}&birthDateFront=${birthDate}&problemsFront=${JSON.stringify(problems)}`
@@ -146,7 +146,7 @@ function quizz(props) {
     
     AsyncStorage.setItem("token", response.userSaved.token)
 
-    var dateNow = new Date()
+    dateNow = new Date()
     var conditionAge = (86400000*365)*18
     var differenceDates = (dateNow - birthDate)
     var isAdult;
@@ -160,12 +160,16 @@ function quizz(props) {
       isAdult == true ? AsyncStorage.setItem("filter", JSON.stringify({ // si isAdult == true alors on set le min age du filter à l'âge de l'user et le max age à l'age de l'user +10 ans
         problemsTypes: problems, 
         gender: 'all', 
-        age: {minAge: Math.floor(differenceDates/(86400000*365)), maxAge: Math.ceil(differenceDates/(86400000*365)+10)},
+        age: {
+          minAge: Math.floor(differenceDates/(86400000*365)), 
+          maxAge: 'all',
+          isAdult: isAdult,
+        },
         localisation: 'France'
       })) : AsyncStorage.setItem("filter", JSON.stringify({ // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
           problemsTypes: problems, 
           gender: 'all', 
-          age: {minAge: Math.floor(differenceDates/(86400000*365)), maxAge: 18},
+          age: {minAge: Math.floor(differenceDates/(86400000*365)), maxAge: 17},
           localisation: 'France'
         }))
   } 
