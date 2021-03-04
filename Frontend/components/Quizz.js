@@ -86,7 +86,7 @@ function quizz(props) {
 
   const handleOnNextPseudo = async () => {
 
-    var rawResponse = await fetch(`http://172.20.10.8:3000/pseudo-check`, {
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/pseudo-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `pseudoFront=${pseudo}`
@@ -141,7 +141,7 @@ function quizz(props) {
     })
     console.log(problems, '<------ state problems')
     userInfo = props.userDisplay
-    var rawResponse = await fetch(`http://172.20.10.8:3000/sign-up-first-step`, {
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/sign-up-first-step`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}&passwordFront=${password}&pseudoFront=${pseudo}&birthDateFront=${birthDate}&problemsFront=${JSON.stringify(problems)}`
