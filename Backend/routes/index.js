@@ -132,30 +132,29 @@ query : tokenFront : 1234, birthDateFront : (12/23/1992), problemsTypesFront : S
 response : userFiltered : array, pseudo (celui du user connecté) : String
 */
 router.get('/show-card', async function(req, res, next) {
-  console.log(JSON.parse(req.query.filterFront), '<<<<<------ filter front')
-  console.log(req.query.tokenFront, '<<<<<------ token front')
 
+  //traitement date 
+  var filterFront = JSON.parse(req.query.filterFront);
+  console.log(filterFront, '<<<<<------ filter front')
   var user = await UserModel.findOne({token: req.query.tokenFront})
   var userToDisplay = await UserModel.find({
     token: {$ne : req.query.tokenFront}, 
     is_adult: user.is_adult, 
-    age: {$elemMatch: {$gte: req.query.filterFront.age.minAge, $lt: req.query.filterFront.age.maxAge}},
+   ////// A FAIRE ///// age: {$elemMatch: {$gte: filterFront.age.minAge, $lt: filterFront.age.maxAge}}, <<<<------!! Faire un filtre avant d'envoyer en base de donner pour créer la clé AGE
   })
 
-  // var problemsMatched = false
+  var userToShow =[];
+
+  for (let i=0; i<userToDisplay.length; i++) {
+    if (filterFront.problemsTypes.some(r=> userToDisplay[i].problems_types.includes(r)) == true) {
+      userToShow.push(userToDisplay[i]);
+    }
+  }
+
+  // console.log(userToShow,'<---------User filtrés')
   
-  // const check = () => {
-    
-  // }
 
-  // for(var i = 0; i< userToDisplay.length; i++ ) {
-  //     if(userToDisplay[i].problems_types.some())
-  //   }
-  
-  // console.log(userToDisplay, '<---------- userto display')
-
-
-  res.json({user:user, userToShow:userToDisplay, });
+  res.json({user:user, userToShow:userToShow, });
 });
 
 
