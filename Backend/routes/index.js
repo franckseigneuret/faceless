@@ -54,6 +54,21 @@ router.post('/pseudo-check', async function (req, res, next){
 router.post('/sign-up-first-step', async function(req, res, next){
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
+  console.log(req.body, '<----- req.body')
+  var birthDate = new Date(req.body.birthDateFront)
+  var dateToday = new Date()
+  var dateCompare = dateToday - birthDate
+  console.log(birthDate, '<-------- birthdate')
+  console.log(dateToday, '<----- date today');
+  console.log(dateCompare, '<------date compare');
+  var conditionDate = (86400000*365)*18
+  var isAdult;
+
+  if(dateCompare > conditionDate) {
+    isAdult = true
+  } else {
+    isAdult = false
+  }
 
   var user = await new UserModel({
     token: uid2(32),
@@ -61,10 +76,12 @@ router.post('/sign-up-first-step', async function(req, res, next){
     password: hash,
     pseudo: req.body.pseudoFront,
     birthDate: req.body.birthDateFront,
-    problems_types: JSON.parse(req.body.problemsFront)
+    problems_types: JSON.parse(req.body.problemsFront),
+    is_adult: isAdult,
   })
 
   var userSaved = await user.save()
+  console.log(userSaved, '<------------ user saved')
 
   res.json({userSaved: userSaved})
 })
@@ -77,8 +94,6 @@ router.post('/sign-up-first-step', async function(req, res, next){
 problemDescriptionFront=${props.userDisplay}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation.coordinates)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${tokenOnLocalStorage}
   */
 router.post('/sign-up-second-step', async function(req, res, next) {
-
-  console.log(req.body.tokenFront, '----> token front')
 
   var user = await UserModel.updateOne(
     { token: req.body.tokenFront}, // ciblage à gauche de la virgule
@@ -122,28 +137,35 @@ response : userFiltered : array, pseudo (celui du user connecté) : String
 router.get('/show-card', async function(req, res, next) {
 
   var user = await UserModel.findOne({token: req.query.tokenFront})
-  var userToDisplay = await UserModel.find({token: {$ne : req.query.tokenFront}})
+  var userToDisplay = await UserModel.find({token: {$ne : req.query.tokenFront}, is_adult: user.is_adult})
+  console.log(userToDisplay, '<--- user')
 
-  var birthDate = user.birthDate
-  var dateToday = new Date()
-  var dateCompare = dateToday - birthDate
-  var conditionDate = (86400000*365)*18
-  if((dateToday - dateCompare) > conditionDate && (user.is_adult = false)) {
-    UserModel.updateOne(
-      { is_adult: false },
-      { $set: { is_adult: true },
-    })
-  }
+  // var birthDate = user.birthDate
+  // var dateToday = new Date()
+  // var dateCompare = dateToday - birthDate
+  // var conditionDate = (86400000*365)*18
+  // if(dateCompare > conditionDate && (user.is_adult = false)) {
+  //   var userToUpdate = await UserModel.updateOne(
+  //     { token: req.body.tokenFront}, // ciblage à gauche de la virgule
+  //     { 
+  //       is_adult: true,
+  //      }
+  // );
+  // }
+  
+  // var userUpdated = await UserModel.findOne({token: req.query.tokenFront})
 
-  if(user.is_adult) {
-    var userToShow = userToDisplay.filter(e => e.is_adult == true);
-  } else {
-    var userToShow = userToDisplay.filter(e => e.is_adult == false);
-  }
+  // console.log(userUpdated.is_adult, '<------- user is adult ??')
+  
+  // if(user.is_adult) {
+  //   var userToShow = userToDisplay.filter(e => e.is_adult == true);
+  //   console.
+  // } else {
+  //   var userToShow = userToDisplay.filter(e => e.is_adult == false);
+  // }
 
-  console.log('Users----->',userToShow)
 
-  res.json({user:user, userToShow:userToShow, });
+  res.json({user:user, userToShow:userToDisplay, });
 });
 
 
@@ -286,7 +308,6 @@ response: userSaved
 router.put("/update-profil", async function (req, res, next) {
 
   var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
-  console.log(userBeforeUpdate, '<---- userBeforeUpdate')
 
   // ajout du genre et descriptionProblemFront
   var userUpdate = await UserModel.updateOne(
@@ -301,7 +322,6 @@ router.put("/update-profil", async function (req, res, next) {
   );
 
   var userAfterUpdate = await UserModel.findOne({token: req.body.tokenFront})
-  console.log(userAfterUpdate, '<---- userAfterUpdate')
 
   res.json({ user: userBeforeUpdate });
 });

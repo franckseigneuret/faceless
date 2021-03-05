@@ -5,7 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Animatable from 'react-native-animatable';
-import  HTTP_IP_DEV from '../mon_ip'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import HTTP_IP_DEV from '../mon_ip'
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -20,13 +21,17 @@ function HomeScreen(props) {
 
 
   useEffect(() => {
-  const handleData = async () => {
-      var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=123456789`);
+  const handleData = () => {
+    AsyncStorage.getItem("token", async function(error, data) {
+      console.log(data, '<-------- data token ?????')
+      var rawResponse = await fetch(`http://${HTTP_IP_DEV}/show-card?tokenFront=${data}`);
       var response = await rawResponse.json();
+      console.log(response, '<---- response homescreen')
       setUserToDisplay(response.userToShow)
       setPseudo(response.user.pseudo)
-     };
-     handleData()
+      });
+    };
+    handleData()
   }, []);
 
 
@@ -91,7 +96,7 @@ function HomeScreen(props) {
             <Ionicons name="funnel" size={25} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
           </TouchableOpacity>
         </View>
-        <ScrollView  snapToInterval={windowWidth} decelerationRate='fast' horizontal >
+        <ScrollView showsHorizontalScrollIndicator={false} snapToInterval={windowWidth} decelerationRate='fast' horizontal >
           {CardToSwipe}
         </ScrollView >
       </View>

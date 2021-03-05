@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Image , TouchableOpacity } from 'react-native'; 
 import {connect} from 'react-redux';
+import HTTP_IP_DEV from '../mon_ip'
 
 import BlueButton from './BlueButton';
 import QuizzTitre from './QuizzTitre';
@@ -16,6 +17,7 @@ function QuizzGender(props) {
   
 
   const [isSelected, setIsSelected] = useState(-1)
+  const [gender, setGender] = useState('')
 
   var handleClick = () => {
     props.onAddUserGender(gender)

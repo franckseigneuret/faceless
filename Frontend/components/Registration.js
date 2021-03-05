@@ -4,6 +4,7 @@ import { StyleSheet, View, Dimensions, Image } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import HTTP_IP_DEV from '../mon_ip'
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -22,6 +23,7 @@ export default function registration(props) {
 
   useEffect(() => {
     const handleData = async () => {
+
       AsyncStorage.getItem("token", function(error, data) {
         console.log(data,'<------<-------<------<----- token on local storage')
         data != null ? alreadyIn = true : alreadyIn = false
