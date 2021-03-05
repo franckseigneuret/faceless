@@ -25,19 +25,24 @@ function MessageScreen(props) {
   useEffect(() => {
     AsyncStorage.getItem("token", function (error, data) {
       setToken(data)
+      // setToken('NQQld4uHQPBLhqkXlngfYE8G0dbBc6Od')
     })
-    
+
     const getId = async () => {
       const idRaw = await fetch(HTTP_IP_DEV + '/get-id-from-token?token=' + token, { method: 'GET' })
-      await idRaw.json()
+      const idResponse = await idRaw.json()
+
+      return idResponse.id
     }
-    const myConnectedId = getId()
 
     const getDialogues = async () => {
+      const myConnectedId = await getId()
+      console.log('myConnectedId = ', myConnectedId)
+      setMyId(myConnectedId)
       const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myConnectedId, { method: 'GET' })
 
       const dialoguesWithFriends = await dialogues.json()
-      // console.log('dialoguesWithFriends = ', dialoguesWithFriends)
+      console.log('dialoguesWithFriends = ', dialoguesWithFriends)
       setCountFriends(dialoguesWithFriends.conversations.length)
       setMsgFriends(dialoguesWithFriends.conversations)
       // setFriends(dialoguesWithFriends.friendsData)
@@ -49,6 +54,7 @@ function MessageScreen(props) {
   const items = msgFriends.map((el, i) => {
 
     if (el.lastMessage && el.friendsDatas) {
+      console.log('el ', el.nbUnreadMsg)
       let when = new Date(el.lastMessage.date)
       let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
         + ' à ' + when.toLocaleTimeString('fr-FR')
@@ -57,12 +63,20 @@ function MessageScreen(props) {
         key={i}
         onPress={() => props.navigation.navigate('ConversationScreen', {
           token,
-          myId: myConnectedId,
+          myId,
           myContactId: el.friendsDatas._id,
           convId: el.lastMessage.conversation_id,
         })}>
 
         <View style={styles.conversations}>
+          {
+            el.nbUnreadMsg ?
+              <View style={styles.nonLuContent}>
+                <Text style={styles.nonLuText}>{el.nbUnreadMsg}</Text>
+              </View>
+              :
+              <Text />
+          }
           <View style={styles.lastMessage}>
             <Text style={styles.friend}>
               {el.friendsDatas.pseudo}
@@ -119,7 +133,7 @@ function MessageScreen(props) {
           </View>
           :
           <Text>
-            Vous n'avez pas de confident
+            Vous n'avez pas de confident !
             <Button title="Rechercher des confidents" />
           </Text>
 
@@ -154,6 +168,8 @@ const styles = StyleSheet.create({
     marginVertical: 40,
   },
   conversations: {
+    padding: 5,
+    position: 'relative',
     flexDirection: 'row',
     justifyContent: 'space-between',
     height: 115,
@@ -172,6 +188,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  nonLuText: {
+    color: 'white',
+  },
+  nonLuContent: {
+    backgroundColor: '#5571D7',
+    position: 'absolute',
+    right: -5,
+    top: -5,
+    // textAlign: 'center',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+
   },
   scrollView: {
     height: windowSize.height * .7,

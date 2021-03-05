@@ -9,7 +9,7 @@ var uid2 = require('uid2');
 
 const cost = 10;
 
-
+var ObjectId = require('mongodb').ObjectId;
 
 
 /* GET home page. */
@@ -189,6 +189,7 @@ router.get('/show-msg', async function (req, res, next) {
   }
 
   const myConnectedId = req.query.user_id
+  // console.log('myConnectedId', myConnectedId)
 
   // load les conversations avec mes contacts
   const allMyConversations = await ConversationsModel.find({
@@ -199,24 +200,36 @@ router.get('/show-msg', async function (req, res, next) {
 
 
   await Promise.all(allMyConversations.map(async (element, index) => {
-    // 1/ construit un tableau listant le dernier message de chaque conversation
-    var allMsg = await MessagesModel.find(
-      { conversation_id: element._id }
+    // compter les messages non lus par l'utilisateur de l'app
+    var allUnreadMsg = await MessagesModel.find({
+        conversation_id: element._id,
+        to_id: new ObjectId(myConnectedId),
+        read: false,
+      }
     )
+
+    // construit un tableau listant le dernier message de chaque conversation
+    var lastMsg = await MessagesModel.find({
+      conversation_id: element._id
+    })
       .sort({ datefield: -1 })
       .limit(1)
-    messagesPerPerson.push(allMsg)
+    messagesPerPerson.push(lastMsg)
 
-    // 2/ construit un tableau des infos de mes contacts (avatar, pseudo...)
+    // construit un tableau des infos de mes contacts (avatar, pseudo...)
     const notMe = element.participants[0] === myConnectedId ? element.participants[0] : element.participants[1]
     const myFriends = await UserModel.findById(notMe)
     console.log('myFriends', myFriends)
     friendsData.push(myFriends)
 
     conversations.push({
-      lastMessage: allMsg[0],
+      nbUnreadMsg: allUnreadMsg.length,
+      lastMessage: lastMsg[0],
       friendsDatas: myFriends
     })
+
+    // tri du tableau pour mettre les blocs avec des messages non lus en haut
+    conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1)
   }))
 
   res.json({
@@ -230,18 +243,17 @@ query : conversationIdFront : 1234     ou     tokenFront : 1234
 response : collection message qui est liée et conversation_id.    OU : variable contenant 10 objets (10 dernières conv) contenant avatar, pseudo, contenu du message
 */
 router.get('/show-convers', async function (req, res, next) {
-  
+
   var infoContact = await UserModel.findOne(
-    {_id: req.query.myContactId}
-    )
-    
-    var pseudo = infoContact.pseudo
-    var avatar = infoContact.avatar
-  
+    { _id: req.query.myContactId }
+  )
+
+  var pseudo = infoContact.pseudo
+  var avatar = infoContact.avatar
+
   var allMessagesWithOneUser = await MessagesModel.find(
     { conversation_id: req.query.convId }
-  );
-
+  ).sort({ date: 1 });
   res.json({ allMessagesWithOneUser, pseudo, avatar })
 });
 
@@ -277,7 +289,7 @@ router.post('/send-msg', async function (req, res, next) {
     { conversation_id: searchConvWithUser._id }
   );
 
-  res.json({result: true});
+  res.json({ result: true });
 });
 
 
@@ -335,8 +347,8 @@ router.put("/update-profil", async function (req, res, next) {
   res.json({ userFromBack: userBeforeUpdate });
 });
 
-router.post('/loadProfil', async function(req, res, next) {
-  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+router.post('/loadProfil', async function (req, res, next) {
+  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   res.json({ userFromBack: userBeforeUpdate });
 });
 
