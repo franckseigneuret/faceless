@@ -10,6 +10,7 @@ var uid2 = require('uid2');
 const cost = 10;
 
 var ObjectId = require('mongodb').ObjectId;
+const { request } = require('express');
 
 
 /* GET home page. */
@@ -167,8 +168,6 @@ router.get('/get-id-from-token', async function (req, res, next) {
     error: false,
     id: me._id
   })
-
-
 })
 
 /**
@@ -202,25 +201,23 @@ router.get('/show-msg', async function (req, res, next) {
   await Promise.all(allMyConversations.map(async (element, index) => {
     // compter les messages non lus par l'utilisateur de l'app
     var allUnreadMsg = await MessagesModel.find({
-        conversation_id: element._id,
-        to_id: new ObjectId(myConnectedId),
-        read: false,
-      }
-    )
+      conversation_id: element._id,
+      to_id: new ObjectId(myConnectedId),
+      read: false,
+    })
+    console.log('no lu ', allUnreadMsg.length)
 
     // construit un tableau listant le dernier message de chaque conversation
     var lastMsg = await MessagesModel.find({
       conversation_id: element._id
     })
-      .sort({ datefield: -1 })
+      .sort({ date: -1 })
       .limit(1)
     messagesPerPerson.push(lastMsg)
 
     // construit un tableau des infos de mes contacts (avatar, pseudo...)
     const notMe = element.participants[0] == myConnectedId ? element.participants[1] : element.participants[0]
-    console.log('notme',notMe)
     const myFriends = await UserModel.findById(notMe)
-    console.log('myFriends', myFriends)
     friendsData.push(myFriends)
 
     conversations.push({
@@ -255,6 +252,20 @@ router.get('/show-convers', async function (req, res, next) {
   var allMessagesWithOneUser = await MessagesModel.find(
     { conversation_id: req.query.convId }
   ).sort({ date: 1 });
+
+  // les messages non lus deviennent lus
+  console.log('req.query.token == ', req.query.token) 
+  if (req.query.token !=  null) {
+    console.log('tooook', req.query.token)
+
+    const me = await UserModel.findOne({
+      token: req.query.token
+    })
+    if(me) {
+      await MessagesModel.updateMany({ to_id: me._id}, { read: true })
+    }
+  }
+
   res.json({ allMessagesWithOneUser, pseudo, avatar })
 });
 
