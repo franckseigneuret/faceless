@@ -9,7 +9,7 @@ var uid2 = require('uid2');
 
 const cost = 10;
 
-
+var ObjectId = require('mongodb').ObjectId;
 
 
 /* GET home page. */
@@ -54,21 +54,6 @@ router.post('/pseudo-check', async function (req, res, next) {
 router.post('/sign-up-first-step', async function (req, res, next) {
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
-  console.log(req.body, '<----- req.body')
-  var birthDate = new Date(req.body.birthDateFront)
-  var dateToday = new Date()
-  var dateCompare = dateToday - birthDate
-  console.log(birthDate, '<-------- birthdate')
-  console.log(dateToday, '<----- date today');
-  console.log(dateCompare, '<------date compare');
-  var conditionDate = (86400000*365)*18
-  var isAdult;
-
-  if(dateCompare > conditionDate) {
-    isAdult = true
-  } else {
-    isAdult = false
-  }
 
   var user = await new UserModel({
     token: uid2(32),
@@ -76,12 +61,10 @@ router.post('/sign-up-first-step', async function (req, res, next) {
     password: hash,
     pseudo: req.body.pseudoFront,
     birthDate: req.body.birthDateFront,
-    problems_types: JSON.parse(req.body.problemsFront),
-    is_adult: isAdult,
+    problems_types: JSON.parse(req.body.problemsFront)
   })
 
   var userSaved = await user.save()
-  console.log(userSaved, '<------------ user saved')
 
   res.json({ userSaved: userSaved })
 })
@@ -94,6 +77,8 @@ router.post('/sign-up-first-step', async function (req, res, next) {
 problemDescriptionFront=${props.userDisplay}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation.coordinates)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${tokenOnLocalStorage}
   */
 router.post('/sign-up-second-step', async function (req, res, next) {
+
+  console.log(req.body.tokenFront, '----> token front')
 
   var user = await UserModel.updateOne(
     { token: req.body.tokenFront }, // ciblage à gauche de la virgule
@@ -136,36 +121,30 @@ response : userFiltered : array, pseudo (celui du user connecté) : String
 */
 router.get('/show-card', async function (req, res, next) {
 
-  var user = await UserModel.findOne({token: req.query.tokenFront})
-  var userToDisplay = await UserModel.find({token: {$ne : req.query.tokenFront}, is_adult: user.is_adult})
-  console.log(userToDisplay, '<--- user')
+  var user = await UserModel.findOne({ token: req.query.tokenFront })
+  var userToDisplay = await UserModel.find({ token: { $ne: req.query.tokenFront } })
 
-  // var birthDate = user.birthDate
-  // var dateToday = new Date()
-  // var dateCompare = dateToday - birthDate
-  // var conditionDate = (86400000*365)*18
-  // if(dateCompare > conditionDate && (user.is_adult = false)) {
-  //   var userToUpdate = await UserModel.updateOne(
-  //     { token: req.body.tokenFront}, // ciblage à gauche de la virgule
-  //     { 
-  //       is_adult: true,
-  //      }
-  // );
-  // }
-  
-  // var userUpdated = await UserModel.findOne({token: req.query.tokenFront})
+  var birthDate = user.birthDate
+  var dateToday = new Date()
+  var dateCompare = dateToday - birthDate
+  var conditionDate = (86400000 * 365) * 18
+  if ((dateToday - dateCompare) > conditionDate && (user.is_adult = false)) {
+    UserModel.updateOne(
+      { is_adult: false },
+      {
+        $set: { is_adult: true },
+      })
+  }
 
-  // console.log(userUpdated.is_adult, '<------- user is adult ??')
-  
-  // if(user.is_adult) {
-  //   var userToShow = userToDisplay.filter(e => e.is_adult == true);
-  //   console.
-  // } else {
-  //   var userToShow = userToDisplay.filter(e => e.is_adult == false);
-  // }
+  if (user.is_adult) {
+    var userToShow = userToDisplay.filter(e => e.is_adult == true);
+  } else {
+    var userToShow = userToDisplay.filter(e => e.is_adult == false);
+  }
 
+  console.log('Users----->', userToShow)
 
-  res.json({user:user, userToShow:userToDisplay, });
+  res.json({ user: user, userToShow: userToShow, });
 });
 
 
@@ -210,6 +189,7 @@ router.get('/show-msg', async function (req, res, next) {
   }
 
   const myConnectedId = req.query.user_id
+  // console.log('myConnectedId', myConnectedId)
 
   // load les conversations avec mes contacts
   const allMyConversations = await ConversationsModel.find({
@@ -220,24 +200,36 @@ router.get('/show-msg', async function (req, res, next) {
 
 
   await Promise.all(allMyConversations.map(async (element, index) => {
-    // 1/ construit un tableau listant le dernier message de chaque conversation
-    var allMsg = await MessagesModel.find(
-      { conversation_id: element._id }
+    // compter les messages non lus par l'utilisateur de l'app
+    var allUnreadMsg = await MessagesModel.find({
+        conversation_id: element._id,
+        to_id: new ObjectId(myConnectedId),
+        read: false,
+      }
     )
+
+    // construit un tableau listant le dernier message de chaque conversation
+    var lastMsg = await MessagesModel.find({
+      conversation_id: element._id
+    })
       .sort({ datefield: -1 })
       .limit(1)
-    messagesPerPerson.push(allMsg)
+    messagesPerPerson.push(lastMsg)
 
-    // 2/ construit un tableau des infos de mes contacts (avatar, pseudo...)
+    // construit un tableau des infos de mes contacts (avatar, pseudo...)
     const notMe = element.participants[0] === myConnectedId ? element.participants[0] : element.participants[1]
     const myFriends = await UserModel.findById(notMe)
     console.log('myFriends', myFriends)
     friendsData.push(myFriends)
 
     conversations.push({
-      lastMessage: allMsg[0],
+      nbUnreadMsg: allUnreadMsg.length,
+      lastMessage: lastMsg[0],
       friendsDatas: myFriends
     })
+
+    // tri du tableau pour mettre les blocs avec des messages non lus en haut
+    conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1)
   }))
 
   res.json({
@@ -251,18 +243,17 @@ query : conversationIdFront : 1234     ou     tokenFront : 1234
 response : collection message qui est liée et conversation_id.    OU : variable contenant 10 objets (10 dernières conv) contenant avatar, pseudo, contenu du message
 */
 router.get('/show-convers', async function (req, res, next) {
-  
+
   var infoContact = await UserModel.findOne(
-    {_id: req.query.myContactId}
-    )
-    
-    var pseudo = infoContact.pseudo
-    var avatar = infoContact.avatar
-  
+    { _id: req.query.myContactId }
+  )
+
+  var pseudo = infoContact.pseudo
+  var avatar = infoContact.avatar
+
   var allMessagesWithOneUser = await MessagesModel.find(
     { conversation_id: req.query.convId }
-  );
-
+  ).sort({ date: 1 });
   res.json({ allMessagesWithOneUser, pseudo, avatar })
 });
 
@@ -281,12 +272,12 @@ response : newMessageData
 router.post('/send-msg', async function (req, res, next) {
 
   const searchConvWithUser = await ConversationsModel.findOne({
-    participants: { $all: ['603f618c78727809c7e1ad9a', req.body.myContactId] }
+    participants: { $all: ['603f67380ce5ea52ee401325', req.body.myContactId] }
   })
 
   var msg = await new MessagesModel({
     conversation_id: searchConvWithUser._id,
-    from_id: '603f618c78727809c7e1ad9a',
+    from_id: '603f67380ce5ea52ee401325',
     to_id: req.body.myContactId,
     content: req.body.msg,
     date: new Date(),
@@ -298,7 +289,7 @@ router.post('/send-msg', async function (req, res, next) {
     { conversation_id: searchConvWithUser._id }
   );
 
-  res.json({result: true});
+  res.json({ result: true });
 });
 
 
@@ -335,7 +326,8 @@ response: userSaved
 */
 router.put("/update-profil", async function (req, res, next) {
 
-  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
+  console.log(userBeforeUpdate, '<---- userBeforeUpdate')
 
   // ajout du genre et descriptionProblemFront
   var userUpdate = await UserModel.updateOne(
@@ -349,13 +341,14 @@ router.put("/update-profil", async function (req, res, next) {
     }
   );
 
-  var userAfterUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  var userAfterUpdate = await UserModel.findOne({ token: req.body.tokenFront })
+  console.log(userAfterUpdate, '<---- userAfterUpdate')
 
   res.json({ userFromBack: userBeforeUpdate });
 });
 
-router.post('/loadProfil', async function(req, res, next) {
-  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+router.post('/loadProfil', async function (req, res, next) {
+  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   res.json({ userFromBack: userBeforeUpdate });
 });
 

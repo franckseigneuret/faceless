@@ -26,7 +26,7 @@ function ConversationScreen(props) {
         setAvatar(response.avatar)
         setMyContactId(props.route.params.myContactId)
     }
-
+    
     useEffect(  () => {
         loadMsg()
     }, [props.route.params.convId])
@@ -41,16 +41,21 @@ function ConversationScreen(props) {
         loadMsg()
     }
 
-    var tabMsg = data.map((item)=>{
+    var tabMsg = data.map((item, i)=>{
+        let when = new Date(item.date)
+        let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
+        + ' à ' + when.toLocaleTimeString('fr-FR')
         if(item.to_id === myContactId){
-            return <View style={styles.blocRight}>
+            return <View style={styles.blocRight} key={i}>
                         <View style={styles.msgRight}>
+                            <Text style={styles.date} >{whenFormat}</Text>
                             <Text style={styles.textRight} >{item.content}</Text>
                         </View>
                     </View>
         } else {
-            return <View style={styles.blocLeft}>
+            return <View style={styles.blocLeft} key={i}>
                         <View style={styles.msgLeft}>
+                            <Text style={styles.date} >{whenFormat}</Text>
                             <Text style={styles.textLeft} >{item.content}</Text>
                         </View>
                     </View>
@@ -144,7 +149,7 @@ const styles = StyleSheet.create({
     textLeft: {
       textAlign: "left", 
       color: "#000000", 
-      fontFamily: "Montserrat_400Regular",
+    //   fontFamily: "Montserrat_400Regular",
     },
     blocRight: {
       display: "flex",
@@ -162,7 +167,7 @@ const styles = StyleSheet.create({
     textRight: {
         textAlign: "right", 
         color: "#FFFFFF", 
-        fontFamily: "Montserrat_400Regular",
+        // fontFamily: "Montserrat_400Regular",
       },
       buttonSend:{
         backgroundColor: "#5571D7",
@@ -184,5 +189,9 @@ const styles = StyleSheet.create({
         marginLeft:3,
         marginBottom:5,
         transform: [{rotate:'-45deg'}]
+      },
+      date: {
+        color: 'red',
+        textAlign: 'right'
       }
     })

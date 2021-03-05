@@ -9,10 +9,6 @@ import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import  HTTP_IP_DEV from '../mon_ip'
 
-
-
-import HTTP_IP_DEV from '../mon_ip'
-
 import {
   useFonts,
   Montserrat_700Bold,
