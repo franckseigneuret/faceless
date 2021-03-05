@@ -10,6 +10,7 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const windowSize = Dimensions.get('window');
+console.log('windowSize', windowSize)
 
 function MessageScreen(props) {
 
@@ -19,13 +20,9 @@ function MessageScreen(props) {
   const [msgFriends, setMsgFriends] = useState([])
   const [friends, setFriends] = useState([])
 
-  // const myConnectedId = '603f67380ce5ea52ee401325'
-  // const myConnectedId = '603f618c78727809c7e1ad9a'
-
   useEffect(() => {
-    AsyncStorage.getItem("token", function (error, data) {
-      setToken(data)
-      // setToken('NQQld4uHQPBLhqkXlngfYE8G0dbBc6Od')
+    AsyncStorage.getItem("token", function (error, tokenValue) {
+      setToken(tokenValue)
     })
 
     const getId = async () => {
@@ -42,7 +39,7 @@ function MessageScreen(props) {
       const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myConnectedId, { method: 'GET' })
 
       const dialoguesWithFriends = await dialogues.json()
-      console.log('dialoguesWithFriends = ', dialoguesWithFriends)
+      console.log('dialoguesWithFriends.conversations = ', dialoguesWithFriends.conversations)
       setCountFriends(dialoguesWithFriends.conversations.length)
       setMsgFriends(dialoguesWithFriends.conversations)
       // setFriends(dialoguesWithFriends.friendsData)
@@ -85,7 +82,7 @@ function MessageScreen(props) {
               {whenFormat}
             </Text>
             <Text style={styles.msg} numberOfLines={4} ellipsizeMode='tail'>
-              {el.lastMessage.content}
+              <Text style={styles.last}>Dernier message : </Text>{el.lastMessage.content}
             </Text>
           </View>
           <View>
@@ -168,12 +165,12 @@ const styles = StyleSheet.create({
     marginVertical: 40,
   },
   conversations: {
-    padding: 5,
+    margin: 10,
     position: 'relative',
     flexDirection: 'row',
     justifyContent: 'space-between',
     height: 115,
-    width: 340,
+    width: windowSize.width * .9,
     marginBottom: 20,
     padding: 10,
     backgroundColor: '#fff1e0',
@@ -189,20 +186,21 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  nonLuText: {
-    color: 'white',
-  },
   nonLuContent: {
     backgroundColor: '#5571D7',
     position: 'absolute',
-    right: -5,
-    top: -5,
-    // textAlign: 'center',
+    right: -7,
+    top: -7,
     borderRadius: 10,
     width: 20,
     height: 20,
-
+    paddingLeft: 6,
+    paddingTop: 2,
   },
+  nonLuText: {
+    color: 'white',
+  },
+
   scrollView: {
     height: windowSize.height * .7,
   },
@@ -228,5 +226,9 @@ const styles = StyleSheet.create({
   },
   msg: {
     fontSize: 12,
+  },
+  last: {
+    color: '#888',
+    fontStyle: 'italic'
   },
 })

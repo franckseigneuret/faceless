@@ -10,6 +10,7 @@ var uid2 = require('uid2');
 const cost = 10;
 
 var ObjectId = require('mongodb').ObjectId;
+const { request } = require('express');
 
 
 /* GET home page. */
@@ -218,8 +219,6 @@ router.get('/get-id-from-token', async function (req, res, next) {
     error: false,
     id: me._id
   })
-
-
 })
 
 /**
@@ -240,36 +239,35 @@ router.get('/show-msg', async function (req, res, next) {
   }
 
   const myConnectedId = req.query.user_id
-  // console.log('myConnectedId', myConnectedId)
+  console.log('myConnectedId', myConnectedId)
 
   // load les conversations avec mes contacts
   const allMyConversations = await ConversationsModel.find({
     participants: { $in: [myConnectedId] }
   })
 
-  // console.log('allMyConversations = ', allMyConversations)
+  console.log('allMyConversations = ', allMyConversations)
 
 
   await Promise.all(allMyConversations.map(async (element, index) => {
     // compter les messages non lus par l'utilisateur de l'app
     var allUnreadMsg = await MessagesModel.find({
-        conversation_id: element._id,
-        to_id: new ObjectId(myConnectedId),
-        read: false,
-      }
-    )
+      conversation_id: element._id,
+      to_id: new ObjectId(myConnectedId),
+      read: false,
+    })
+    console.log('no lu ', allUnreadMsg.length)
 
     // construit un tableau listant le dernier message de chaque conversation
     var lastMsg = await MessagesModel.find({
       conversation_id: element._id
     })
-      .sort({ datefield: -1 })
+      .sort({ date: -1 })
       .limit(1)
     messagesPerPerson.push(lastMsg)
 
     // construit un tableau des infos de mes contacts (avatar, pseudo...)
     const notMe = element.participants[0] == myConnectedId ? element.participants[1] : element.participants[0]
-    
     const myFriends = await UserModel.findById(notMe)
     friendsData.push(myFriends)
 
@@ -305,6 +303,20 @@ router.get('/show-convers', async function (req, res, next) {
   var allMessagesWithOneUser = await MessagesModel.find(
     { conversation_id: req.query.convId }
   ).sort({ date: 1 });
+
+  // les messages non lus deviennent lus
+  console.log('req.query.token == ', req.query.token) 
+  if (req.query.token !=  null) {
+    console.log('tooook', req.query.token)
+
+    const me = await UserModel.findOne({
+      token: req.query.token
+    })
+    if(me) {
+      await MessagesModel.updateMany({ to_id: me._id}, { read: true })
+    }
+  }
+
   res.json({ allMessagesWithOneUser, pseudo, avatar })
 });
 
@@ -323,15 +335,18 @@ response : newMessageData
 router.post('/send-msg', async function (req, res, next) {
 
   const searchConvWithUser = await ConversationsModel.findOne({
-    participants: { $all: ['603f67380ce5ea52ee401325', req.body.myContactId] }
+    participants: { $all: ['603f7b5163ca3a5cbd0a4746', req.body.myContactId] }
   })
 
   var msg = await new MessagesModel({
     conversation_id: searchConvWithUser._id,
-    from_id: '603f67380ce5ea52ee401325',
+    from_id: '603f7b5163ca3a5cbd0a4746',
     to_id: req.body.myContactId,
+    // from_id: ObjectId('603f7b5163ca3a5cbd0a4746'),
+    // to_id: ObjectId(req.body.myContactId),
     content: req.body.msg,
     date: new Date(),
+    read: false
   })
 
   var mewMsg = await msg.save()
@@ -343,6 +358,20 @@ router.post('/send-msg', async function (req, res, next) {
   res.json({ result: true });
 });
 
+router.post('/create-conv', async function (req, res, next) {
+  console.log(" req.body.myContactId",  req.body.myContactId)
+  console.log(" req.body.myId",  req.body.myId)
+
+  var conv = await new ConversationsModel({
+    participants: [req.body.myContactId, req.body.myId]
+  })
+
+  var newConv = await conv.save()
+
+  console.log("newConv", newConv._id)
+
+  res.json({ convId: newConv._id });
+});
 
 /*update-filter -> mettre à jour le filtre pour permettre de mettre à jour la page card-show 
 

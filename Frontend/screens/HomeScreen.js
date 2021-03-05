@@ -43,6 +43,22 @@ function HomeScreen(props) {
   AsyncStorage.getItem("filter", function(error, data) {
     console.log(JSON.parse(data), '<<<<<-------- new filter')
 });
+  async function createConv(contactId) {
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/create-conv`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      //remplacer mon ID avec celui recuperer du back
+      body: `myContactId=${contactId}&myId=${"603f7b5163ca3a5cbd0a4746"}`
+    });
+    var response = await rawResponse.json();
+    console.log("create conv", response.convId)
+    props.navigation.navigate('ConversationScreen', {
+        // myId: myConnectedId,
+        //recuperer l'ID de la card pour le renvoyer 
+        myContactId: contactId,
+        convId: response.convId,
+      })
+}
 
   let [fontsLoaded] = useFonts({
     Montserrat_400Regular,
@@ -111,6 +127,14 @@ function HomeScreen(props) {
         <ScrollView showsHorizontalScrollIndicator={false} snapToInterval={windowWidth} decelerationRate='fast' horizontal >
           {CardToSwipe}
         </ScrollView >
+
+        {/* delete */}
+        <TouchableOpacity 
+          style={styles.buttonSend}
+          //renvoyer en argument de createConv l'ID de mon contact
+          onPress={()=> createConv("603f618c78727809c7e1ad9a")}
+        ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
+        </TouchableOpacity>
       </View>
     )};
 }
