@@ -23,7 +23,6 @@ export default function registration(props) {
 
   useEffect(() => {
     const handleData = async () => {
-
       AsyncStorage.getItem("token", function(error, data) {
         console.log(data,'<------<-------<------<----- token on local storage')
         data != null ? alreadyIn = true : alreadyIn = false

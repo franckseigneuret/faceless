@@ -20,11 +20,12 @@ function Filter(props) {
 
   const [ageMin, setAgeMin] = useState()
   const [ageMax, setAgeMax] = useState()
-  const [localisation, setLocalisation] = useState('France')
+  const [localisation, setLocalisation] = useState()
   const [problems, setProblems] = useState()
-  const [problemsStatut, setProblemsStatut] = useState({amoureux: false, familiale: false, physique: false, professionnel: false, scolaire: false})
-  const [genderStatut, setGenderStatut] = useState({other: false, male: false, female: false })
+  const [problemsStatut, setProblemsStatut] = useState({ Amoureux: false, Familiale: false, Physique: false, Professionnel: false, Scolaire: false })
+  const [genderStatut, setGenderStatut] = useState({other: true, male: true, female: true })
   const [genderSelected, setGenderSelected] = useState([])
+
 
   useEffect(() => {
     const handleData = async () => {
@@ -34,6 +35,8 @@ function Filter(props) {
         setAgeMax(data.age.maxAge)
         setLocalisation(data.localisation)
         setProblems(data.problemsTypes)
+        setGenderStatut(data.gender)
+        setLocalisation(data.localisation)
       });
     };
     handleData()
@@ -75,31 +78,71 @@ function Filter(props) {
     props.navigation.navigate('BottomNavigator', { screen: 'HomeScreen' })
   }
 
-  const handleSelectProblems = (element) => {
-    var genderStatutCopy = genderStatut
-    
-    if (genderStatutCopy.element == false) {
-      genderStatutCopy.element = true;
+  const handleSelectGender = (element) => {
+    var genderStatutCopy = { ...genderStatut }
+    console.log(genderStatutCopy, 'copy ---------')
+    if (genderStatutCopy[element] == false) {
+      genderStatutCopy[element] = true;
       setGenderStatut(genderStatutCopy);
     } else {
-      genderStatutCopy.element = false
+      genderStatutCopy[element] = false
       setGenderStatut(genderStatutCopy)
     }
   } // on fait pas de map et on execute une fonction avec en argument (male ou female ou other), on change un état d'objet
 
-  
-  var problemsBadge = problemsContent.map(e => {
-    return <View style={styles.badge}><Text style={styles.fontBadge}>{e.name}</Text></View>
-  })
+  const handleSelectProblems = (element) => {
+    var problemsStatutCopy = { ...problemsStatut }
+    console.log(problemsStatutCopy, 'copy ---------')
+    if (problemsStatutCopy[element] == false) {
+      problemsStatutCopy[element] = true;
+      setProblemsStatut(problemsStatutCopy);
+    } else {
+      problemsStatutCopy[element] = false
+      setProblemsStatut(problemsStatutCopy)
+    }
+  }
+  var problemsArray = []
+  var genderArray = []
+  const handleSaveFilter = () => {
+    for (const [key, value] of Object.entries(problemsStatut)) {
+      console.log(`${key}: ${value}`);
+      if(value == true)
+      problemsArray.push(key)
+      console.log(problemsArray, '<------problems array')
+    }
+    
+    AsyncStorage.setItem('filter', JSON.stringify(
+      {
+        problemsTypes: problems, 
+        gender: genderStatut, 
+        age: {
+          minAge: ageMin, 
+          maxAge: ageMax,
+        },
+        localisation: localisation
+      }
+    ));
+    AsyncStorage.getItem("filter", function(error, data) {
+      console.log(JSON.parse(data), '<<<<<-------- new filter')
+  });
+  }
+ 
+  var problemsBadge = [
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problemsStatut['Amoureux'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Amoureux</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problemsStatut['Familial'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Familial</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={problemsStatut['Physique'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Physique</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={problemsStatut['Professionnel'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Professionnel</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={problemsStatut['Scolaire'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Scolaire</Text></TouchableOpacity>
+  ]
 
   var imagesGender = [
-    { unSelected: <TouchableOpacity onPress={() => { handleSelectProblems(other) }}><Image source={require('../assets/gender_1.png')} /></TouchableOpacity>, selected: <TouchableOpacity onPress={() => { handleSelectProblems(other) }}><Image source={require('../assets/gender_1_selected.png')} /></TouchableOpacity> },
-    { unSelected: <TouchableOpacity onPress={() => { handleSelectProblems(male) }}><Image source={require('../assets/gender_male.png')} /></TouchableOpacity>, selected: <TouchableOpacity onPress={() => { handleSelectProblems(male) }}><Image source={require('../assets/gender_male_selected.png')} /></TouchableOpacity> },
-    { unSelected: <TouchableOpacity onPress={() => { handleSelectProblems(female) }}><Image source={require('../assets/gender_female.png')} /></TouchableOpacity>, selected: <TouchableOpacity onPress={() => { handleSelectProblems(female) }}><Image source={require('../assets/gender_female_selected.png')} /></TouchableOpacity> },
+    { unSelected: <TouchableOpacity onPress={() => { handleSelectGender(`other`) }}><Image source={require('../assets/gender_1.png')} /></TouchableOpacity>, selected: <TouchableOpacity onPress={() => { handleSelectGender(`other`) }}><Image source={require('../assets/gender_1_selected.png')} /></TouchableOpacity> },
+    { unSelected: <TouchableOpacity onPress={() => { handleSelectGender(`male`) }}><Image source={require('../assets/gender_male.png')} /></TouchableOpacity>, selected: <TouchableOpacity onPress={() => { handleSelectGender(`male`) }}><Image source={require('../assets/gender_male_selected.png')} /></TouchableOpacity> },
+    { unSelected: <TouchableOpacity onPress={() => { handleSelectGender(`female`) }}><Image source={require('../assets/gender_female.png')} /></TouchableOpacity>, selected: <TouchableOpacity onPress={() => { handleSelectGender(`female`) }}><Image source={require('../assets/gender_female_selected.png')} /></TouchableOpacity> },
   ];
 
   // var genderImages = images.map((img, key) => {
-  //   return <TouchableOpacity key={key} onPress={() => {handleSelectProblems(key)}}>
+  //   return <TouchableOpacity key={key} onPress={() => {handleSelectGender(key)}}>
   //       {gender[key] ? img.selected : img.unSelected}
   //  </TouchableOpacity>
   // })
@@ -128,48 +171,40 @@ function Filter(props) {
             {genderStatut.male == false ? imagesGender[1].unSelected : imagesGender[1].selected}
             {genderStatut.female == false ? imagesGender[2].unSelected : imagesGender[2].selected}
           </View>
-          <Text style={styles.titleProblems}>Age :</Text>
+          <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+            <Text style={styles.titleProblems}>Age :</Text>
+            <Text style={styles.textDynamic}>min: {ageMin}</Text>
+            <Text style={styles.textDynamic}>max: {ageMax}</Text>
+          </View>
           <MultiSlider
             selectedStyle={styles.selectedStyle}
             unselectedStyle={styles.unselectedStyle}
             style={styles.sliderLabel}
-            customeLabelStyle={styles.trackStyle}
             markerStyle={styles.markerStyle}
-            // pressedMarkerStyle={MultiSliderStyles.markerStyle}
             min={18}
             max={100}
             values={[18, 100]}
-            enableLabel
             enabledTwo
-
-          // onValuesChangeStart={onValuesChangeStartCallback}
-          // onValuesChangeFinish={onValuesChangeFinishCallback}
-          // allowOverlap={false}	
-          // minMarkerOverlapDistance={
-          //   SLIDER_LENGTH / (quotationBounds.max - quotationBounds.min)
-          // }
+            onValuesChangeFinish={value => { setAgeMin(value[0]); setAgeMax(value[1]); console.log(value, '<----- value ageMin') }}
           />
-          <Text style={styles.titleProblems}>Distance :</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+            <Text style={styles.titleProblems}>Distance :</Text>
+            <Text style={styles.textDynamic}>{localisation == 'France' || localisation > 90 ? 'France' : `${localisation} km`}</Text>
+          </View>
           <MultiSlider
             selectedStyle={styles.selectedStyle}
             unselectedStyle={styles.unselectedStyle}
-
-            // trackStyle={MultiSliderStyles.trackStyle}
             markerStyle={styles.markerStyle}
-            // pressedMarkerStyle={MultiSliderStyles.markerStyle}
             min={18}
             max={100}
             values={[18]}
             enabledTwo
+            onValuesChange={value => setLocalisation(value)}
             pressedMarkerStyle={styles.stepLabelStyle}
-            // onValuesChangeStart={onValuesChangeStartCallback}
-            // onValuesChangeFinish={onValuesChangeFinishCallback}
             allowOverlap={false}
-          // minMarkerOverlapDistance={
-          //   SLIDER_LENGTH / (quotationBounds.max - quotationBounds.min)
-          // }
+
           />
-          <Text>95km</Text>
+
           <Button
             title="enregistrer"
             type="solid"
@@ -178,6 +213,7 @@ function Filter(props) {
               fontFamily: 'Montserrat_700Bold'
             }}
           //   onPress={() => props.navigation.navigate('Quizz')}
+          onPress={() => handleSaveFilter()}
           />
         </View>
       </View>
@@ -301,5 +337,10 @@ const styles = StyleSheet.create({
   },
   trackStyle: {
     backgroundColor: 'red'
+  },
+  textDynamic: {
+    fontFamily: 'Montserrat_700Bold',
+    color: '#EC9A1F',
+    fontSize: 18
   }
 })

@@ -118,7 +118,7 @@ export default function ProfilScreen() {
     console.log(emailText, "<--- email changé");
 
     async function updateUser() {
-      rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
+      await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `emailFront=${emailText}&localisationFront=${cityText}&passwordFront=${mdpText}&genderFront=${gender}`,

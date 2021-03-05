@@ -72,7 +72,6 @@ function quizz(props) {
   const [dateToDisplay, setDateToDisplay] = useState('JJ/MM/AAAA')
 
   const handleOnNextEmail = async () => {
-    console.log("Before Fetch");
     var rawResponse = await fetch(`${HTTP_IP_DEV}/email-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
@@ -127,7 +126,6 @@ function quizz(props) {
     var dateDisplay = `${day}/${month}/${year}`
     setDateToDisplay(dateDisplay)
     setBirthDate(currentDate)
-    console.log(currentDate, '<------ date de naissance sélectionnée')  
   };
 
 
@@ -141,7 +139,6 @@ function quizz(props) {
       birthDate: birthDate,
       problems: problems,
     })
-    console.log(problems, '<------ state problems')
     userInfo = props.userDisplay
     var rawResponse = await fetch(`${HTTP_IP_DEV}/sign-up-first-step`, {
      method: 'POST',
@@ -165,7 +162,10 @@ function quizz(props) {
 
       isAdult == true ? AsyncStorage.setItem("filter", JSON.stringify({ // si isAdult == true alors on set le min age du filter à l'âge de l'user et le max age à l'age de l'user +10 ans
         problemsTypes: problems, 
-        gender: 'all', 
+        gender: {
+          other: true, 
+          male: true, 
+          female: true }, 
         age: {
           minAge: 18, 
           maxAge: 100,
@@ -174,7 +174,7 @@ function quizz(props) {
         localisation: 'France'
       })) : AsyncStorage.setItem("filter", JSON.stringify({ // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
           problemsTypes: problems, 
-          gender: 'all', 
+          gender: {other: true, male: true, female: true }, 
           age: {minAge: 13, maxAge: 17},
           localisation: 'France'
         }))
