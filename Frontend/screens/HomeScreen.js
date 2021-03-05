@@ -34,13 +34,15 @@ function HomeScreen(props) {
           var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${tokenValue}&filterFront=${JSON.stringify(filterValue)}`);
           var response = await rawResponse.json();
           setUserToDisplay(response.userToShow)
-          setPseudo(response.user.pseudo)
-    
-
+          setPseudo(response.user.pseudo)    
      })
   }; 
   handleData()
   }, []);
+
+  AsyncStorage.getItem("filter", function(error, data) {
+    console.log(JSON.parse(data), '<<<<<-------- new filter')
+});
 
   let [fontsLoaded] = useFonts({
     Montserrat_400Regular,

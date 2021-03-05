@@ -185,14 +185,14 @@ router.get('/show-card', async function(req, res, next) {
   })
 
   var userToShow =[];
-
+  console.log(userToDisplay,'<---------- user to display')
   for (let i=0; i<userToDisplay.length; i++) {
     if (filterFront.problemsTypes.some(r=> userToDisplay[i].problems_types.includes(r)) == true) {
       userToShow.push(userToDisplay[i]);
     }
   }
 
-  // console.log(userToShow,'<---------User filtrés')
+  console.log(userToShow,'<---------User filtrés')
   
 
   res.json({user:user, userToShow:userToShow, });

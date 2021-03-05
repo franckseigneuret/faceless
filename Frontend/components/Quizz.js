@@ -152,10 +152,6 @@ function quizz(props) {
 
     differenceDates > conditionAge ? isAdult = true : isAdult = false // On vérifie age > 18yo, if > => isAdult = true else isAdult = false
 
-    console.log(birthDate, '<---- date de naissance')
-    console.log(problems, '<------- problemes selectionnés');
-    console.log(birthDate.getFullYear(), '');
-
       isAdult == true ? AsyncStorage.setItem("filter", JSON.stringify({ // si isAdult == true alors on set le min age du filter à l'âge de l'user et le max age à l'age de l'user +10 ans
         problemsTypes: problems, 
         gender: {

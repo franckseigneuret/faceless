@@ -40,7 +40,6 @@ function Filter(props) {
       });
     };
     handleData()
-    console.log(ageMin, '<-- age Min', ageMax, '<-- age Max', localisation, '<-- localisation', problems, '<-- problems')
   }, []);
 
   const problemsContent = [
@@ -80,7 +79,6 @@ function Filter(props) {
 
   const handleSelectGender = (element) => {
     var genderStatutCopy = { ...genderStatut }
-    console.log(genderStatutCopy, 'copy ---------')
     if (genderStatutCopy[element] == false) {
       genderStatutCopy[element] = true;
       setGenderStatut(genderStatutCopy);
@@ -92,7 +90,6 @@ function Filter(props) {
 
   const handleSelectProblems = (element) => {
     var problemsStatutCopy = { ...problemsStatut }
-    console.log(problemsStatutCopy, 'copy ---------')
     if (problemsStatutCopy[element] == false) {
       problemsStatutCopy[element] = true;
       setProblemsStatut(problemsStatutCopy);
@@ -105,10 +102,8 @@ function Filter(props) {
   var genderArray = []
   const handleSaveFilter = () => {
     for (const [key, value] of Object.entries(problemsStatut)) {
-      console.log(`${key}: ${value}`);
       if(value == true)
       problemsArray.push(key)
-      console.log(problemsArray, '<------problems array')
     }
     
     AsyncStorage.setItem('filter', JSON.stringify(
@@ -122,10 +117,8 @@ function Filter(props) {
         localisation: localisation
       }
     ));
-    AsyncStorage.getItem("filter", function(error, data) {
-      console.log(JSON.parse(data), '<<<<<-------- new filter')
-  });
   }
+  
  
   var problemsBadge = [
     <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problemsStatut['Amoureux'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Amoureux</Text></TouchableOpacity>,
@@ -185,7 +178,7 @@ function Filter(props) {
             max={100}
             values={[18, 100]}
             enabledTwo
-            onValuesChangeFinish={value => { setAgeMin(value[0]); setAgeMax(value[1]); console.log(value, '<----- value ageMin') }}
+            onValuesChangeFinish={value => { setAgeMin(value[0]); setAgeMax(value[1]) }}
           />
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <Text style={styles.titleProblems}>Distance :</Text>

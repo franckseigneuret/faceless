@@ -27,7 +27,7 @@ function QuizzAvatar(props) {
         setToken(data)
     });
     AsyncStorage.getItem("filter", function(error, data) {
-        console.log(JSON.parse(data),'<------<-------<------<----- filter on store')
+        console.log(JSON.parse(data),'<------<-------<------<----- filter on store after sign-up')
     });
 
     var handleClick = async () => {
