@@ -3,6 +3,8 @@ import { StyleSheet, View, Dimensions, Image, ScrollView, TouchableOpacity } fro
 import {connect} from 'react-redux';
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import  HTTP_IP_DEV from '../mon_ip'
+
 
 import HTTP_IP_DEV from '../mon_ip'
 

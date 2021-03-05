@@ -51,6 +51,7 @@ function HomeScreen(props) {
   });
 
   var CardToSwipe = userToDisplay.map((e, i) => {
+    // console.log(e.problem_description,'<---- avatar')
      
       return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
                 <View style={styles.topCard}>
