@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { Button, Overlay } from "react-native-elements";
 import AppLoading from "expo-app-loading";
+import HTTP_IP_DEV from '../mon_ip'
 
 import  HTTP_IP_DEV from '../mon_ip'
 

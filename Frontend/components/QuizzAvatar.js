@@ -4,6 +4,8 @@ import {connect} from 'react-redux';
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import HTTP_IP_DEV from '../mon_ip'
+
 import BlueButton from './BlueButton';
 
 import {
@@ -30,7 +32,7 @@ function QuizzAvatar(props) {
     });
 
     var handleClick = async () => {
-    var rawResponse = await fetch(`http://172.17.1.40/sign-up-second-step`, {
+    var rawResponse = await fetch(`http://${HTTP_IP_DEV}/sign-up-second-step`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `problemDescriptionFront=${props.userDisplay.problem_description}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${token}`
