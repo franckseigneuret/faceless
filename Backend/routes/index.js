@@ -101,8 +101,49 @@ router.post('/sign-up-second-step', async function(req, res, next) {
 body : emailFront : (quentin@gmail.com), passwordFront : (XXXXXX)
 response : result (true), token : 1234
 */
-router.post('/sign-in', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.post('/sign-in', async function(req, res, next) {
+
+  var result =false;
+  let user = null;
+  var error = [];
+  var token = null;
+
+  console.log('ici')
+  console.log(error)
+
+  if(req.body.emailFromFront == ''
+  || req.body.passwordFromFront == ''
+  ){
+    error.push('champs vides')
+  }
+
+
+  user = await UserModel.findOne({
+    email: req.body.emailFromFront,
+    // et le PWD pour sécuriser  
+  })
+  console.log(user, 'user find sign in ');
+
+    // user = await UserModel.findOne({
+    //   email: req.body.emailFromFront,
+    //   // et le PWD pour sécuriser  
+    // })
+    // console.log(user, 'user find sign in ');
+
+    if(user){
+      if(bcrypt.compareSync(req.body.passwordFromFront, user.password)){
+        token = user.token
+        result = true
+      } else {
+        error.push('mot de passe incorrect')
+      }
+      
+    } else {
+      error.push('email incorrect')
+    }
+
+
+  res.json({result, user, token, error});
 });
 
 
@@ -285,6 +326,8 @@ response: userSaved
 */
 router.put("/update-profil", async function (req, res, next) {
 
+  const hash = bcrypt.hashSync(req.body.passwordFront, cost);
+
   var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
   console.log(userBeforeUpdate, '<---- userBeforeUpdate')
 
@@ -294,7 +337,7 @@ router.put("/update-profil", async function (req, res, next) {
     {
       email: req.body.emailFront,
       localisation: req.body.localisationFront,
-      password: req.body.passwordFront,
+      password: hash,
       gender: req.body.genderFront,
       problem_description: req.body.descriptionProblemFront
     }
@@ -303,7 +346,10 @@ router.put("/update-profil", async function (req, res, next) {
   var userAfterUpdate = await UserModel.findOne({token: req.body.tokenFront})
   console.log(userAfterUpdate, '<---- userAfterUpdate')
 
-  res.json({ user: userBeforeUpdate });
+  var result;
+  userAfterUpdate ? result = true : result = false
+
+  res.json({ userSaved: userAfterUpdate, result });
 });
 
 /* show-profil : montrer le profil de l'utilisateur au clic sur l'icône user de la bottom tab 

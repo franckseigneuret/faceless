@@ -39,14 +39,14 @@ function HomeScreen(props) {
   });
 
   var CardToSwipe = userToDisplay.map((e, i) => {
-    console.log(e.problem_description,'<---- avatar')
+    // console.log(e.problem_description,'<---- avatar')
      
       return (<Animatable.View animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
                 <View style={styles.topCard}>
                   <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
                   <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
                   <Text style={styles.member}>Membre depuis le 12 février 2020</Text>
-                  <Text style={{marginTop: 5}}><Ionicons name='location' size={15} /> Region de {e.localisation}</Text>
+                  {/* <Text style={{marginTop: 5}}><Ionicons name='location' size={15} /> Region de {e.localisation}</Text> */}
                 </View>
                 <View style={styles.problemDesc}>
                   <Text style={styles.subtitle}>En quelques mots :</Text>
