@@ -55,6 +55,17 @@ router.post('/pseudo-check', async function (req, res, next) {
 router.post('/sign-up-first-step', async function (req, res, next) {
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
+  var birthDate = new Date(req.body.birthDateFront)
+  var dateToday = new Date()
+  var dateCompare = dateToday - birthDate
+  var conditionDate = (86400000*365)*18
+  var isAdult;
+
+  if(dateCompare > conditionDate) {
+    isAdult = true
+  } else {
+    isAdult = false
+  }
 
   var user = await new UserModel({
     token: uid2(32),
@@ -62,7 +73,8 @@ router.post('/sign-up-first-step', async function (req, res, next) {
     password: hash,
     pseudo: req.body.pseudoFront,
     birthDate: req.body.birthDateFront,
-    problems_types: JSON.parse(req.body.problemsFront)
+    problems_types: JSON.parse(req.body.problemsFront),
+    is_adult: isAdult,
   })
 
   var userSaved = await user.save()
@@ -102,8 +114,49 @@ router.post('/sign-up-second-step', async function (req, res, next) {
 body : emailFront : (quentin@gmail.com), passwordFront : (XXXXXX)
 response : result (true), token : 1234
 */
-router.post('/sign-in', function (req, res, next) {
-  res.render('index', { title: 'Express' });
+router.post('/sign-in', async function(req, res, next) {
+
+  var result =false;
+  let user = null;
+  var error = [];
+  var token = null;
+
+  console.log('ici')
+  console.log(error)
+
+  if(req.body.emailFromFront == ''
+  || req.body.passwordFromFront == ''
+  ){
+    error.push('champs vides')
+  }
+
+
+  user = await UserModel.findOne({
+    email: req.body.emailFromFront,
+    // et le PWD pour sécuriser  
+  })
+  console.log(user, 'user find sign in ');
+
+    // user = await UserModel.findOne({
+    //   email: req.body.emailFromFront,
+    //   // et le PWD pour sécuriser  
+    // })
+    // console.log(user, 'user find sign in ');
+
+    if(user){
+      if(bcrypt.compareSync(req.body.passwordFromFront, user.password)){
+        token = user.token
+        result = true
+      } else {
+        error.push('mot de passe incorrect')
+      }
+      
+    } else {
+      error.push('email incorrect')
+    }
+
+
+  res.json({result, user, token, error});
 });
 
 
@@ -120,32 +173,30 @@ router.post('/sign-out', function (req, res, next) {
 query : tokenFront : 1234, birthDateFront : (12/23/1992), problemsTypesFront : String, localisationFront : String, genderFront : String, 
 response : userFiltered : array, pseudo (celui du user connecté) : String
 */
-router.get('/show-card', async function (req, res, next) {
+router.get('/show-card', async function(req, res, next) {
 
-  var user = await UserModel.findOne({ token: req.query.tokenFront })
-  var userToDisplay = await UserModel.find({ token: { $ne: req.query.tokenFront } })
+  //traitement date 
+  var filterFront = JSON.parse(req.query.filterFront);
+  console.log(filterFront, '<<<<<------ filter front')
+  var user = await UserModel.findOne({token: req.query.tokenFront})
+  var userToDisplay = await UserModel.find({
+    token: {$ne : req.query.tokenFront}, 
+    is_adult: user.is_adult, 
+   ////// A FAIRE ///// age: {$elemMatch: {$gte: filterFront.age.minAge, $lt: filterFront.age.maxAge}}, <<<<------!! Faire un filtre avant d'envoyer en base de donner pour créer la clé AGE
+  })
 
-  var birthDate = user.birthDate
-  var dateToday = new Date()
-  var dateCompare = dateToday - birthDate
-  var conditionDate = (86400000 * 365) * 18
-  if ((dateToday - dateCompare) > conditionDate && (user.is_adult = false)) {
-    UserModel.updateOne(
-      { is_adult: false },
-      {
-        $set: { is_adult: true },
-      })
+  var userToShow =[];
+  console.log(userToDisplay,'<---------- user to display')
+  for (let i=0; i<userToDisplay.length; i++) {
+    if (filterFront.problemsTypes.some(r=> userToDisplay[i].problems_types.includes(r)) == true) {
+      userToShow.push(userToDisplay[i]);
+    }
   }
 
-  if (user.is_adult) {
-    var userToShow = userToDisplay.filter(e => e.is_adult == true);
-  } else {
-    var userToShow = userToDisplay.filter(e => e.is_adult == false);
-  }
+  console.log(userToShow,'<---------User filtrés')
+  
 
-  console.log('Users----->', userToShow)
-
-  res.json({ user: user, userToShow: userToShow, });
+  res.json({user:user, userToShow:userToShow, });
 });
 
 
@@ -361,7 +412,9 @@ response: userSaved
 */
 router.put("/update-profil", async function (req, res, next) {
 
-  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
+  const hash = bcrypt.hashSync(req.body.passwordFront, cost);
+
+  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
   console.log(userBeforeUpdate, '<---- userBeforeUpdate')
 
   // ajout du genre et descriptionProblemFront
@@ -370,7 +423,7 @@ router.put("/update-profil", async function (req, res, next) {
     {
       email: req.body.emailFront,
       localisation: req.body.localisationFront,
-      password: req.body.passwordFront,
+      password: hash,
       gender: req.body.genderFront,
       problem_description: req.body.descriptionProblemFront
     }
@@ -379,12 +432,10 @@ router.put("/update-profil", async function (req, res, next) {
   var userAfterUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   console.log(userAfterUpdate, '<---- userAfterUpdate')
 
-  res.json({ userFromBack: userBeforeUpdate });
-});
+  var result;
+  userAfterUpdate ? result = true : result = false
 
-router.post('/loadProfil', async function (req, res, next) {
-  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
-  res.json({ userFromBack: userBeforeUpdate });
+  res.json({ userSaved: userAfterUpdate, result });
 });
 
 /* show-profil : montrer le profil de l'utilisateur au clic sur l'icône user de la bottom tab 

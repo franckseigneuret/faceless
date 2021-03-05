@@ -3,8 +3,7 @@ import { StyleSheet, View, Dimensions, Image, ScrollView, TouchableOpacity } fro
 import {connect} from 'react-redux';
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import HTTP_IP_DEV from '../mon_ip'
+import  HTTP_IP_DEV from '../mon_ip'
 
 import BlueButton from './BlueButton';
 
@@ -28,11 +27,11 @@ function QuizzAvatar(props) {
         setToken(data)
     });
     AsyncStorage.getItem("filter", function(error, data) {
-        console.log(JSON.parse(data),'<------<-------<------<----- filter on store')
+        console.log(JSON.parse(data),'<------<-------<------<----- filter on store after sign-up')
     });
 
     var handleClick = async () => {
-    var rawResponse = await fetch(`http://${HTTP_IP_DEV}/sign-up-second-step`, {
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/sign-up-second-step`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `problemDescriptionFront=${props.userDisplay.problem_description}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${token}`
