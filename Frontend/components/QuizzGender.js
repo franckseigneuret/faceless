@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Image , TouchableOpacity } from 'react-native'; 
 import {connect} from 'react-redux';
+import HTTP_IP_DEV from '../mon_ip'
 
 import BlueButton from './BlueButton';
 import QuizzTitre from './QuizzTitre';
@@ -14,7 +15,7 @@ import {
 
 function QuizzGender(props) {
   
-
+  const [gender, setGender] = useState("")
   const [isSelected, setIsSelected] = useState(-1)
 
   var handleClick = () => {

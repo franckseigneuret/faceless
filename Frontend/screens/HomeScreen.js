@@ -5,7 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Animatable from 'react-native-animatable';
-import  HTTP_IP_DEV from '../mon_ip'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import HTTP_IP_DEV from '../mon_ip'
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -20,13 +21,17 @@ function HomeScreen(props) {
 
 
   useEffect(() => {
-  const handleData = async () => {
-      var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=zAor7QYMSoDIspu7vY8KoEEah1RlAMkZ`);
+  const handleData = () => {
+    AsyncStorage.getItem("token", async function(error, data) {
+      console.log(data, '<-------- data token ?????')
+      var rawResponse = await fetch(`http://${HTTP_IP_DEV}/show-card?tokenFront=${data}`);
       var response = await rawResponse.json();
+      console.log(response, '<---- response homescreen')
       setUserToDisplay(response.userToShow)
       setPseudo(response.user.pseudo)
-     };
-     handleData()
+      });
+    };
+    handleData()
   }, []);
 
 
@@ -64,10 +69,10 @@ function HomeScreen(props) {
                   <TouchableOpacity 
                                 style={styles.buttonSend}
                                 onPress={() => props.navigation.navigate('ConversationScreen', {
-                                  // token,
-                                  // myId: myConnectedId,
-                                  // myContactId: e._id,
-                                  // convId: null,
+                                  token,
+                                  myId: myConnectedId,
+                                  myContactId: e._id,
+                                  convId: null,
                                 })}
                               ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
                   </TouchableOpacity>
@@ -94,7 +99,7 @@ function HomeScreen(props) {
             <Ionicons name="funnel" size={25} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
           </TouchableOpacity>
         </View>
-        <ScrollView  snapToInterval={windowWidth} decelerationRate='fast' horizontal >
+        <ScrollView showsHorizontalScrollIndicator={false} snapToInterval={windowWidth} decelerationRate='fast' horizontal >
           {CardToSwipe}
         </ScrollView >
       </View>
