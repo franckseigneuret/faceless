@@ -164,10 +164,16 @@ router.get('/get-id-from-token', async function (req, res, next) {
     token: req.query.token
   })
 
-  res.json({
-    error: false,
-    id: me._id
-  })
+  if(me) {
+    res.json({
+      error: false,
+      id: me._id
+    })
+  } else {
+    res.json({
+      error: true
+    })
+  }
 })
 
 /**

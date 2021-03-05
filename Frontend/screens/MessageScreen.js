@@ -18,7 +18,7 @@ function MessageScreen(props) {
   const [myId, setMyId] = useState(null)
   const [countFriends, setCountFriends] = useState(0)
   const [msgFriends, setMsgFriends] = useState([])
-  const [friends, setFriends] = useState([])
+  const [unreadPerConversation, setUnreadPerConversation] = useState([])
 
   useEffect(() => {
     AsyncStorage.getItem("token", function (error, tokenValue) {
@@ -42,7 +42,12 @@ function MessageScreen(props) {
       console.log('dialoguesWithFriends.conversations = ', dialoguesWithFriends.conversations)
       setCountFriends(dialoguesWithFriends.conversations.length)
       setMsgFriends(dialoguesWithFriends.conversations)
-      // setFriends(dialoguesWithFriends.friendsData)
+
+      let nolu = []
+      dialoguesWithFriends.conversations.forEach(element => {
+        nolu.push(element.nbUnreadMsg)
+      });
+      setUnreadPerConversation(nolu)
     }
     getDialogues()
 
@@ -51,24 +56,31 @@ function MessageScreen(props) {
   const items = msgFriends.map((el, i) => {
 
     if (el.lastMessage && el.friendsDatas) {
+
+      console.log('el ', el.nbUnreadMsg)
       let when = new Date(el.lastMessage.date)
       let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
         + ' à ' + when.toLocaleTimeString('fr-FR')
 
       return <TouchableOpacity
         key={i}
-        onPress={() => props.navigation.navigate('ConversationScreen', {
-          token,
-          myId,
-          myContactId: el.friendsDatas._id,
-          convId: el.lastMessage.conversation_id,
-        })}>
+        onPress={() => {
+          let noluCopy = [...unreadPerConversation]
+          noluCopy[i] = 0
+          setUnreadPerConversation(noluCopy)
+          props.navigation.navigate('ConversationScreen', {
+            token,
+            myId,
+            myContactId: el.friendsDatas._id,
+            convId: el.lastMessage.conversation_id,
+          })
+        }}>
 
         <View style={styles.conversations}>
           {
-            el.nbUnreadMsg ?
+            unreadPerConversation[i] ?
               <View style={styles.nonLuContent}>
-                <Text style={styles.nonLuText}>{el.nbUnreadMsg}</Text>
+                <Text style={styles.nonLuText}>{unreadPerConversation[i]}</Text>
               </View>
               :
               <Text />
