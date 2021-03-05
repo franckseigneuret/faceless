@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { Button, Overlay } from "react-native-elements";
 import AppLoading from "expo-app-loading";
+import HTTP_IP_DEV from '../mon_ip'
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -109,7 +110,7 @@ export default function ProfilScreen() {
     // });
     console.log(emailText, "<--- email changé");
     async function updateUser() {
-      await fetch("http://172.17.1.196:3000/update-profil", {
+      await fetch(`http://${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `tokenFront=123456789&emailFront=${emailText}&localisationFront=${cityText}&passwordFront=${mdpText}&genderFront=${gender}descriptionProblemFront=`,

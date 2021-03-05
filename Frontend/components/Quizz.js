@@ -8,6 +8,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import HTTP_IP_DEV from '../mon_ip'
+
 import {
   useFonts,
   Montserrat_700Bold,
@@ -67,7 +69,7 @@ function quizz(props) {
   const [dateToDisplay, setDateToDisplay] = useState('JJ/MM/AAAA')
 
   const handleOnNextEmail = async () => {
-    var rawResponse = await fetch(`http://172.17.1.40:3000/email-check`, {
+    var rawResponse = await fetch(`http://${HTTP_IP_DEV}/email-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}`
@@ -82,7 +84,7 @@ function quizz(props) {
 
   const handleOnNextPseudo = async () => {
 
-    var rawResponse = await fetch(`http://172.17.1.40:3000/pseudo-check`, {
+    var rawResponse = await fetch(`http://${HTTP_IP_DEV}/pseudo-check`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `pseudoFront=${pseudo}`
@@ -137,7 +139,7 @@ function quizz(props) {
     })
     console.log(problems, '<------ state problems')
     userInfo = props.userDisplay
-    var rawResponse = await fetch(`http://172.17.1.40:3000/sign-up-first-step`, {
+    var rawResponse = await fetch(`http://${HTTP_IP_DEV}/sign-up-first-step`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `emailFront=${email}&passwordFront=${password}&pseudoFront=${pseudo}&birthDateFront=${birthDate}&problemsFront=${JSON.stringify(problems)}`
@@ -161,15 +163,15 @@ function quizz(props) {
         problemsTypes: problems, 
         gender: 'all', 
         age: {
-          minAge: Math.floor(differenceDates/(86400000*365)), 
-          maxAge: 'all',
+          minAge: 18, 
+          maxAge: 100,
           isAdult: isAdult,
         },
         localisation: 'France'
       })) : AsyncStorage.setItem("filter", JSON.stringify({ // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
           problemsTypes: problems, 
           gender: 'all', 
-          age: {minAge: Math.floor(differenceDates/(86400000*365)), maxAge: 17},
+          age: {minAge: 13, maxAge: 17},
           localisation: 'France'
         }))
   } 
@@ -186,8 +188,8 @@ function quizz(props) {
       <Pressable key={i} style={visible[i] ? styles.problemCardBis : styles.problemCard}
         onPress={() => {handleSelectProblem(i);}}
       >
-        <Ionicons name={item.icon} size={24} color="#5571D7" />
-        <Text style={styles.textProblem}>{item.name}</Text>
+        <Ionicons key={i} name={item.icon} size={24} color="#5571D7" />
+        <Text key={i} style={styles.textProblem}>{item.name}</Text>
       </Pressable>)
   }
   )
