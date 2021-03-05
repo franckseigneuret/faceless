@@ -56,7 +56,6 @@ function MessageScreen(props) {
   const items = msgFriends.map((el, i) => {
 
     if (el.lastMessage && el.friendsDatas) {
-
       console.log('el ', el.nbUnreadMsg)
       let when = new Date(el.lastMessage.date)
       let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
