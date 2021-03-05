@@ -18,6 +18,9 @@ function ConversationScreen(props) {
     const [avatar, setAvatar] = useState("https://i.imgur.com/P3rBF8E.png")
     const scrollViewRef = useRef();
 
+    // console.log("props.route.params.convId", props.route.params.convId)
+
+
     async function loadMsg() {
         var rawResponse = await fetch(`${HTTP_IP_DEV}/show-convers?convId=${props.route.params.convId}&myContactId=${props.route.params.myContactId}`, {method: 'GET'});
         var response = await rawResponse.json();
@@ -26,7 +29,7 @@ function ConversationScreen(props) {
         setAvatar(response.avatar)
         setMyContactId(props.route.params.myContactId)
     }
-    
+
     useEffect(  () => {
         loadMsg()
     }, [props.route.params.convId])

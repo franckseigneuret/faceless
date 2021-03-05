@@ -18,8 +18,6 @@ import { Button, Overlay } from "react-native-elements";
 import AppLoading from "expo-app-loading";
 import HTTP_IP_DEV from '../mon_ip'
 
-import  HTTP_IP_DEV from '../mon_ip'
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Ionicons } from "@expo/vector-icons";

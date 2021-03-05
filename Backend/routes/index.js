@@ -189,14 +189,14 @@ router.get('/show-msg', async function (req, res, next) {
   }
 
   const myConnectedId = req.query.user_id
-  // console.log('myConnectedId', myConnectedId)
+  console.log('myConnectedId', myConnectedId)
 
   // load les conversations avec mes contacts
   const allMyConversations = await ConversationsModel.find({
     participants: { $in: [myConnectedId] }
   })
 
-  // console.log('allMyConversations = ', allMyConversations)
+  console.log('allMyConversations = ', allMyConversations)
 
 
   await Promise.all(allMyConversations.map(async (element, index) => {
@@ -217,7 +217,8 @@ router.get('/show-msg', async function (req, res, next) {
     messagesPerPerson.push(lastMsg)
 
     // construit un tableau des infos de mes contacts (avatar, pseudo...)
-    const notMe = element.participants[0] === myConnectedId ? element.participants[0] : element.participants[1]
+    const notMe = element.participants[0] == myConnectedId ? element.participants[1] : element.participants[0]
+    console.log('notme',notMe)
     const myFriends = await UserModel.findById(notMe)
     console.log('myFriends', myFriends)
     friendsData.push(myFriends)
@@ -272,15 +273,18 @@ response : newMessageData
 router.post('/send-msg', async function (req, res, next) {
 
   const searchConvWithUser = await ConversationsModel.findOne({
-    participants: { $all: ['603f67380ce5ea52ee401325', req.body.myContactId] }
+    participants: { $all: ['603f7b5163ca3a5cbd0a4746', req.body.myContactId] }
   })
 
   var msg = await new MessagesModel({
     conversation_id: searchConvWithUser._id,
-    from_id: '603f67380ce5ea52ee401325',
+    from_id: '603f7b5163ca3a5cbd0a4746',
     to_id: req.body.myContactId,
+    // from_id: ObjectId('603f7b5163ca3a5cbd0a4746'),
+    // to_id: ObjectId(req.body.myContactId),
     content: req.body.msg,
     date: new Date(),
+    read: false
   })
 
   var mewMsg = await msg.save()
@@ -292,6 +296,20 @@ router.post('/send-msg', async function (req, res, next) {
   res.json({ result: true });
 });
 
+router.post('/create-conv', async function (req, res, next) {
+  console.log(" req.body.myContactId",  req.body.myContactId)
+  console.log(" req.body.myId",  req.body.myId)
+
+  var conv = await new ConversationsModel({
+    participants: [req.body.myContactId, req.body.myId]
+  })
+
+  var newConv = await conv.save()
+
+  console.log("newConv", newConv._id)
+
+  res.json({ convId: newConv._id });
+});
 
 /*update-filter -> mettre à jour le filtre pour permettre de mettre à jour la page card-show 
 
