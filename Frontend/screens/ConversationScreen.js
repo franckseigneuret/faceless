@@ -26,7 +26,7 @@ function ConversationScreen(props) {
         setAvatar(response.avatar)
         setMyContactId(props.route.params.myContactId)
     }
-    
+
     useEffect(  () => {
         loadMsg()
     }, [props.route.params.convId])

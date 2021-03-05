@@ -21,7 +21,7 @@ function HomeScreen(props) {
 
   useEffect(() => {
   const handleData = async () => {
-      var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=zAor7QYMSoDIspu7vY8KoEEah1RlAMkZ`);
+      var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=123456789`);
       var response = await rawResponse.json();
       setUserToDisplay(response.userToShow)
       setPseudo(response.user.pseudo)
@@ -64,10 +64,10 @@ function HomeScreen(props) {
                   <TouchableOpacity 
                                 style={styles.buttonSend}
                                 onPress={() => props.navigation.navigate('ConversationScreen', {
-                                  // token,
-                                  // myId: myConnectedId,
-                                  // myContactId: e._id,
-                                  // convId: null,
+                                  token,
+                                  myId: myConnectedId,
+                                  myContactId: e._id,
+                                  convId: null,
                                 })}
                               ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
                   </TouchableOpacity>
