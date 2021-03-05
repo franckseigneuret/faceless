@@ -52,7 +52,7 @@ function HomeScreen(props) {
 
   var CardToSwipe = userToDisplay.map((e, i) => {
      
-      return (<Animatable.View animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
+      return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
                 <View style={styles.topCard}>
                   <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
                   <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
@@ -67,16 +67,19 @@ function HomeScreen(props) {
                   <Text style={styles.subtitle}>Type de probleme(s)</Text>
                   <View style={styles.problemBadge}>
                     {e.problems_types.map((arg, i) => {
-                      return ( <View style={styles.badge}><Text style={styles.fontBadge}>{arg}</Text></View>)
+                      return ( <View style={styles.badge} key={i}><Text style={styles.fontBadge}>{arg}</Text></View>)
                     })}
                   </View>
                   <View style={{display:'flex',flexDirection:'row', justifyContent:'space-between', width:'100%', padding:20}}>
-                  <TouchableOpacity 
-                                style={styles.buttonInfo}
-                              ><Text style={{fontSize:25, color:"#FFEEDD", fontFamily: 'Montserrat_700Bold',}}>i</Text>
-                  </TouchableOpacity>
+
                   <TouchableOpacity 
                                 style={styles.buttonSend}
+                                onPress={() => props.navigation.navigate('ConversationScreen', {
+                                  token,
+                                  myId: myConnectedId,
+                                  myContactId: e._id,
+                                  convId: null,
+                                })}
                               ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
                   </TouchableOpacity>
                   </View>

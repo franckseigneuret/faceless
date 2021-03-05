@@ -5,6 +5,34 @@ var UserModel = require('../models/users')
 var MessagesModel = require('../models/messages')
 var ConversationsModel = require('../models/conversations')
 
+router.get('/change_avatar', async function (req, res, next) {
+
+  var imgAvatarSrc = [
+    'https://i.imgur.com/Xqf1Ilk.png',
+    'https://i.imgur.com/w9g1N3c.png',
+    'https://i.imgur.com/lbx9ygk.png',
+    'https://i.imgur.com/Fl632zM.png',
+    'https://i.imgur.com/uC9E6zE.png',
+    'https://i.imgur.com/FbL66Lc.png',
+    'https://i.imgur.com/3X0bsrQ.png',
+  ]
+  
+  var users = await UserModel.find()
+  console.log(users)
+  users.forEach(async u => {
+    let i = Math.floor(Math.random() * imgAvatarSrc.length)
+    console.log(i)
+    
+    await UserModel.updateOne(
+      { _id: u._id},
+      {
+        avatar: imgAvatarSrc[i]
+      })
+  });
+
+})
+
+
 router.get('/random-users', async function (req, res, next) {
 
   var users = ["Tony", "Matteo", "Maud", "Ines", "Jeremy", "Antoine", "Emeline", "Zoe", "Alan", "Alexis", "Maelle", "Lena",

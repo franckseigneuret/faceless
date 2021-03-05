@@ -9,37 +9,37 @@ var uid2 = require('uid2');
 
 const cost = 10;
 
-
+var ObjectId = require('mongodb').ObjectId;
 
 
 /* GET home page. */
-router.get('/', async function(req, res, next) {
+router.get('/', async function (req, res, next) {
 
 });
 
 
-router.post('/email-check', async function(req, res, next){
+router.post('/email-check', async function (req, res, next) {
 
-  var user = await UserModel.findOne({email: req.body.emailFront})
+  var user = await UserModel.findOne({ email: req.body.emailFront })
   var result;
   var error;
-  if(user) {
+  if (user) {
     result = true;
-    error= 'Cet adresse mail est déjà associée à un compte'
+    error = 'Cet adresse mail est déjà associée à un compte'
   } else {
     result = false;
     error = 'Aucun email semblable trouvé en BDD, next step'
   }
 
-  res.json({result, error})
+  res.json({ result, error })
 })
 
 
-router.post('/pseudo-check', async function (req, res, next){
-  var user = await UserModel.findOne({pseudo: req.body.pseudoFront})
+router.post('/pseudo-check', async function (req, res, next) {
+  var user = await UserModel.findOne({ pseudo: req.body.pseudoFront })
   var result;
   var error;
-  if(user) {
+  if (user) {
     result = true;
     error = 'Ce pseudo est déjà utilisé'
   } else {
@@ -47,11 +47,11 @@ router.post('/pseudo-check', async function (req, res, next){
     error = 'Ce pseudo est disponible'
   }
 
-  res.json({result, error})
+  res.json({ result, error })
 });
 
 
-router.post('/sign-up-first-step', async function(req, res, next){
+router.post('/sign-up-first-step', async function (req, res, next) {
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
   var birthDate = new Date(req.body.birthDateFront)
@@ -78,7 +78,7 @@ router.post('/sign-up-first-step', async function(req, res, next){
 
   var userSaved = await user.save()
 
-  res.json({userSaved: userSaved})
+  res.json({ userSaved: userSaved })
 })
 
 /* Sign-up -> Inscription 
@@ -88,22 +88,24 @@ router.post('/sign-up-first-step', async function(req, res, next){
   Response : result (true), token (1234), birthDate : (12/23/1992), problems_types : String, localisation : String
 problemDescriptionFront=${props.userDisplay}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation.coordinates)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${tokenOnLocalStorage}
   */
-router.post('/sign-up-second-step', async function(req, res, next) {
+router.post('/sign-up-second-step', async function (req, res, next) {
+
+  console.log(req.body.tokenFront, '----> token front')
 
   var user = await UserModel.updateOne(
-    { token: req.body.tokenFront}, // ciblage à gauche de la virgule
-    { 
+    { token: req.body.tokenFront }, // ciblage à gauche de la virgule
+    {
       problem_description: req.body.problemDescriptionFront,
       gender: req.body.genderFront,
       localisation: JSON.parse(req.body.localisationFront),
       avatar: req.body.avatarFront,
-     }
-);
+    }
+  );
 
   var result;
   user ? result = true : result = false
-  
-  res.json({result: result});
+
+  res.json({ result: result });
 });
 
 
@@ -111,7 +113,7 @@ router.post('/sign-up-second-step', async function(req, res, next) {
 body : emailFront : (quentin@gmail.com), passwordFront : (XXXXXX)
 response : result (true), token : 1234
 */
-router.post('/sign-in', function(req, res, next) {
+router.post('/sign-in', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -120,7 +122,7 @@ router.post('/sign-in', function(req, res, next) {
 body : tokenFront : 1234, 
 response : result (true), 
 */
-router.post('/sign-out', function(req, res, next) {
+router.post('/sign-out', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -158,31 +160,92 @@ router.get('/show-card', async function(req, res, next) {
 
 
 /**
+ * récupère l'id utilisateur à partir du token
+ */
+router.get('/get-id-from-token', async function (req, res, next) {
+
+  if (req.query && req.query.token === '') {
+    res.json({
+      error: true
+    })
+  }
+
+  const me = await UserModel.findOne({
+    token: req.query.token
+  })
+
+  res.json({
+    error: false,
+    id: me._id
+  })
+
+
+})
+
+/**
  * show-msg -> afficher les différentes conversations avec les users.
  * query : tokenFront: 1234
  * response : [{pseudo (sender) : String, date (dernier message) : date, avatar (sender) : String, last_message : String, demande : boolean, is_read (nombre de messages non-lus) : Number, delete : boolean, conversation_id : 1234}] 
  **/
-router.get('/show-msg', async function(req, res, next) {
-  
-  var allMyConversations = await ConversationsModel.find(
-    {participants: { $in: ["603f618c78727809c7e1ad9b"]}}
-  );
+router.get('/show-msg', async function (req, res, next) {
 
-  // console.log(allMyConversations)
-
-  //construit un tableau listant les 5 derniers messages par user
   let messagesPerPerson = []
+  let friendsData = []
+  let conversations = []
 
-  await Promise.all(allMyConversations.map( async (element, index) => {
-    var allMsg = await MessagesModel.find(
-      {conversation_id: element._id}
-    ).limit(5)
-    messagesPerPerson.push(allMsg)
+  if (req.query && req.query.user_id === '') {
+    res.json({
+      conversations
+    })
+  }
+
+  const myConnectedId = req.query.user_id
+  // console.log('myConnectedId', myConnectedId)
+
+  // load les conversations avec mes contacts
+  const allMyConversations = await ConversationsModel.find({
+    participants: { $in: [myConnectedId] }
+  })
+
+  // console.log('allMyConversations = ', allMyConversations)
+
+
+  await Promise.all(allMyConversations.map(async (element, index) => {
+    // compter les messages non lus par l'utilisateur de l'app
+    var allUnreadMsg = await MessagesModel.find({
+        conversation_id: element._id,
+        to_id: new ObjectId(myConnectedId),
+        read: false,
+      }
+    )
+
+    // construit un tableau listant le dernier message de chaque conversation
+    var lastMsg = await MessagesModel.find({
+      conversation_id: element._id
+    })
+      .sort({ datefield: -1 })
+      .limit(1)
+    messagesPerPerson.push(lastMsg)
+
+    // construit un tableau des infos de mes contacts (avatar, pseudo...)
+    const notMe = element.participants[0] == myConnectedId ? element.participants[1] : element.participants[0]
+    
+    const myFriends = await UserModel.findById(notMe)
+    friendsData.push(myFriends)
+
+    conversations.push({
+      nbUnreadMsg: allUnreadMsg.length,
+      lastMessage: lastMsg[0],
+      friendsDatas: myFriends
+    })
+
+    // tri du tableau pour mettre les blocs avec des messages non lus en haut
+    conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1)
   }))
 
-  console.log("messagesPerPerson",messagesPerPerson)
-
-  res.render('index', { title: 'Express' });
+  res.json({
+    conversations
+  })
 });
 
 
@@ -190,66 +253,26 @@ router.get('/show-msg', async function(req, res, next) {
 query : conversationIdFront : 1234     ou     tokenFront : 1234
 response : collection message qui est liée et conversation_id.    OU : variable contenant 10 objets (10 dernières conv) contenant avatar, pseudo, contenu du message
 */
-router.get('/show-convers', async function(req, res, next) {
+router.get('/show-convers', async function (req, res, next) {
 
-  // var user = await userModel.find({token: req.body.tokenFront})
-  
-  // var lastConvId = []
-  // var toUsersId = []
-  // var usersData = []
-  // var messagesId =  []
-  // var conversationsDisplay = []
+  var infoContact = await UserModel.findOne(
+    { _id: req.query.myContactId }
+  )
 
-  // // idée de fonctionnement :
-  // // cherche dans les 10 dernières conversations, l'avatar de chaque user trouvé grâce au from_to_id, et le dernier message de chaque conversation
-
-  // for (var i = user.conversation_list_id.length ; (i = user.conversation_list_id.length - 10) ; i--) {
-  //   lastConvId.push(user.conversation_list_id[i]);
-  // }
-
-  // var conversations = await conversationsModel.find({_id: lastConvId.map(e => e), demande_receiver: true, delete: false}); // ne sait pas si cette methode pour find fonctionne
-
-  // toUsersId = conversations.map(e => e.to_id);
-  
-  // var toUsersData = await userModel.find({_id: toUsersId.map(e => e)})
-
-  // usersData = toUsersData.map((e) => ({
-  //   avatar: e.avatar,
-  //   pseudo: e.pseudo
-  // }))
-
-  // for (var i = 0; i< conversations.length ; i++) {
-  //   messagesId.push(conversations[i].messages_id[message_id.length-1])
-  // }
-
-  // var messagesData = await messagesModel.find({_id: messagesId.map(e => e)})
-
-  // for (var i =0; i<lastConvId.length ; i++) {
-  //   conversationsDisplay.push({
-  //     avatar: avatarData[i].avatar,
-  //     pseudo: avatarData[i].pseudo,
-  //     lastMessage: messagesData[i],
-  //   })
-  // }
-
-  var pseudo = "Alexis"
-  var avatar = "../assets/women_4.png"
-  var id = "603f67380ce5ea52ee401325"
+  var pseudo = infoContact.pseudo
+  var avatar = infoContact.avatar
 
   var allMessagesWithOneUser = await MessagesModel.find(
-    {conversation_id: "603f98460ced2c1ed9fe2e6b"}
-  ).limit(5);
-
-  console.log("allMessagesWithOneUser", allMessagesWithOneUser)
-
-  res.json({allMessagesWithOneUser, pseudo, avatar, id})
+    { conversation_id: req.query.convId }
+  ).sort({ date: 1 });
+  res.json({ allMessagesWithOneUser, pseudo, avatar })
 });
 
 /* first-message -> création de la convers en base.
 body : idReceiverFront: 1234, tokenSenderFront: 1234, avatarReceiverFront : 'exemple.jpg', pseudoReceiverFront: 'gigatank3000', 
 response : new_conversation_data
 */
-router.post('/first-msg', function(req, res, next) {
+router.post('/first-msg', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -257,8 +280,27 @@ router.post('/first-msg', function(req, res, next) {
 body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, contentFront: 'il est né le divin enfant'
 response : newMessageData
 */
-router.post('/send-msg', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.post('/send-msg', async function (req, res, next) {
+
+  const searchConvWithUser = await ConversationsModel.findOne({
+    participants: { $all: ['603f67380ce5ea52ee401325', req.body.myContactId] }
+  })
+
+  var msg = await new MessagesModel({
+    conversation_id: searchConvWithUser._id,
+    from_id: '603f67380ce5ea52ee401325',
+    to_id: req.body.myContactId,
+    content: req.body.msg,
+    date: new Date(),
+  })
+
+  var mewMsg = await msg.save()
+
+  var msgs = await MessagesModel.find(
+    { conversation_id: searchConvWithUser._id }
+  );
+
+  res.json({ result: true });
 });
 
 
@@ -269,7 +311,7 @@ le local storage et on redirige vers la page card-show qui aura un useEffect per
 fonction du local storage.
 
 */
-router.put('/update-filter', function(req, res, next) {
+router.put('/update-filter', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -279,13 +321,13 @@ body: idUserSignaledFront: 1234, warningSignalFront: 1234
 response: result: true ? message: Nous avons bien pris en compte votre signalement : message: 'Erreur, l'utilisateur n'a pas pu être signalé, vous
 pouvez nous envoyer un email à l'adresse mail....'
  */
-router.post('/signalement-help', function(req, res, next) {
+router.post('/signalement-help', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
 /* loadProfil : mettre à jour les information en BDD de l'utilisateur qui modifie son profil. */
-router.post('/loadProfil', async function(req, res, next) {
-  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+router.post('/loadProfil', async function (req, res, next) {
+  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   res.json({ userFromBack: userBeforeUpdate });
 });
 
@@ -295,7 +337,8 @@ response: userSaved
 */
 router.put("/update-profil", async function (req, res, next) {
 
-  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
+  console.log(userBeforeUpdate, '<---- userBeforeUpdate')
 
   // ajout du genre et descriptionProblemFront
   var userUpdate = await UserModel.updateOne(
@@ -309,16 +352,22 @@ router.put("/update-profil", async function (req, res, next) {
     }
   );
 
-  var userAfterUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  var userAfterUpdate = await UserModel.findOne({ token: req.body.tokenFront })
+  console.log(userAfterUpdate, '<---- userAfterUpdate')
 
-  res.json({ user: userBeforeUpdate });
+  res.json({ userFromBack: userBeforeUpdate });
+});
+
+router.post('/loadProfil', async function (req, res, next) {
+  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
+  res.json({ userFromBack: userBeforeUpdate });
 });
 
 /* show-profil : montrer le profil de l'utilisateur au clic sur l'icône user de la bottom tab 
 body: tokenFront: 1243
 response: userFind
 */
-router.get('/show-my-profil', function(req, res, next) {
+router.get('/show-my-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -326,7 +375,7 @@ router.get('/show-my-profil', function(req, res, next) {
 body: idUserSelectedFront: 1234
 response: userSelected
  */
-router.get('/show-user-profil', function(req, res, next) {
+router.get('/show-user-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -334,7 +383,7 @@ router.get('/show-user-profil', function(req, res, next) {
 body: tokenFront : 1234,
 response: result: true
 */
-router.delete('/delete-my-profil', function(req, res, next) {
+router.delete('/delete-my-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -342,7 +391,7 @@ router.delete('/delete-my-profil', function(req, res, next) {
 body: idMessageFront: 1234
 response: messagesUpdated
  */
-router.put('/delete-msg', function(req, res, next) {
+router.put('/delete-msg', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -350,7 +399,7 @@ router.put('/delete-msg', function(req, res, next) {
 body: idConversFront: 1234
 response: conversationsUpdated
 */
-router.put('/delete-convers', function(req, res, next) {
+router.put('/delete-convers', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 

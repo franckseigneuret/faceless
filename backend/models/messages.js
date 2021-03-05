@@ -8,6 +8,7 @@ var MessagesSchema = mongoose.Schema({
     date: Date,
     // read_user_id1: Boolean,
     // read_user_id2: Boolean,
+    read: Boolean,
     // delete_user_id1: Boolean,
     // delete_user_id2: Boolean,
 });
