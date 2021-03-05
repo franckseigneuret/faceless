@@ -24,7 +24,7 @@ function HomeScreen(props) {
   const handleData = () => {
     AsyncStorage.getItem("token", async function(error, data) {
       console.log(data, '<-------- data token ?????')
-      var rawResponse = await fetch(`http://${HTTP_IP_DEV}/show-card?tokenFront=${data}`);
+      var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${data}`);
       var response = await rawResponse.json();
       console.log(response, '<---- response homescreen')
       setUserToDisplay(response.userToShow)

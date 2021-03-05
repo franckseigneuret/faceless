@@ -217,9 +217,9 @@ router.get('/show-msg', async function (req, res, next) {
     messagesPerPerson.push(lastMsg)
 
     // construit un tableau des infos de mes contacts (avatar, pseudo...)
-    const notMe = element.participants[0] === myConnectedId ? element.participants[0] : element.participants[1]
+    const notMe = element.participants[0] == myConnectedId ? element.participants[1] : element.participants[0]
+    
     const myFriends = await UserModel.findById(notMe)
-    console.log('myFriends', myFriends)
     friendsData.push(myFriends)
 
     conversations.push({
