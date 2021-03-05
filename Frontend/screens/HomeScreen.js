@@ -21,19 +21,26 @@ function HomeScreen(props) {
 
 
   useEffect(() => {
+    var token;
+    var filter;
   const handleData = () => {
-    AsyncStorage.getItem("token", async function(error, data) {
-      console.log(data, '<-------- data token ?????')
-      var rawResponse = await fetch(`http://${HTTP_IP_DEV}/show-card?tokenFront=${data}`);
-      var response = await rawResponse.json();
-      console.log(response, '<---- response homescreen')
-      setUserToDisplay(response.userToShow)
-      setPseudo(response.user.pseudo)
-      });
-    };
-    handleData()
-  }, []);
+     AsyncStorage.multiGet(['token', 'filter'], async function (error, data){
+       
+          let token = data[0][0];
+          let tokenValue = data[0][1]
+          let filter = data[1][0]
+          let filterValue = JSON.parse(data[1][1])
 
+          var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${tokenValue}&filterFront=${JSON.stringify(filterValue)}`);
+          var response = await rawResponse.json();
+          setUserToDisplay(response.userToShow)
+          setPseudo(response.user.pseudo)
+    
+
+     })
+  }; 
+  handleData()
+  }, []);
 
   let [fontsLoaded] = useFonts({
     Montserrat_400Regular,
@@ -44,18 +51,17 @@ function HomeScreen(props) {
   });
 
   var CardToSwipe = userToDisplay.map((e, i) => {
-    console.log(e.problem_description,'<---- avatar')
      
       return (<Animatable.View animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
                 <View style={styles.topCard}>
                   <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
                   <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
                   <Text style={styles.member}>Membre depuis le 12 février 2020</Text>
-                  <Text style={{marginTop: 5}}><Ionicons name='location' size={15} /> Region de {e.localisation}</Text>
+                  {/* <Text style={{marginTop: 5}}><Ionicons name='location' size={15} /> Region de {e.localisation.label == undefined ? 'France' : e.localisation.label}</Text> */}
                 </View>
                 <View style={styles.problemDesc}>
                   <Text style={styles.subtitle}>En quelques mots :</Text>
-                  <Text style={{ textAlign: "left", color: "#264653", fontFamily: "Montserrat_400Regular",}} numberOfLines={4}>{e.problem_description}</Text>
+                  <Text style={{ color: "#264653", fontFamily: "Montserrat_400Regular",}} numberOfLines={4}>{e.problem_description}</Text>
                 </View>
                 <View style={styles.problemContainer}>
                   <Text style={styles.subtitle}>Type de probleme(s)</Text>
@@ -151,8 +157,9 @@ const styles = StyleSheet.create({
   problemDesc:{
     display:'flex',
     flexDirection:'column',
-    justifyContent:'center',
+    justifyContent:'flex-start',
     alignItems:'flex-start',
+    width: '100%'
   },
   problemContainer:{
     width:'100%',

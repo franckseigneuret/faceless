@@ -51,13 +51,9 @@ router.post('/pseudo-check', async function (req, res, next){
 router.post('/sign-up-first-step', async function(req, res, next){
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
-  console.log(req.body, '<----- req.body')
   var birthDate = new Date(req.body.birthDateFront)
   var dateToday = new Date()
   var dateCompare = dateToday - birthDate
-  console.log(birthDate, '<-------- birthdate')
-  console.log(dateToday, '<----- date today');
-  console.log(dateCompare, '<------date compare');
   var conditionDate = (86400000*365)*18
   var isAdult;
 
@@ -78,7 +74,6 @@ router.post('/sign-up-first-step', async function(req, res, next){
   })
 
   var userSaved = await user.save()
-  console.log(userSaved, '<------------ user saved')
 
   res.json({userSaved: userSaved})
 })
@@ -132,34 +127,27 @@ query : tokenFront : 1234, birthDateFront : (12/23/1992), problemsTypesFront : S
 response : userFiltered : array, pseudo (celui du user connecté) : String
 */
 router.get('/show-card', async function(req, res, next) {
+  console.log(JSON.parse(req.query.filterFront), '<<<<<------ filter front')
+  console.log(req.query.tokenFront, '<<<<<------ token front')
 
   var user = await UserModel.findOne({token: req.query.tokenFront})
-  var userToDisplay = await UserModel.find({token: {$ne : req.query.tokenFront}, is_adult: user.is_adult})
-  console.log(userToDisplay, '<--- user')
+  var userToDisplay = await UserModel.find({
+    token: {$ne : req.query.tokenFront}, 
+    is_adult: user.is_adult, 
+    age: {$elemMatch: {$gte: req.query.filterFront.age.minAge, $lt: req.query.filterFront.age.maxAge}},
+  })
 
-  // var birthDate = user.birthDate
-  // var dateToday = new Date()
-  // var dateCompare = dateToday - birthDate
-  // var conditionDate = (86400000*365)*18
-  // if(dateCompare > conditionDate && (user.is_adult = false)) {
-  //   var userToUpdate = await UserModel.updateOne(
-  //     { token: req.body.tokenFront}, // ciblage à gauche de la virgule
-  //     { 
-  //       is_adult: true,
-  //      }
-  // );
-  // }
+  // var problemsMatched = false
   
-  // var userUpdated = await UserModel.findOne({token: req.query.tokenFront})
+  // const check = () => {
+    
+  // }
 
-  // console.log(userUpdated.is_adult, '<------- user is adult ??')
+  // for(var i = 0; i< userToDisplay.length; i++ ) {
+  //     if(userToDisplay[i].problems_types.some())
+  //   }
   
-  // if(user.is_adult) {
-  //   var userToShow = userToDisplay.filter(e => e.is_adult == true);
-  //   console.
-  // } else {
-  //   var userToShow = userToDisplay.filter(e => e.is_adult == false);
-  // }
+  // console.log(userToDisplay, '<---------- userto display')
 
 
   res.json({user:user, userToShow:userToDisplay, });

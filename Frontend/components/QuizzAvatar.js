@@ -32,7 +32,7 @@ function QuizzAvatar(props) {
     });
 
     var handleClick = async () => {
-    var rawResponse = await fetch(`http://${HTTP_IP_DEV}/sign-up-second-step`, {
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/sign-up-second-step`, {
      method: 'POST',
      headers: {'Content-Type':'application/x-www-form-urlencoded'},
      body: `problemDescriptionFront=${props.userDisplay.problem_description}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${token}`

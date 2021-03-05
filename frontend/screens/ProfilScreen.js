@@ -110,7 +110,7 @@ export default function ProfilScreen() {
     // });
     console.log(emailText, "<--- email changé");
     async function updateUser() {
-      await fetch(`http://${HTTP_IP_DEV}/update-profil`, {
+      await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `tokenFront=123456789&emailFront=${emailText}&localisationFront=${cityText}&passwordFront=${mdpText}&genderFront=${gender}descriptionProblemFront=`,
@@ -125,7 +125,7 @@ export default function ProfilScreen() {
     console.log("app load");
 
     async function loadDATA() {
-      var rawResponse = await fetch("http://172.17.1.196:3000/loadProfil", {
+      var rawResponse = await fetch(`${HTTP_IP_DEV}/loadProfil`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "tokenFront=z9iNwb7cTgGOhUrrvndz9rOHJCkxGAqo",
