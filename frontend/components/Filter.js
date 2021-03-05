@@ -22,7 +22,7 @@ function Filter(props) {
   const [ageMax, setAgeMax] = useState()
   const [localisation, setLocalisation] = useState()
   const [problems, setProblems] = useState()
-  const [problemsStatut, setProblemsStatut] = useState({ Amoureux: false, Familiale: false, Physique: false, Professionnel: false, Scolaire: false })
+  const [problemsStatut, setProblemsStatut] = useState({ Amoureux: false, Familial: false, Physique: false, Professionnel: false, Scolaire: false })
   const [genderStatut, setGenderStatut] = useState({other: true, male: true, female: true })
   const [genderSelected, setGenderSelected] = useState([])
 
@@ -30,11 +30,34 @@ function Filter(props) {
   useEffect(() => {
     const handleData = async () => {
       AsyncStorage.getItem("filter", function (error, data) {
+        var problemsArriving;
         var data = JSON.parse(data)
         setAgeMin(data.age.minAge)
         setAgeMax(data.age.maxAge)
         setLocalisation(data.localisation)
+        
         setProblems(data.problemsTypes)
+        if (data.problemsTypes.includes('Amoureux')){
+          problemsArriving= {...problemsStatut};
+          problemsArriving[`Amoureux`] = true;
+          setProblemsStatut(problemsArriving)
+        } else if (data.problemsTypes.includes('Familial')){
+          problemsArriving= {...problemsStatut};
+          problemsArriving[`Familial`] = true;
+          setProblemsStatut(problemsArriving)
+        } else if (data.problemsTypes.includes('Physique')){
+          problemsArriving= {...problemsStatut};
+          problemsArriving[`Physique`] = true;
+          setProblemsStatut(problemsArriving);
+        } else if (data.problemsTypes.includes('Professionnel')){
+          problemsArriving= {...problemsStatut};
+          problemsArriving[`Professionnel`] = true;
+          setProblemsStatut(problemsArriving)
+        } else if (data.problemsTypes.includes('Scolaire')){
+          problemsArriving= {...problemsStatut};
+          problemsArriving[`Scolaire`] = true;
+          setProblemsStatut(problemsArriving);
+        }
         setGenderStatut(data.gender)
         setLocalisation(data.localisation)
       });
@@ -90,25 +113,33 @@ function Filter(props) {
 
   const handleSelectProblems = (element) => {
     var problemsStatutCopy = { ...problemsStatut }
-    if (problemsStatutCopy[element] == false) {
+    var problemsTypesCopy = [...problems]
+    if (problemsStatutCopy[element] == false && problemsTypesCopy.includes(element) == false) {
       problemsStatutCopy[element] = true;
       setProblemsStatut(problemsStatutCopy);
+      problemsTypesCopy.push(element);
+      setProblems(problemsTypesCopy)
+      console.log(problemsTypesCopy, '<------- problems types copy')
     } else {
       problemsStatutCopy[element] = false
       setProblemsStatut(problemsStatutCopy)
+      problemsTypesCopy = problemsTypesCopy.filter(e => e != element)
+      setProblems(problemsTypesCopy)
+      console.log(problemsTypesCopy, '<------- problems types copy')
     }
   }
   var problemsArray = []
   var genderArray = []
+
   const handleSaveFilter = () => {
     for (const [key, value] of Object.entries(problemsStatut)) {
-      if(value == true)
+      if(value == true && problemsArray.includes(key) == false)
       problemsArray.push(key)
     }
-    
+    console.log(problemsArray, '<----- problems on save')
     AsyncStorage.setItem('filter', JSON.stringify(
       {
-        problemsTypes: problems, 
+        problemsTypes: problemsArray, 
         gender: genderStatut, 
         age: {
           minAge: ageMin, 
@@ -155,7 +186,9 @@ function Filter(props) {
         </View>
         <View style={styles.problemsSelect}>
           <Text style={styles.titleProblems}>J'aimerais parler de...</Text>
-          <View style={styles.badgeContainer}>{problemsBadge}</View>
+          <View style={styles.badgeContainer}>
+            {problemsBadge}
+          </View>
         </View>
         <View style={styles.bottomContainer}>
           <Text style={styles.titleProblems}>Je veux parler avec :</Text>
