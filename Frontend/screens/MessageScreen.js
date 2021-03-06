@@ -139,8 +139,9 @@ function MessageScreen(props) {
             </ScrollView>
           </View>
           :
-          <Text>
-            Vous n'avez pas de confident !
+          <View style={styles.ScrollView}>
+            <Text style={{ textAlign: 'center' }}>
+              Vous n'avez pas de confident !
             <Button title="Rechercher des confidents" />
           </Text>
 
