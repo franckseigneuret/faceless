@@ -143,8 +143,12 @@ function MessageScreen(props) {
             <Text style={{ textAlign: 'center' }}>
               Vous n'avez pas de confident !
             <Button title="Rechercher des confidents" />
-          </Text>
-
+            </Text>
+            <Text>
+              <Button title="Rechercher des confidents"
+                onPress={() => props.navigation.navigate("HomeScreen")} />
+            </Text>
+          </View>
       }
     </View>
 
