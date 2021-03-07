@@ -64,6 +64,7 @@ function MessageScreen(props) {
         + ' à ' + when.toLocaleTimeString('fr-FR')
 
       return <TouchableOpacity
+        activeOpacity={1}
         key={i}
         onPress={() => {
           let noluCopy = [...unreadPerConversation]
@@ -77,7 +78,7 @@ function MessageScreen(props) {
           })
         }}>
 
-        <View style={styles.conversations}>
+        <View style={styles.conversationsItem}>
           {
             unreadPerConversation[i] ?
               <View style={styles.nonLuContent}>
@@ -136,14 +137,19 @@ function MessageScreen(props) {
                 { label: "Demandes (0)", value: "d" },
               ]}
             />
-            <ScrollView
-              showsVerticalScrollIndicator={true} style={styles.ScrollView}
-              onMomentumScrollEnd={() => {
-                loadConversations()
-              }}
-            >
-              {items}
-            </ScrollView>
+            <View style={styles.conversations}>
+              <Image style={styles.loader} source={{ uri: 'https://i.imgur.com/WtX0jT0.gif' }} />
+              <View style={styles.scrollContent}>
+                <ScrollView
+                  showsVerticalScrollIndicator={true} style={styles.ScrollView}
+                  onMomentumScrollEnd={() => {
+                    loadConversations()
+                  }}
+                >
+                  {items}
+                </ScrollView>
+              </View>
+            </View>
           </View>
           :
           <View style={styles.ScrollView}>
@@ -186,6 +192,25 @@ const styles = StyleSheet.create({
     marginVertical: 40,
   },
   conversations: {
+    position: 'relative',
+    width: windowSize.width * .9,
+  },
+  loader: {
+    marginHorizontal: '45%',
+    height: 50,
+    width: 50,
+  },
+  scrollContent: {
+    position: 'absolute',
+    top: -10,
+    left: -10,
+    height: windowSize.height * .7,
+    width: '900%'
+  },
+  scrollView: {
+    height: windowSize.height * .7,
+  },
+  conversationsItem: {
     margin: 10,
     position: 'relative',
     flexDirection: 'row',
@@ -220,10 +245,6 @@ const styles = StyleSheet.create({
   },
   nonLuText: {
     color: 'white',
-  },
-
-  scrollView: {
-    height: windowSize.height * .7,
   },
   lastMessage: {
     width: '70%',
