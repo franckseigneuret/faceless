@@ -1,6 +1,6 @@
 import HTTP_IP_DEV from '../mon_ip'
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView, Dimensions, Vibration } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SwitchSelector from "react-native-switch-selector";
@@ -143,6 +143,7 @@ function MessageScreen(props) {
                 <ScrollView
                   showsVerticalScrollIndicator={true} style={styles.ScrollView}
                   onMomentumScrollEnd={() => {
+                    Vibration.vibrate(10);
                     loadConversations()
                   }}
                 >
