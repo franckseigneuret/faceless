@@ -10,38 +10,22 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const windowSize = Dimensions.get('window');
-console.log('windowSize', windowSize)
 
 function MessageScreen(props) {
 
   const [token, setToken] = useState(null)
   const [myId, setMyId] = useState(null)
-  const [countFriends, setCountFriends] = useState(0)
-  const [msgFriends, setMsgFriends] = useState([])
+  const [conversations, setConversations] = useState([])
   const [unreadPerConversation, setUnreadPerConversation] = useState([])
 
-  useEffect(() => {
-    AsyncStorage.getItem("token", function (error, tokenValue) {
-      setToken(tokenValue)
-    })
-
-    const getId = async () => {
-      const idRaw = await fetch(HTTP_IP_DEV + '/get-id-from-token?token=' + token, { method: 'GET' })
-      const idResponse = await idRaw.json()
-
-      return idResponse.id
-    }
-
-    const getDialogues = async () => {
-      const myConnectedId = await getId()
-      console.log('myConnectedId = ', myConnectedId)
-      setMyId(myConnectedId)
-      const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myConnectedId, { method: 'GET' })
+  const loadConversations = async () => {
+    console.log('myId', myId)
+    if (myId) { // l'id obtenue à partir du token existe bien
+      const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myId, { method: 'GET' })
 
       const dialoguesWithFriends = await dialogues.json()
-      console.log('dialoguesWithFriends.conversations = ', dialoguesWithFriends.conversations)
-      setCountFriends(dialoguesWithFriends.conversations.length)
-      setMsgFriends(dialoguesWithFriends.conversations)
+      // console.log('dialoguesWithFriends.conversations = ', dialoguesWithFriends.conversations)
+      setConversations(dialoguesWithFriends.conversations)
 
       let nolu = []
       dialoguesWithFriends.conversations.forEach(element => {
@@ -49,14 +33,32 @@ function MessageScreen(props) {
       });
       setUnreadPerConversation(nolu)
     }
-    getDialogues()
 
-  }, [token])
+  }
 
-  const items = msgFriends.map((el, i) => {
+  useEffect(() => {
+    AsyncStorage.getItem("token", function (error, tokenValue) {
+      setToken(tokenValue)
+      const getId = () => {
+        fetch(HTTP_IP_DEV + '/get-id-from-token?token=' + tokenValue, { method: 'GET' })
+          .then(r => r.json())
+          .then(data => {
+            setMyId(data.id)
+          }).catch((e) =>
+            console.log('error', e)
+          )
+      }
+      getId()
+    })
+
+    loadConversations()
+    // setInterval(() => loadConversations(), 5000) // ne marche pas !!
+
+  }, [myId])
+
+  const items = conversations.map((el, i) => {
 
     if (el.lastMessage && el.friendsDatas) {
-      console.log('el ', el.nbUnreadMsg)
       let when = new Date(el.lastMessage.date)
       let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
         + ' à ' + when.toLocaleTimeString('fr-FR')
@@ -116,7 +118,7 @@ function MessageScreen(props) {
 
     <View style={styles.container}>
       {
-        countFriends > 0 ?
+        conversations.length > 0 ?
           <View style={styles.main}>
             <Text style={styles.mainTitle}>Messagerie</Text>
             <SwitchSelector style={styles.switch}
@@ -134,7 +136,12 @@ function MessageScreen(props) {
                 { label: "Demandes (0)", value: "d" },
               ]}
             />
-            <ScrollView showsVerticalScrollIndicator={true} style={styles.ScrollView}>
+            <ScrollView
+              showsVerticalScrollIndicator={true} style={styles.ScrollView}
+              onMomentumScrollEnd={() => {
+                loadConversations()
+              }}
+            >
               {items}
             </ScrollView>
           </View>
@@ -142,7 +149,6 @@ function MessageScreen(props) {
           <View style={styles.ScrollView}>
             <Text style={{ textAlign: 'center' }}>
               Vous n'avez pas de confident !
-            <Button title="Rechercher des confidents" />
             </Text>
             <Text>
               <Button title="Rechercher des confidents"

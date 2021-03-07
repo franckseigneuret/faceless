@@ -222,7 +222,8 @@ router.get('/get-id-from-token', async function (req, res, next) {
     })
   } else {
     res.json({
-      error: true
+      error: true,
+      id: undefined,
     })
   }
 })
@@ -245,7 +246,6 @@ router.get('/show-msg', async function (req, res, next) {
   }
 
   const myConnectedId = req.query.user_id
-  console.log('myConnectedId', myConnectedId)
 
   // load les conversations avec mes contacts
   const allMyConversations = await ConversationsModel.find({
