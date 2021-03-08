@@ -74,11 +74,18 @@ function MessageScreen(props) {
           let noluCopy = [...unreadPerConversation]
           noluCopy[i] = 0
           setUnreadPerConversation(noluCopy)
+          console.log(el.friendsDatas,'<<<<----- props à renvoyer')
           props.navigation.navigate('ConversationScreen', {
             token,
             myId,
             myContactId: el.friendsDatas._id,
             convId: el.lastMessage.conversation_id,
+            pseudo: el.friendsDatas.pseudo,
+            gender: el.friendsDatas.gender,
+            subscriptionDate: el.friendsDatas.subscriptionDate,
+            problemDesc : el.friendsDatas.problem_description,
+            problems_types : el.friendsDatas.problems_types,
+            avatar: el.friendsDatas.avatar
           })
         }}>
 
