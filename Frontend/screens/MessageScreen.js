@@ -10,66 +10,79 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const windowSize = Dimensions.get('window');
-console.log('windowSize', windowSize)
 
 function MessageScreen(props) {
 
   const [token, setToken] = useState(null)
   const [myId, setMyId] = useState(null)
-  const [countFriends, setCountFriends] = useState(0)
-  const [msgFriends, setMsgFriends] = useState([])
-  const [friends, setFriends] = useState([])
+  const [conversations, setConversations] = useState([])
+  const [unreadPerConversation, setUnreadPerConversation] = useState([])
+
+  const loadConversations = async () => {
+    console.log('myId', myId)
+    if (myId) { // l'id obtenue à partir du token existe bien
+      const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myId, { method: 'GET' })
+
+      const dialoguesWithFriends = await dialogues.json()
+      // console.log('dialoguesWithFriends.conversations = ', dialoguesWithFriends.conversations)
+      setConversations(dialoguesWithFriends.conversations)
+
+      let nolu = []
+      dialoguesWithFriends.conversations.forEach(element => {
+        nolu.push(element.nbUnreadMsg)
+      });
+      setUnreadPerConversation(nolu)
+    }
+
+  }
 
   useEffect(() => {
     AsyncStorage.getItem("token", function (error, tokenValue) {
       setToken(tokenValue)
+      const getId = () => {
+        fetch(HTTP_IP_DEV + '/get-id-from-token?token=' + tokenValue, { method: 'GET' })
+          .then(r => r.json())
+          .then(data => {
+            setMyId(data.id)
+          }).catch((e) =>
+            console.log('error', e)
+          )
+      }
+      getId()
     })
 
-    const getId = async () => {
-      const idRaw = await fetch(HTTP_IP_DEV + '/get-id-from-token?token=' + token, { method: 'GET' })
-      const idResponse = await idRaw.json()
+    loadConversations()
+    // setInterval(() => loadConversations(), 5000) // ne marche pas !!
 
-      return idResponse.id
-    }
+  }, [myId])
 
-    const getDialogues = async () => {
-      const myConnectedId = await getId()
-      console.log('myConnectedId = ', myConnectedId)
-      setMyId(myConnectedId)
-      const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myConnectedId, { method: 'GET' })
-
-      const dialoguesWithFriends = await dialogues.json()
-      console.log('dialoguesWithFriends.conversations = ', dialoguesWithFriends.conversations)
-      setCountFriends(dialoguesWithFriends.conversations.length)
-      setMsgFriends(dialoguesWithFriends.conversations)
-      // setFriends(dialoguesWithFriends.friendsData)
-    }
-    getDialogues()
-
-  }, [token])
-
-  const items = msgFriends.map((el, i) => {
+  const items = conversations.map((el, i) => {
 
     if (el.lastMessage && el.friendsDatas) {
-      console.log('el ', el.nbUnreadMsg)
       let when = new Date(el.lastMessage.date)
       let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
         + ' à ' + when.toLocaleTimeString('fr-FR')
 
       return <TouchableOpacity
+        activeOpacity={1}
         key={i}
-        onPress={() => props.navigation.navigate('ConversationScreen', {
-          token,
-          myId,
-          myContactId: el.friendsDatas._id,
-          convId: el.lastMessage.conversation_id,
-        })}>
+        onPress={() => {
+          let noluCopy = [...unreadPerConversation]
+          noluCopy[i] = 0
+          setUnreadPerConversation(noluCopy)
+          props.navigation.navigate('ConversationScreen', {
+            token,
+            myId,
+            myContactId: el.friendsDatas._id,
+            convId: el.lastMessage.conversation_id,
+          })
+        }}>
 
-        <View style={styles.conversations}>
+        <View style={styles.conversationsItem}>
           {
-            el.nbUnreadMsg ?
+            unreadPerConversation[i] ?
               <View style={styles.nonLuContent}>
-                <Text style={styles.nonLuText}>{el.nbUnreadMsg}</Text>
+                <Text style={styles.nonLuText}>{unreadPerConversation[i]}</Text>
               </View>
               :
               <Text />
@@ -106,7 +119,7 @@ function MessageScreen(props) {
 
     <View style={styles.container}>
       {
-        countFriends > 0 ?
+        conversations.length > 0 ?
           <View style={styles.main}>
             <Text style={styles.mainTitle}>Messagerie</Text>
             <SwitchSelector style={styles.switch}
@@ -124,16 +137,30 @@ function MessageScreen(props) {
                 { label: "Demandes (0)", value: "d" },
               ]}
             />
-            <ScrollView showsVerticalScrollIndicator={true} style={styles.ScrollView}>
-              {items}
-            </ScrollView>
+            <View style={styles.conversations}>
+              <Image style={styles.loader} source={{ uri: 'https://i.imgur.com/WtX0jT0.gif' }} />
+              <View style={styles.scrollContent}>
+                <ScrollView
+                  showsVerticalScrollIndicator={true} style={styles.ScrollView}
+                  onMomentumScrollEnd={() => {
+                    loadConversations()
+                  }}
+                >
+                  {items}
+                </ScrollView>
+              </View>
+            </View>
           </View>
           :
-          <Text>
-            Vous n'avez pas de confident !
-            <Button title="Rechercher des confidents" />
-          </Text>
-
+          <View style={styles.ScrollView}>
+            <Text style={{ textAlign: 'center' }}>
+              Vous n'avez pas de confident !
+            </Text>
+            <Text>
+              <Button title="Rechercher des confidents"
+                onPress={() => props.navigation.navigate("HomeScreen")} />
+            </Text>
+          </View>
       }
     </View>
 
@@ -165,6 +192,25 @@ const styles = StyleSheet.create({
     marginVertical: 40,
   },
   conversations: {
+    position: 'relative',
+    width: windowSize.width * .9,
+  },
+  loader: {
+    marginHorizontal: '45%',
+    height: 50,
+    width: 50,
+  },
+  scrollContent: {
+    position: 'absolute',
+    top: -10,
+    left: -10,
+    height: windowSize.height * .7,
+    width: '900%'
+  },
+  scrollView: {
+    height: windowSize.height * .7,
+  },
+  conversationsItem: {
     margin: 10,
     position: 'relative',
     flexDirection: 'row',
@@ -199,10 +245,6 @@ const styles = StyleSheet.create({
   },
   nonLuText: {
     color: 'white',
-  },
-
-  scrollView: {
-    height: windowSize.height * .7,
   },
   lastMessage: {
     width: '70%',
