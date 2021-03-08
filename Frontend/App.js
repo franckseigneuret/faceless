@@ -18,6 +18,7 @@ import Filter from "./components/Filter";
 import MessageScreen from "./screens/MessageScreen";
 import HomeScreen from "./screens/HomeScreen";
 import ProfilScreen from "./screens/ProfilScreen";
+import UserProfilScreen from './screens/UserProfilScreen'
 // NAVIGATION
 import { NavigationContainer, useIsFocused } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -92,6 +93,7 @@ export default function App() {
           <Stack.Screen name='BottomNavigator' component={BottomNavigator} />
           <Stack.Screen name='ConversationScreen' component={ConversationScreen} />
           <Stack.Screen name='Filter' component={Filter} />
+          <Stack.Screen name='UserProfilScreen' component={UserProfilScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

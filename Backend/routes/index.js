@@ -11,6 +11,7 @@ const cost = 10;
 
 var ObjectId = require('mongodb').ObjectId;
 const { request } = require('express');
+const { count } = require('../models/users');
 
 
 /* GET home page. */
@@ -24,6 +25,7 @@ router.post('/email-check', async function (req, res, next) {
   var user = await UserModel.findOne({ email: req.body.emailFront })
   var result;
   var error;
+  var errorRegex
   if (user) {
     result = true;
     error = 'Cet adresse mail est déjà associée à un compte'
@@ -32,7 +34,19 @@ router.post('/email-check', async function (req, res, next) {
     error = 'Aucun email semblable trouvé en BDD, next step'
   }
 
-  res.json({ result, error })
+    const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    var testEmail = regex.test(String(req.body.emailFront).toLowerCase());
+    if(testEmail == true) {
+      errorRegex = 'Email valide !'
+      resultRegex = true
+    } else {
+      errorRegex = 'Ça ne ressemble pas à un email valide !'
+      resultRegex = false
+    }
+    console.log(testEmail, 'testEmail ')
+
+
+  res.json({ result, resultRegex, error, errorRegex })
 })
 
 
@@ -73,6 +87,7 @@ router.post('/sign-up-first-step', async function (req, res, next) {
     password: hash,
     pseudo: req.body.pseudoFront,
     birthDate: req.body.birthDateFront,
+    subscriptionDate : new Date(),
     problems_types: JSON.parse(req.body.problemsFront),
     is_adult: isAdult,
   })
@@ -174,21 +189,34 @@ query : tokenFront : 1234, birthDateFront : (12/23/1992), problemsTypesFront : S
 response : userFiltered : array, pseudo (celui du user connecté) : String
 */
 router.get('/show-card', async function(req, res, next) {
-
-  //traitement date 
   var filterFront = JSON.parse(req.query.filterFront);
-  // console.log(filterFront, '<<<<<------ filter front')
-  var user = await UserModel.findOne({token: req.query.tokenFront})
+  //traitement date avec années bissextiles prisent en compte
+  var todayYear = new Date().getFullYear();
+  var ageMinFilter = filterFront.age.minAge;
+  var ageMaxFilter = filterFront.age.maxAge;
+  var dateMinMillisecondes = new Date() - ((86400000*365)*ageMinFilter);
+  var dateMaxMillisecondes = new Date() - ((86400000*365)*ageMaxFilter);
+  var dateMin = new Date(dateMinMillisecondes);
+  var dateMax = new Date(dateMaxMillisecondes);
+  var countBissextileAgeMin = Math.ceil((todayYear - dateMin.getFullYear())/4)
+  var countBissextileAgeMax = Math.ceil((todayYear - dateMax.getFullYear())/4)
+  var dateMinCondition = new Date(dateMin - (countBissextileAgeMin*86400000));
+  var dateMaxCondition = new Date(dateMax - (countBissextileAgeMax*86400000));
+  //
+  var user = await UserModel.findOne({token: req.query.tokenFront});
+
   var userToDisplay = await UserModel.find({
     token: {$ne : req.query.tokenFront}, 
     is_adult: user.is_adult, 
-   ////// A FAIRE ///// age: {$elemMatch: {$gte: filterFront.age.minAge, $lt: filterFront.age.maxAge}}, <<<<------!! Faire un filtre avant d'envoyer en base de donner pour créer la clé AGE
+    birthDate: {$gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString())},
   })
 
+  // console.log(userToDisplay, '<----- userTO DISPLAU')
+
   var userToShow =[];
-  // console.log(userToDisplay,'<---------- user to display')
   for (let i=0; i<userToDisplay.length; i++) {
-    if (filterFront.problemsTypes.some(r=> userToDisplay[i].problems_types.includes(r)) == true) {
+    if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
+    filterFront.gender.includes(userToDisplay[i].gender) == true) {
       userToShow.push(userToDisplay[i]);
     }
   }
@@ -411,6 +439,10 @@ pouvez nous envoyer un email à l'adresse mail....'
  */
 router.post('/signalement-help', function (req, res, next) {
   res.render('index', { title: 'Express' });
+});
+
+router.post('/signalement-user', function (req, res, next) {
+  res.json();
 });
 
 /* loadProfil : mettre à jour les information en BDD de l'utilisateur qui modifie son profil. */

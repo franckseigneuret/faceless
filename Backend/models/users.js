@@ -6,6 +6,7 @@ var UserSchema = mongoose.Schema({
     password : String,
     pseudo: String,
     birthDate : Date,
+    subscriptionDate: Date,
     is_adult: Boolean,
     problems_types: [String],
     problem_description: String,
