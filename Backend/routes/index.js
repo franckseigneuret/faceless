@@ -27,10 +27,10 @@ router.post('/email-check', async function (req, res, next) {
   var error;
   var errorRegex
   if (user) {
-    result = true;
+    result = false;
     error = 'Cet adresse mail est déjà associée à un compte'
   } else {
-    result = false;
+    result = true;
     error = 'Aucun email semblable trouvé en BDD, next step'
   }
 
@@ -210,18 +210,43 @@ router.get('/show-card', async function(req, res, next) {
     is_adult: user.is_adult, 
     birthDate: {$gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString())},
   })
+  var distance;
+  function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1); 
+    var a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      ; 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c; // Distance in km
+    distance = d;
+  }
+
+  console.log(filterFront, '<----- filter front')
 
   // console.log(userToDisplay, '<----- userTO DISPLAU')
 
   var userToShow =[];
+if(filterFront.localisation == 'France') {
   for (let i=0; i<userToDisplay.length; i++) {
     if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
-    filterFront.gender.includes(userToDisplay[i].gender) == true) {
+    filterFront.gender.includes(userToDisplay[i].gender) == true ) {
       userToShow.push(userToDisplay[i]);
     }
   }
-
-  // console.log(userToShow,'<---------User filtrés')
+} else {
+  for (let i=0; i<userToDisplay.length; i++) {
+    getDistanceFromLatLonInKm(user.localisation.coordinates[0], user.localisation.coordinates[1], userToDisplay[i].localisation.coordinates[0], userToDisplay[i].localisation.coordinates[1])
+    if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
+    filterFront.gender.includes(userToDisplay[i].gender) == true && distance <= filterFront.localisation[0]) {
+      userToShow.push(userToDisplay[i]);
+    }
+  }
+}
+  console.log(userToShow,'<---------User filtrés')
   
 
   res.json({user:user, userToShow:userToShow, });
@@ -266,13 +291,6 @@ router.get('/show-msg', async function (req, res, next) {
   let messagesPerPerson = []
   let friendsData = []
   let conversations = []
-  let askNewConversation = false
-  
-  if(req.query.demandes && req.query.demandes === 'oui') {
-    askNewConversation = true
-  }
-
-  console.log('???', askNewConversation)
 
   if (req.query && req.query.user_id === '') {
     res.json({
@@ -284,8 +302,7 @@ router.get('/show-msg', async function (req, res, next) {
 
   // load les conversations avec mes contacts
   const allMyConversations = await ConversationsModel.find({
-    participants: { $in: [myConnectedId] },
-    demand: askNewConversation,
+    participants: { $in: [myConnectedId] }
   })
 
   console.log('allMyConversations = ', allMyConversations)
@@ -376,17 +393,13 @@ response : newMessageData
 */
 router.post('/send-msg', async function (req, res, next) {
 
-  console.log("req.body.myContactId", req.body.myContactId)
-
   const searchConvWithUser = await ConversationsModel.findOne({
-    participants: { $all: ['604290d10dee5248be25bf7e', req.body.myContactId] }
+    participants: { $all: ['603f7b5163ca3a5cbd0a4746', req.body.myContactId] }
   })
-
-  console.log("searchConvWithUser", searchConvWithUser)
 
   var msg = await new MessagesModel({
     conversation_id: searchConvWithUser._id,
-    from_id: '604290d10dee5248be25bf7e',
+    from_id: '603f7b5163ca3a5cbd0a4746',
     to_id: req.body.myContactId,
     // from_id: ObjectId('603f7b5163ca3a5cbd0a4746'),
     // to_id: ObjectId(req.body.myContactId),
@@ -397,9 +410,9 @@ router.post('/send-msg', async function (req, res, next) {
 
   var mewMsg = await msg.save()
 
-  // var msgs = await MessagesModel.find(
-  //   { conversation_id: searchConvWithUser._id }
-  // );
+  var msgs = await MessagesModel.find(
+    { conversation_id: searchConvWithUser._id }
+  );
 
   res.json({ result: true });
 });
@@ -409,15 +422,14 @@ router.post('/create-conv', async function (req, res, next) {
   console.log(" req.body.myId",  req.body.myId)
 
   var conv = await new ConversationsModel({
-    participants: [req.body.myContactId, req.body.myId],
-    demand: true,
+    participants: [req.body.myContactId, req.body.myId]
   })
 
   var newConv = await conv.save()
 
   console.log("newConv", newConv._id)
 
-  res.json({result: true});
+  res.json({ convId: newConv._id });
 });
 
 /*update-filter -> mettre à jour le filtre pour permettre de mettre à jour la page card-show 
