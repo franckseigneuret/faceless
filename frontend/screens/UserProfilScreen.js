@@ -14,10 +14,9 @@ const windowHeight = Dimensions.get('window').height;
 function UserProfilScreen(props) {
 
    const handleClickBack = () => {
-       props.navigation.navigate('HomeScreen')
+       props.navigation.goBack()
    };
-  
-   
+     
     moment.locale('fr');
     var NewDate = moment(props.route.params.subscriptionDate).format('Do MMMM YYYY')
 
