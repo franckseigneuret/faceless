@@ -332,7 +332,7 @@ export default function ProfilScreen(props) {
             {!cityVisible ? (
               <>
                 <Text style={styles.subtitle}>
-                  {/* localisation.label */}
+                  {/* {localisation.label} */}
                   {localisation == "" ? "France" : localisation}
                 </Text>
                 <TouchableOpacity onPress={handlePressCity}>

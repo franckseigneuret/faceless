@@ -23,6 +23,7 @@ function HomeScreen(props) {
   const handleData = async () => {
       var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=123456789`);
       var response = await rawResponse.json();
+      console.log(response, 'response useEffect')
       setUserToDisplay(response.userToShow)
       setPseudo(response.user.pseudo)
      };
