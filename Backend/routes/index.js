@@ -238,6 +238,13 @@ router.get('/show-msg', async function (req, res, next) {
   let messagesPerPerson = []
   let friendsData = []
   let conversations = []
+  let askNewConversation = false
+  
+  if(req.query.demandes && req.query.demandes === 'oui') {
+    askNewConversation = true
+  }
+
+  console.log('???', askNewConversation)
 
   if (req.query && req.query.user_id === '') {
     res.json({
@@ -249,7 +256,8 @@ router.get('/show-msg', async function (req, res, next) {
 
   // load les conversations avec mes contacts
   const allMyConversations = await ConversationsModel.find({
-    participants: { $in: [myConnectedId] }
+    participants: { $in: [myConnectedId] },
+    demand: askNewConversation,
   })
 
   console.log('allMyConversations = ', allMyConversations)
@@ -369,7 +377,8 @@ router.post('/create-conv', async function (req, res, next) {
   console.log(" req.body.myId",  req.body.myId)
 
   var conv = await new ConversationsModel({
-    participants: [req.body.myContactId, req.body.myId]
+    participants: [req.body.myContactId, req.body.myId],
+    demand: true,
   })
 
   var newConv = await conv.save()

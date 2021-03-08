@@ -18,10 +18,14 @@ function MessageScreen(props) {
   const [conversations, setConversations] = useState([])
   const [unreadPerConversation, setUnreadPerConversation] = useState([])
 
-  const loadConversations = async () => {
+  const loadConversations = async (params) => {
     console.log('myId', myId)
     if (myId) { // l'id obtenue à partir du token existe bien
-      const dialogues = await fetch(HTTP_IP_DEV + '/show-msg?user_id=' + myId, { method: 'GET' })
+      let uri = `${HTTP_IP_DEV}/show-msg?user_id=${myId}`
+      if(params.demandes) {
+        uri += `&demandes=oui`
+      }
+      const dialogues = await fetch(uri, { method: 'GET' })
 
       const dialoguesWithFriends = await dialogues.json()
       // console.log('dialoguesWithFriends.conversations = ', dialoguesWithFriends.conversations)
@@ -51,7 +55,7 @@ function MessageScreen(props) {
       getId()
     })
 
-    loadConversations()
+    loadConversations({demandes:false})
     // setInterval(() => loadConversations(), 5000) // ne marche pas !!
 
   }, [myId])
@@ -124,7 +128,9 @@ function MessageScreen(props) {
             <Text style={styles.mainTitle}>Messagerie</Text>
             <SwitchSelector style={styles.switch}
               initial={0}
-              // onPress={value => this.setState({ gender: value })}
+              onPress={value => {
+                value === 'demandes' ? loadConversations({demandes:true}) : loadConversations({demandes:false})
+              }}
               textColor={'#5571D7'}
               selectedColor={'#FFF'}
               backgroundColor={'#b9c7f3'}
@@ -133,8 +139,8 @@ function MessageScreen(props) {
               hasPadding
               fontSize={18}
               options={[
-                { label: "Confidents", value: "c" },
-                { label: "Demandes (0)", value: "d" },
+                { label: "Confidents", value: 'confidents' },
+                { label: "Demandes (0)", value: 'demandes' },
               ]}
             />
             <View style={styles.conversations}>
