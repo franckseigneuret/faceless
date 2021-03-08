@@ -44,10 +44,6 @@ function HomeScreen(props) {
           let filterValue = JSON.parse(data[1][1]) 
 
         var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${tokenValue}&filterFront=${JSON.stringify(filterValue)}`);
-          var response = await rawResponse.json();
-          setUserToDisplay(response.userToShow)
-          setPseudo(response.user.pseudo)  
-        var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${tokenValue}&filterFront=${JSON.stringify(filterValue)}`);
         var response = await rawResponse.json();
         setUserToDisplay(response.userToShow)
         setPseudo(response.user.pseudo)

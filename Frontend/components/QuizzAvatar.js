@@ -19,7 +19,7 @@ const windowHeight = Dimensions.get('window').height;
 
 function QuizzAvatar(props) {
 
-    const [imgAvatarSelected, setImgAvatarSelected] = useState('https://i.imgur.com/P3rBF8E.png')
+    const [imgAvatarSelected, setImgAvatarSelected] = useState('https://i.imgur.com/atDrheA.png')
     const [imgAvatarUrl, setImgAvatarUrl] = useState("")
     const [token, setToken] = useState('')
     
@@ -44,13 +44,20 @@ function QuizzAvatar(props) {
     }
 
     var imgAvatarSrc = [
-        'https://i.imgur.com/Xqf1Ilk.png',
-        'https://i.imgur.com/w9g1N3c.png',
-        'https://i.imgur.com/lbx9ygk.png',
-        'https://i.imgur.com/Fl632zM.png',
-        'https://i.imgur.com/uC9E6zE.png',
-        'https://i.imgur.com/FbL66Lc.png',
-        'https://i.imgur.com/3X0bsrQ.png',
+        'https://i.imgur.com/HgBDc9B.png',
+        'https://i.imgur.com/NBYvxKX.png',
+        'https://i.imgur.com/urOQgGD.png',
+        'https://i.imgur.com/clPw5Nx.png',
+        'https://i.imgur.com/Wm5vVmF.png',
+        'https://i.imgur.com/YSesoUz.png',
+        'https://i.imgur.com/mMzuMuT.png',
+        'https://i.imgur.com/EHaBuT9.png',
+        'https://i.imgur.com/21c3YgT.png',
+        'https://i.imgur.com/17T5sWH.png',
+        'https://i.imgur.com/97zBLZM.png',
+        'https://i.imgur.com/aK9HbPT.png',
+        'https://i.imgur.com/T7wBkkk.png',
+        'https://i.imgur.com/fJYbMZO.png'
     ]
 
     var imgAvatar = imgAvatarSrc.map((url, key) => {

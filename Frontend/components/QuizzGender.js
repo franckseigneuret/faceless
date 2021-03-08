@@ -44,6 +44,12 @@ function QuizzGender(props) {
     {unSelected: <Image source={require('../assets/gender_female.png')}/>, selected: <Image source={require('../assets/gender_female_selected.png')}/>},
   ];
 
+  // var images = [
+  //   {unSelected: <Image source={{uri: 'https://i.imgur.com/wK81q24.png'}}/>, selected: <Image source={{uri: 'https://i.imgur.com/EvKcqi9.png'}}/>},
+  //   {unSelected: <Image source={{uri: 'https://i.imgur.com/U0HK9Zb.png'}}/>, selected: <Image source={{uri: 'https://i.imgur.com/FNaPA8d.png'}}/>},
+  //   {unSelected: <Image source={{uri: 'https://i.imgur.com/XDpv4eo.png'}}/>, selected: <Image source={{uri: 'https://i.imgur.com/S1xUry1.png'}}/>},
+  // ];
+
   var image = images.map((img, key) => {
       return <TouchableOpacity key={key} onPress={() => {setIsSelected(key), updateGender(key)}}>
        {isSelected === key ? img.selected : img.unSelected}
@@ -55,7 +61,6 @@ function QuizzGender(props) {
         <QuizzTitre title="Tu es ?"/>
         <View style={{display: "flex", flexDirection:"row", justifyContent: "center"}}>
           {image}
-          
         </View>
         <BlueButton btnTitle="enregistrer" handleClickParent={handleClick}/>
       </View>
