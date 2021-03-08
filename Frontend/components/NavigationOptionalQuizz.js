@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Button } from 'react-native-elements';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
-
+import HTTP_IP_DEV from '../mon_ip'
 import {connect} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -19,6 +20,23 @@ import { startClock } from 'react-native-reanimated';
 
 
 function NavigationOptionalQuizz(props) {
+
+  const [token, setToken] = useState('')
+
+  AsyncStorage.getItem("token", function(error, data) {
+    setToken(data)
+});
+
+  var handleClick = async () => {
+    console.log(token, '<)--------------- token');
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/sign-up-second-step`, {
+     method: 'POST',
+     headers: {'Content-Type':'application/x-www-form-urlencoded'},
+     body: `problemDescriptionFront=${props.userDisplay.problem_description}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${token}`
+    });
+    var response = await rawResponse.json()
+    console.log(response, '<------<--------<--------<--- response after update')
+    }
 
     let [fontsLoaded] = useFonts({
         Montserrat_700Bold,
@@ -52,7 +70,7 @@ function NavigationOptionalQuizz(props) {
             color: '#5571D7',
             fontFamily: 'Montserrat_700Bold',
             }}
-            onPress={()=>(props.onIncrease()) }
+            onPress={()=>{props.onIncrease(); props.count == 3 ? handleClick() : null} }
             /> 
         </View>
     );
@@ -69,8 +87,15 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+function mapStateToProps(state) {
+  return { 
+    userDisplay: state.user,
+    count: state.count,
+   }
+ }
+
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(NavigationOptionalQuizz);
 

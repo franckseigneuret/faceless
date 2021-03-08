@@ -182,7 +182,6 @@ function quizz(props) {
         age: {
           minAge: 18, 
           maxAge: 100,
-          isAdult: isAdult,
         },
         localisation: 'France'
       })) : AsyncStorage.setItem("filter", JSON.stringify({ // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
