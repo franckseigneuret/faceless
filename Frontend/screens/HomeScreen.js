@@ -21,7 +21,7 @@ function HomeScreen(props) {
   const [pseudo, setPseudo] = useState('');
   const [myToken, setMyToken] = useState('');
   const [myContactId, setMyContactId] = useState('');
-  const [myId, setMyId] = useState('');
+  const [myId, setMyId] = useState(null)
   const [newConvId, setNewConvId] = useState('');
   const [currentMsg, setCurrentMsg] = useState("")
 
@@ -45,6 +45,18 @@ function HomeScreen(props) {
         setPseudo(response.user.pseudo)
         //recupere mon token
         setMyToken(response.user.token)
+
+
+        const getId = () => {
+          fetch(HTTP_IP_DEV + '/get-id-from-token?token=' + tokenValue, { method: 'GET' })
+            .then(r => r.json())
+            .then(data => {
+              setMyId(data.id)
+            }).catch((e) =>
+              console.log('error', e)
+            )
+        }
+        getId()
       })
     };
     handleData()
@@ -58,11 +70,13 @@ function HomeScreen(props) {
   // console.log("USER TO DISPLAY", userToDisplay)
 
   async function createConv(contactId) {
+    console.log('myId', myId)
+    console.log('contactId', contactId)
     var rawResponse = await fetch(`${HTTP_IP_DEV}/create-conv`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       //remplacer mon ID avec celui recuperer du back
-      body: `myContactId=${contactId}&myId=604290d10dee5248be25bf7e`
+      body: `myContactId=${contactId}&myId=${myId}`
     });
     var response = await rawResponse.json();
     console.log("create conv", response.convId)
