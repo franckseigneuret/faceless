@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Image, Alert, Modal, Pressable, KeyboardAvoidingView, Button } from 'react-native';
-import { Input } from 'react-native-elements';
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Image, KeyboardAvoidingView, Button } from 'react-native';
+import { Input, Overlay } from 'react-native-elements';
 import { useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold } from "@expo-google-fonts/montserrat";
 import { Ionicons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
@@ -23,9 +23,13 @@ function HomeScreen(props) {
   const [myContactId, setMyContactId] = useState('');
   const [myId, setMyId] = useState(null)
   const [newConvId, setNewConvId] = useState('');
-  const [currentMsg, setCurrentMsg] = useState("")
+  const [currentMsg, setCurrentMsg] = useState("");
+  const [disableSendBtn, setDisableSendBtn] = useState(true);
+  const [visible, setVisible] = useState(false);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const toggleOverlay = () => {
+    setVisible(!visible);
+  };
 
   useEffect(() => {
     var token;
@@ -78,7 +82,7 @@ function HomeScreen(props) {
     });
     var response = await rawResponse.json();
     console.log("create conv", response.convId)
-    // setNewConvId(response.convId)
+    setNewConvId(response.convId)
   }
 
   var sendMsg = async (myContactId, message) => {
@@ -88,10 +92,25 @@ function HomeScreen(props) {
       body: `msg=${message}&myContactId=${myContactId}&myId=${myId}`
     });
     setCurrentMsg("")
-    setModalVisible(!modalVisible)
+    setVisible(false)
+    setDisableSendBtn(true)
   }
 
-  console.log("current msg", currentMsg)
+  var checkTextSize = (val) => {
+    if(val.length>0){
+        setDisableSendBtn(false)
+    } else {
+        setDisableSendBtn(true)
+    }
+  }
+
+  var deleteConv = async (convId) => {
+    await fetch(`${HTTP_IP_DEV}/delete-convers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `convId=${convId}`
+    });
+  }
 
   let [fontsLoaded] = useFonts({
     Montserrat_400Regular,
@@ -113,36 +132,31 @@ function HomeScreen(props) {
 
     return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
       <View style={styles.topCard}>
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-        // onRequestClose={() => {
-        //   Alert.alert("Modal has been closed.");
-        //   setModalVisible(!modalVisible);
-        // }}
-        >
+        <Overlay isVisible={visible} overlayBackgroundColor="pink" overlayStyle={{ backgroundColor: "rgba(255, 241, 226, 0.5)"}}>
           <View style={styles.centeredView}>
+            <TouchableOpacity style={styles.buttonRelatif} onPress={() => { setVisible(false), deleteConv(newConvId), toggleOverlay() }}>
+              <Ionicons name="close-outline" size={30} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
+            </TouchableOpacity>
             <View style={styles.modalView}>
-              <TouchableOpacity style={styles.button} onPress={() => { setModalVisible(!modalVisible), console.log("newConvId", newConvId) }}>
-                <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
-              </TouchableOpacity>
               <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ width: "80%", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
                 <Input
-                  containerStyle={{ marginBottom: 5, borderWidth: 2, minHeight: 40, maxHeight: 100, borderColor: "#8C8C8C", borderRadius: 20, backgroundColor: "white" }}
+                  containerStyle={{ borderWidth: 2, minHeight: 40, borderColor: "#8C8C8C", borderRadius: 20, backgroundColor: "white" }}
                   placeholder='Your message'
                   inputContainerStyle={{ borderBottomWidth: 0 }}
                   multiline={true}
                   value={currentMsg}
-                  onChangeText={(val) => setCurrentMsg(val)}
+                  onChangeText={(val) => {
+                    setCurrentMsg(val)
+                    checkTextSize(val)
+                  }}
                 />
-                <TouchableOpacity style={styles.buttonSend} onPress={() => sendMsg(myContactId, currentMsg)}>
+                <TouchableOpacity style={disableSendBtn ? styles.buttonDisabled : styles.buttonSend} onPress={() => sendMsg(myContactId, currentMsg)} disabled={disableSendBtn}>
                   <Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton} />
                 </TouchableOpacity>
               </KeyboardAvoidingView>
             </View>
           </View>
-        </Modal>
+        </Overlay>
         <Image source={{ uri: e.avatar }} style={{ borderWidth: 3, borderRadius: 50, borderColor: '#EC9A1F', width: 100, height: 100 }} />
         <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
         <Text style={styles.member}>Membre depuis le 12 février 2020</Text>
@@ -163,7 +177,7 @@ function HomeScreen(props) {
 
           <TouchableOpacity
             style={styles.buttonSend}
-            onPress={() => { setModalVisible(true), createConv(e._id), setMyContactId(e._id) }}
+            onPress={() => { setVisible(true), createConv(e._id), setMyContactId(e._id), toggleOverlay() }}
           ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton} />
           </TouchableOpacity>
           <TouchableOpacity
@@ -197,14 +211,6 @@ function HomeScreen(props) {
           <ScrollView showsHorizontalScrollIndicator={false} snapToInterval={windowWidth} decelerationRate='fast' horizontal >
             {CardToSwipe}
           </ScrollView >
-
-          {/* delete */}
-          {/* <TouchableOpacity 
-          style={styles.buttonSend}
-          //renvoyer en argument de createConv l'ID de mon contact
-          onPress={()=> createConv("603f618c78727809c7e1ad9a")}
-        ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
-        </TouchableOpacity> */}
         </View>
       )
     } else {
@@ -290,7 +296,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexWrap: 'wrap'
   },
-  buttonSend: {
+  buttonDisabled: {
     backgroundColor: "#5571D7",
     padding: 10,
     width: 50,
@@ -302,8 +308,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
-  },
+    alignItems: 'center',
+    marginLeft: 10,
+    opacity: 0.3
+    }, 
   buttonInfo: {
     backgroundColor: "#5571D7",
     width: 50,
@@ -352,26 +360,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Montserrat_700Bold"
   },
-  sendButton: {
-    alignSelf: 'center',
-    marginLeft: 3,
-    marginBottom: 5,
-    transform: [{ rotate: '-45deg' }]
-  },
   centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,
+    // backgroundColor: "#FFEEDD"
   },
   modalView: {
     width: "90%",
     minHeight: "30%",
     margin: 20,
-    backgroundColor: "white",
+    backgroundColor: "#FFF1E2",
     borderRadius: 20,
     padding: 35,
     alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -379,7 +383,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
   },
   buttonSend: {
     backgroundColor: "#5571D7",
@@ -416,7 +420,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: 15
   },
-
+  buttonRelatif: {
+    backgroundColor: "#FFF1E2",
+    width: 50,
+    height: 50,
+    borderRadius: 30,
+    borderColor: '#5571D7',
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.5,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 15,
+    top: 60,
+    left: -150,
+    zIndex: 1
+  },
   noCardContainer: {
     width: '100%',
     height: windowHeight - 50,

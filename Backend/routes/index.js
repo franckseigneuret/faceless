@@ -547,7 +547,11 @@ router.put('/delete-msg', function (req, res, next) {
 body: idConversFront: 1234
 response: conversationsUpdated
 */
-router.put('/delete-convers', function (req, res, next) {
+router.post('/delete-convers', async function (req, res, next) {
+
+  await ConversationsModel.deleteOne(
+    { _id: req.body.convId}
+  );
   res.render('index', { title: 'Express' });
 });
 
