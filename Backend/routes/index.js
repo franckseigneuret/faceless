@@ -136,8 +136,7 @@ router.post('/sign-in', async function (req, res, next) {
 
 
   user = await UserModel.findOne({
-    email: req.body.emailFromFront,
-    // et le PWD pour sécuriser  
+    email: req.body.emailFromFront, 
   })
   console.log(user, 'user find sign in ');
 
@@ -154,7 +153,6 @@ router.post('/sign-in', async function (req, res, next) {
     } else {
       error.push('mot de passe incorrect')
     }
-
   } else {
     error.push('email incorrect')
   }
