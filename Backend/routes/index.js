@@ -29,15 +29,15 @@ router.post('/email-check', async function (req, res, next) {
 
   const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var testEmail = regex.test(String(req.body.emailFront).toLowerCase());
-   if (testEmail == false) {
-    res.json({result: false, error: 'Ça ne ressemble pas à un email valide !'})
-  } else if(user) {
-  res.json({result: false, error:'Cet email est déjà associé à un compte existant'})
+  if (testEmail == false) {
+    res.json({ result: false, error: 'Ça ne ressemble pas à un email valide !' })
+  } else if (user) {
+    res.json({ result: false, error: 'Cet email est déjà associé à un compte existant' })
   } else {
-    res.json({result: true})
+    res.json({ result: true })
   }
 });
-  
+
 
 router.post('/pseudo-check', async function (req, res, next) {
   var user = await UserModel.findOne({ pseudo: req.body.pseudoFront })
@@ -61,10 +61,10 @@ router.post('/sign-up-first-step', async function (req, res, next) {
   var birthDate = new Date(req.body.birthDateFront)
   var dateToday = new Date()
   var dateCompare = dateToday - birthDate
-  var conditionDate = (86400000*365)*18
+  var conditionDate = (86400000 * 365) * 18
   var isAdult;
 
-  if(dateCompare > conditionDate) {
+  if (dateCompare > conditionDate) {
     isAdult = true
   } else {
     isAdult = false
@@ -76,7 +76,7 @@ router.post('/sign-up-first-step', async function (req, res, next) {
     password: hash,
     pseudo: req.body.pseudoFront,
     birthDate: req.body.birthDateFront,
-    subscriptionDate : new Date(),
+    subscriptionDate: new Date(),
     problems_types: JSON.parse(req.body.problemsFront),
     is_adult: isAdult,
   })
@@ -128,9 +128,9 @@ router.post('/sign-up-second-step', async function (req, res, next) {
 body : emailFront : (quentin@gmail.com), passwordFront : (XXXXXX)
 response : result (true), token : 1234
 */
-router.post('/sign-in', async function(req, res, next) {
+router.post('/sign-in', async function (req, res, next) {
 
-  var result =false;
+  var result = false;
   let user = null;
   var error = [];
   var token = null;
@@ -138,39 +138,37 @@ router.post('/sign-in', async function(req, res, next) {
   console.log('ici')
   console.log(error)
 
-  if(req.body.emailFromFront == ''
-  || req.body.passwordFromFront == ''
-  ){
+  if (req.body.emailFromFront == ''
+    || req.body.passwordFromFront == ''
+  ) {
     error.push('champs vides')
   }
 
 
   user = await UserModel.findOne({
     email: req.body.emailFromFront,
-    // et le PWD pour sécuriser  
   })
   console.log(user, 'user find sign in ');
 
-    // user = await UserModel.findOne({
-    //   email: req.body.emailFromFront,
-    //   // et le PWD pour sécuriser  
-    // })
-    // console.log(user, 'user find sign in ');
+  // user = await UserModel.findOne({
+  //   email: req.body.emailFromFront,
+  //   // et le PWD pour sécuriser  
+  // })
+  // console.log(user, 'user find sign in ');
 
-    if(user){
-      if(bcrypt.compareSync(req.body.passwordFromFront, user.password)){
-        token = user.token
-        result = true
-      } else {
-        error.push('mot de passe incorrect')
-      }
-      
+  if (user) {
+    if (bcrypt.compareSync(req.body.passwordFromFront, user.password)) {
+      token = user.token
+      result = true
     } else {
-      error.push('email incorrect')
+      error.push('mot de passe incorrect')
     }
+  } else {
+    error.push('email incorrect')
+  }
 
 
-  res.json({result, user, token, error});
+  res.json({ result, user, token, error });
 });
 
 
@@ -187,29 +185,27 @@ router.post('/sign-out', function (req, res, next) {
 query : tokenFront : 1234, birthDateFront : (12/23/1992), problemsTypesFront : String, localisationFront : String, genderFront : String, 
 response : userFiltered : array, pseudo (celui du user connecté) : String
 */
-router.get('/show-card', async function(req, res, next) {
+router.get('/show-card', async function (req, res, next) {
   var filterFront = JSON.parse(req.query.filterFront);
   //traitement date avec années bissextiles prisent en compte
   var todayYear = new Date().getFullYear();
   var ageMinFilter = filterFront.age.minAge;
   var ageMaxFilter = filterFront.age.maxAge;
-  var dateMinMillisecondes = new Date() - ((86400000*365)*ageMinFilter);
-  var dateMaxMillisecondes = new Date() - ((86400000*365)*ageMaxFilter);
+  var dateMinMillisecondes = new Date() - ((86400000 * 365) * ageMinFilter);
+  var dateMaxMillisecondes = new Date() - ((86400000 * 365) * ageMaxFilter);
   var dateMin = new Date(dateMinMillisecondes);
   var dateMax = new Date(dateMaxMillisecondes);
-  var countBissextileAgeMin = Math.ceil((todayYear - dateMin.getFullYear())/4)
-  var countBissextileAgeMax = Math.ceil((todayYear - dateMax.getFullYear())/4)
-  var dateMinCondition = new Date(dateMin - (countBissextileAgeMin*86400000));
-  var dateMaxCondition = new Date(dateMax - (countBissextileAgeMax*86400000));
-  
-  console.log(req.query.tokenFront, '<------ tokenFront');
-
-  var user = await UserModel.findOne({token: req.query.tokenFront});
+  var countBissextileAgeMin = Math.ceil((todayYear - dateMin.getFullYear()) / 4)
+  var countBissextileAgeMax = Math.ceil((todayYear - dateMax.getFullYear()) / 4)
+  var dateMinCondition = new Date(dateMin - (countBissextileAgeMin * 86400000));
+  var dateMaxCondition = new Date(dateMax - (countBissextileAgeMax * 86400000));
+  //
+  var user = await UserModel.findOne({ token: req.query.tokenFront });
 
   var userToDisplay = await UserModel.find({
-    token: {$ne : req.query.tokenFront}, 
-    is_adult: user.is_adult, 
-    birthDate: {$gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString())},
+    token: { $ne: req.query.tokenFront },
+    is_adult: user.is_adult,
+    birthDate: { $gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString()) },
   })
   function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
     console.log(lat1, lat2, lon1, lon2)
@@ -273,7 +269,7 @@ router.get('/get-id-from-token', async function (req, res, next) {
     token: req.query.token
   })
 
-  if(me) {
+  if (me) {
     res.json({
       error: false,
       id: me._id
@@ -296,6 +292,12 @@ router.get('/show-msg', async function (req, res, next) {
   let messagesPerPerson = []
   let friendsData = []
   let conversations = []
+  let askNewConversation = false
+  let nbNewConversations = 0
+
+  if (req.query.demandes && req.query.demandes === 'oui') {
+    askNewConversation = true
+  }
 
   if (req.query && req.query.user_id === '') {
     res.json({
@@ -305,22 +307,29 @@ router.get('/show-msg', async function (req, res, next) {
 
   const myConnectedId = req.query.user_id
 
+  // compter le nb de demandes de conversation
+  const allConversations = await ConversationsModel.find({
+    participants: { $in: [myConnectedId] },
+  })
+  allConversations.forEach(element => {
+    nbNewConversations = element.demand === true ? ++nbNewConversations : nbNewConversations
+  });
+
   // load les conversations avec mes contacts
-  const allMyConversations = await ConversationsModel.find({
-    participants: { $in: [myConnectedId] }
+  const conversationsPerPart = await ConversationsModel.find({
+    participants: { $in: [myConnectedId] },
+    demand: askNewConversation,
   })
 
-  console.log('allMyConversations = ', allMyConversations)
+  // console.log('conversationsPerPart = ', conversationsPerPart)
 
-
-  await Promise.all(allMyConversations.map(async (element, index) => {
+  await Promise.all(conversationsPerPart.map(async (element, index) => {
     // compter les messages non lus par l'utilisateur de l'app
     var allUnreadMsg = await MessagesModel.find({
       conversation_id: element._id,
       to_id: new ObjectId(myConnectedId),
       read: false,
     })
-    console.log('no lu ', allUnreadMsg.length)
 
     // construit un tableau listant le dernier message de chaque conversation
     var lastMsg = await MessagesModel.find({
@@ -332,21 +341,37 @@ router.get('/show-msg', async function (req, res, next) {
 
     // construit un tableau des infos de mes contacts (avatar, pseudo...)
     const notMe = element.participants[0] == myConnectedId ? element.participants[1] : element.participants[0]
-    const myFriends = await UserModel.findById(notMe)
-    friendsData.push(myFriends)
+    let myFriend = await UserModel.findById(notMe)
 
+    // le confindent est Online ?? analyse date dernier message
+    const lastMsgFriend = await MessagesModel.findOne({
+      from_id: notMe,
+    }).sort({ date: -1 })
+
+    now = new Date()
+
+    let statusOnLine = 'off'
+    statusOnLine = now - lastMsgFriend.date < 1800000 ? 'recent' : 'off'  // - de 30 min, soit 1000 * 30 * 60 = 1800000 ms
+    statusOnLine = now - lastMsgFriend.date < 900000 ? 'on' : 'recent'    // - de 15 min, soit 1000 * 15 * 60 = 900000 ms
+    console.log(lastMsgFriend.date)
+    myFriend = { ...myFriend.toObject(), statusOnLine }
+
+    friendsData.push(myFriend)
     conversations.push({
       nbUnreadMsg: allUnreadMsg.length,
       lastMessage: lastMsg[0],
-      friendsDatas: myFriends
+      friendsDatas: myFriend,
     })
 
     // tri du tableau pour mettre les blocs avec des messages non lus en haut
     conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1)
   }))
 
+
+
   res.json({
-    conversations
+    conversations,
+    nbNewConversations,
   })
 });
 
@@ -369,15 +394,15 @@ router.get('/show-convers', async function (req, res, next) {
   ).sort({ date: 1 });
 
   // les messages non lus deviennent lus
-  console.log('req.query.token == ', req.query.token) 
-  if (req.query.token !=  null) {
+  console.log('req.query.token == ', req.query.token)
+  if (req.query.token != null) {
     console.log('tooook', req.query.token)
 
     const me = await UserModel.findOne({
       token: req.query.token
     })
-    if(me) {
-      await MessagesModel.updateMany({ to_id: me._id}, { read: true })
+    if (me) {
+      await MessagesModel.updateMany({ to_id: me._id }, { read: true })
     }
   }
 
@@ -402,37 +427,44 @@ router.post('/send-msg', async function (req, res, next) {
     participants: { $all: [req.body.myId, req.body.myContactId] }
   })
 
-  var msg = await new MessagesModel({
+  var msg = new MessagesModel({
     conversation_id: searchConvWithUser._id,
     from_id: req.body.myId,
     to_id: req.body.myContactId,
-    // from_id: ObjectId('603f7b5163ca3a5cbd0a4746'),
-    // to_id: ObjectId(req.body.myContactId),
     content: req.body.msg,
     date: new Date(),
     read: false
   })
 
-  var mewMsg = await msg.save()
+  var newMsg = await msg.save()
 
-  var msgs = await MessagesModel.find(
+  var allMsg = await MessagesModel.find(
     { conversation_id: searchConvWithUser._id }
-  );
+  )
+
+  for (var i = 0; i < allMsg.length; i++) {
+    if (allMsg[i].to_id == req.body.myId) {
+      // condition fonctionnelle mais à améliorer
+      var updateStatusConv = await ConversationsModel.updateOne(
+        { _id: searchConvWithUser._id },
+        { demand: false }
+      );
+    }
+  }
 
   res.json({ result: true });
 });
 
 router.post('/create-conv', async function (req, res, next) {
-  console.log(" req.body.myContactId",  req.body.myContactId)
-  console.log(" req.body.myId",  req.body.myId)
+  console.log(" req.body.myContactId", req.body.myContactId)
+  console.log(" req.body.myId", req.body.myId)
 
-  var conv = await new ConversationsModel({
-    participants: [req.body.myContactId, req.body.myId]
+  var conv = new ConversationsModel({
+    participants: [req.body.myContactId, req.body.myId],
+    demand: true
   })
 
   var newConv = await conv.save()
-
-  console.log("newConv", newConv._id)
 
   res.json({
     result: true,
@@ -479,7 +511,7 @@ router.put("/update-profil", async function (req, res, next) {
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
 
-  var userBeforeUpdate = await UserModel.findOne({token: req.body.tokenFront})
+  var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   console.log(userBeforeUpdate, '<---- userBeforeUpdate')
 
   // ajout du genre et descriptionProblemFront
@@ -539,7 +571,11 @@ router.put('/delete-msg', function (req, res, next) {
 body: idConversFront: 1234
 response: conversationsUpdated
 */
-router.put('/delete-convers', function (req, res, next) {
+router.post('/delete-convers', async function (req, res, next) {
+
+  await ConversationsModel.deleteOne(
+    { _id: req.body.convId}
+  );
   res.render('index', { title: 'Express' });
 });
 

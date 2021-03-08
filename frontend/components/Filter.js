@@ -27,7 +27,6 @@ function Filter(props) {
   // const [genderStatut, setGenderStatut] = useState({other: true, male: true, female: true })
 
   useEffect(() => {
-
     AsyncStorage.getItem("filter", function(error, data) {
       var dataStorage = JSON.parse(data)
       if(dataStorage.localisation[0] > 90) {

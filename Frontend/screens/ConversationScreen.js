@@ -10,8 +10,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-function ConversationScreen(props) {
 
+function ConversationScreen(props) {
+    
     const [token, setToken] = useState(null)
     const [myId, setMyId] = useState(null)
     const [data, setData] = useState([])
@@ -19,6 +20,7 @@ function ConversationScreen(props) {
     const [myContactId, setMyContactId] = useState("")
     const [pseudo, setPseudo] = useState("")
     const [avatar, setAvatar] = useState("https://i.imgur.com/P3rBF8E.png")
+    const [disableSendBtn, setDisableSendBtn] = useState(true)
     const scrollViewRef = useRef();
 
     // console.log("props.route.params.convId", props.route.params.convId)
@@ -32,6 +34,9 @@ function ConversationScreen(props) {
         setAvatar(response.avatar)
         setMyContactId(props.route.params.myContactId)
     }
+
+    var infoUser= props.route.params
+    console.log(infoUser,'<------ INFO À RENVOYER')
 
     useEffect(() => {
         AsyncStorage.getItem("token", function (error, tokenValue) {
@@ -58,6 +63,14 @@ function ConversationScreen(props) {
         });
         setCurrentMsg("")
         loadMsg()
+    }
+
+    var checkTextSize = (val) => {
+        if(val.length>0){
+            setDisableSendBtn(false)
+        } else {
+            setDisableSendBtn(true)
+        }
     }
 
     var tabMsg = data.map((item, i) => {
@@ -89,7 +102,16 @@ function ConversationScreen(props) {
                     <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
                 </TouchableOpacity>
                 <View style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <Image source={{ uri: avatar }} style={{ borderWidth: 3, borderRadius: 50, borderColor: '#EC9A1F', width: 75, height: 75 }} />
+                <TouchableOpacity onPress={()=> props.navigation.navigate('UserProfilScreen', {
+                      pseudo: infoUser.pseudo,
+                      gender: infoUser.gender,
+                      subscriptionDate: infoUser.subscriptionDate,
+                      problemDesc : infoUser.problemDesc,
+                      problems_types : infoUser.problems_types,
+                      avatar: infoUser.avatar
+                    })}> 
+                  <Image source={{uri: infoUser.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
+                </TouchableOpacity>
                     <Text style={styles.pseudo}>{pseudo}</Text>
                 </View>
                 <TouchableOpacity style={styles.button}>
@@ -110,9 +132,12 @@ function ConversationScreen(props) {
                     inputContainerStyle={{ borderBottomWidth: 0 }}
                     multiline={true}
                     value={currentMsg}
-                    onChangeText={(val) => setCurrentMsg(val)}
+                    onChangeText={(val) => {
+                        setCurrentMsg(val) 
+                        checkTextSize(val)
+                    }}
                 />
-                <TouchableOpacity style={styles.buttonSend} onPress={() => sendMsg()}>
+                <TouchableOpacity style={disableSendBtn ? styles.buttonSend : styles.buttonReadyToSend} onPress={() => sendMsg()} disabled={disableSendBtn}>
                     <Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton} />
                 </TouchableOpacity>
             </KeyboardAvoidingView>
@@ -189,6 +214,23 @@ const styles = StyleSheet.create({
         // fontFamily: "Montserrat_400Regular",
     },
     buttonSend: {
+        backgroundColor: "#5571D7",
+        padding: 10,
+        width: 50,
+        height: 50,
+        borderRadius: 30,
+        borderColor: '#5571D7',
+        shadowColor: "black",
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.5,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 10,
+        opacity: 0.3
+
+    },
+    buttonReadyToSend: {
         backgroundColor: "#5571D7",
         padding: 10,
         width: 50,

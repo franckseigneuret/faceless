@@ -38,16 +38,50 @@ function SignIn(props) {
       body: `emailFromFront=${signInEmail}&passwordFromFront=${signInPassword}`,
     });
     const data = await rawData.json();
-    console.log(data, "After Fetch");
+    console.log(data, "<----- After Fetch");
 
     if (data.result == true) {
       AsyncStorage.setItem("token", data.token);
       props.navigation.navigate("BottomNavigator");
     }
-    console.log(data.error);
+
     if (data.error) {
       setErrorsSignIn(data.error);
     }
+
+    if (data.user.is_adult == true) {
+      AsyncStorage.setItem(
+        "filter",
+        JSON.stringify({
+          // si isAdult == true alors on set le min age du filter à l'âge de l'user et le max age à l'age de l'user +10 ans
+          problemsTypes: data.user.problems_types, // problems
+          gender: ['other', 'male', 'female'],
+          age: {
+            minAge: 18,
+            maxAge: 100,
+          },
+          localisation: "France",
+        })
+      );
+    } else {
+      AsyncStorage.setItem(
+        "filter",
+        JSON.stringify({
+          // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
+          problemsTypes: data.user.problems_types, 
+          gender: ['other', 'male', 'female'],
+          age: {
+            minAge: 13, //Math.floor(new Date(new Date() - data.user.birthDate))
+            maxAge: 17,
+          },
+          localisation: "France",
+        })
+      );
+    }
+
+    AsyncStorage.getItem("filter", function(error, data) {
+      console.log(data, 'DATA DU ASYNC ')
+  })
   };
 
   var tabErrorsSignIn = listErrorsSignIn.map((error, i) => {
