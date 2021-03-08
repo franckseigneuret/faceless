@@ -18,7 +18,7 @@ function MessageScreen(props) {
   const [conversations, setConversations] = useState([])
   const [unreadPerConversation, setUnreadPerConversation] = useState([])
   const [part, setPart] = useState('confident')
-  // const [nbDemand, setNbDemand] = useState(0)
+  const [nbDemand, setNbDemand] = useState(0)
 
   const loadConversations = async (params) => {
     console.log('myId', myId)
@@ -32,10 +32,7 @@ function MessageScreen(props) {
       const dialoguesWithFriends = await dialogues.json()
       // console.log('dialoguesWithFriends.conversations = ', dialoguesWithFriends.conversations)
       setConversations(dialoguesWithFriends.conversations)
-
-      // dialoguesWithFriends.conversations.forEach(element => {
-      //   setNbDemand()
-      // });
+      setNbDemand(dialoguesWithFriends.nbNewConversations)
 
       let nolu = []
       dialoguesWithFriends.conversations.forEach(element => {
@@ -146,7 +143,7 @@ function MessageScreen(props) {
             fontSize={18}
             options={[
               { label: "Confidents", value: 'confidents' },
-              { label: "Demandes (0)", value: 'demandes' },
+              { label: `Demandes (${nbDemand})`, value: 'demandes' },
             ]}
           />
           {
