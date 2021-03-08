@@ -67,6 +67,10 @@ export default function ProfilScreen(props) {
   const [cityVisible, setCityVisible] = useState(false);
   const [mdpVisible, setMdpVisible] = useState(false);
 
+  // A FAIRE POUR QUE LE USER NE VOIT PAS SES MODIF AVANT D ENREGISTRER 
+  const [descriptionVisible, setDescriptionVisible] = useState(false)
+  
+
   // Changement de la couleur button enregistrer bottom
   const [saveButton, setSaveButton] = useState(false);
 
@@ -91,6 +95,7 @@ export default function ProfilScreen(props) {
 
   const handleSaveDescription = () => {
     setVisible(!visible);
+    setSaveButton(true);
   };
 
   const handleSaveChange = () => {
@@ -103,7 +108,7 @@ export default function ProfilScreen(props) {
       rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `tokenFront=${tokenAsync}&emailFront=${email}&localisationFront=${localisation}&passwordFront=${password}&genderFront=${gender}&problem_description=${problemDescription}`,
+        body: `tokenFront=${tokenAsync}&emailFront=${email}&localisationFront=${localisation}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}`,
       });
       response = await rawResponse.json();
 
@@ -140,7 +145,6 @@ export default function ProfilScreen(props) {
     setSaveButton(false);
   };
 
-  // ne marche pas
   const handleDisconnect = () => {
     AsyncStorage.removeItem("token");
     props.navigation.navigate("Registration");
@@ -180,6 +184,9 @@ export default function ProfilScreen(props) {
       setPassword(password);
 
       var gender = response.userFromBack.gender;
+      if (gender == null) {
+        setIsSelected(0);
+      } 
       if (gender == "other") {
         setIsSelected(0);
       }
@@ -395,7 +402,9 @@ export default function ProfilScreen(props) {
                 <Ionicons name="pencil" size={18} color="#5571D7" />
               </TouchableOpacity>
             </View>
-            <Text style={{ width: "100%" }}>{problemDescription}</Text>
+            <Text style={{ width: "100%" }} numberOfLines={4}>
+              {problemDescription}
+            </Text>
           </View>
 
           <Overlay
@@ -419,7 +428,7 @@ export default function ProfilScreen(props) {
               }}
             ></TextInput>
             <Button
-              title="enregistrer"
+              title="ok"
               type="solid"
               buttonStyle={styles.buttonValider}
               titleStyle={{
@@ -655,6 +664,13 @@ const styles = StyleSheet.create({
   },
   buttonValiderBIS: {
     backgroundColor: "#BCC8F0",
+    borderRadius: 86,
+    width: 159,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  buttonOK: {
+    backgroundColor: "#5571D7",
     borderRadius: 86,
     width: 159,
     paddingHorizontal: 10,
