@@ -29,15 +29,15 @@ router.post('/email-check', async function (req, res, next) {
 
   const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var testEmail = regex.test(String(req.body.emailFront).toLowerCase());
-   if (testEmail == false) {
-    res.json({result: false, error: 'Ça ne ressemble pas à un email valide !'})
-  } else if(user) {
-  res.json({result: false, error:'Cet email est déjà associé à un compte existant'})
+  if (testEmail == false) {
+    res.json({ result: false, error: 'Ça ne ressemble pas à un email valide !' })
+  } else if (user) {
+    res.json({ result: false, error: 'Cet email est déjà associé à un compte existant' })
   } else {
-    res.json({result: true})
+    res.json({ result: true })
   }
 });
-  
+
 
 router.post('/pseudo-check', async function (req, res, next) {
   var user = await UserModel.findOne({ pseudo: req.body.pseudoFront })
@@ -94,19 +94,29 @@ router.post('/sign-up-first-step', async function (req, res, next) {
 problemDescriptionFront=${props.userDisplay}&genderFront=${props.userDisplay.gender}&localisationFront=${JSON.stringify(props.userDisplay.localisation.coordinates)}&avatarFront=${props.userDisplay.avatar}&tokenFront=${tokenOnLocalStorage}
   */
 router.post('/sign-up-second-step', async function (req, res, next) {
+  var localisation = req.body.localisation;
+  var gender = req.body.genderFront;
+  var problemDesc = req.body.problemDescriptionFront;
+  var avatar = req.body.avatarFront;
+  req.body.localisationFront == 'undefined' ? localisation = 'France' : localisation = JSON.parse(req.body.localisationFront);
+  req.body.genderFront == 'undefined' ? gender = '' : gender = req.body.genderFront;
+  req.body.problemDescriptionFront == 'undefined' ? problemDesc = '' : problemDesc = req.body.problemDescriptionFront;
+  req.body.avatarFront == 'undefined' ? avatar = 'https://i.imgur.com/Xqf1Ilk.png' : avatar = req.body.avatarFront;
 
-  console.log(req.body.tokenFront, '----> token front')
+  
 
   var user = await UserModel.updateOne(
     { token: req.body.tokenFront }, // ciblage à gauche de la virgule
     {
-      problem_description: req.body.problemDescriptionFront,
-      gender: req.body.genderFront,
-      localisation: JSON.parse(req.body.localisationFront),
-      avatar: req.body.avatarFront,
+      problem_description: problemDesc,
+      gender: gender,
+      localisation: localisation,
+      avatar: avatar,
     }
   );
 
+  var userUpdated = await UserModel.findOne({token: req.body.tokenFront})
+    console.log(userUpdated, '<------- USER UPDATED')
   var result;
   user ? result = true : result = false
 
@@ -136,7 +146,7 @@ router.post('/sign-in', async function (req, res, next) {
 
 
   user = await UserModel.findOne({
-    email: req.body.emailFromFront, 
+    email: req.body.emailFromFront,
   })
   console.log(user, 'user find sign in ');
 
@@ -197,10 +207,10 @@ router.get('/show-card', async function (req, res, next) {
     is_adult: user.is_adult,
     birthDate: { $gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString()) },
   })
-  var distance;
   function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-    var R = 6371; // Radius of the earth in km
-    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    console.log(lat1, lat2, lon1, lon2)
+    var R = 6371; 
+    var dLat = deg2rad(lat2-lat1); 
     var dLon = deg2rad(lon2-lon1); 
     var a = 
       Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -208,36 +218,39 @@ router.get('/show-card', async function (req, res, next) {
       Math.sin(dLon/2) * Math.sin(dLon/2)
       ; 
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    var d = R * c; // Distance in km
-    distance = d;
+    var d = R * c; 
+    return d;
   }
-
-  console.log(filterFront, '<----- filter front')
-
-  // console.log(userToDisplay, '<----- userTO DISPLAU')
-
-  var userToShow =[];
-if(filterFront.localisation == 'France') {
-  for (let i=0; i<userToDisplay.length; i++) {
-    if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
-    filterFront.gender.includes(userToDisplay[i].gender) == true ) {
-      userToShow.push(userToDisplay[i]);
-    }
-  }
-} else {
-  for (let i=0; i<userToDisplay.length; i++) {
-    getDistanceFromLatLonInKm(user.localisation.coordinates[0], user.localisation.coordinates[1], userToDisplay[i].localisation.coordinates[0], userToDisplay[i].localisation.coordinates[1])
-    if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
-    filterFront.gender.includes(userToDisplay[i].gender) == true && distance <= filterFront.localisation[0]) {
-      userToShow.push(userToDisplay[i]);
-    }
-  }
-}
-  console.log(userToShow,'<---------User filtrés')
   
+  function deg2rad(deg) {
+    return deg * (Math.PI/180)
+  }
+  
+  var userToShow =[];
+    for (let i=0; i<userToDisplay.length; i++) {
+      if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
+      filterFront.gender.includes(userToDisplay[i].gender) == true ) {
+        userToShow.push(userToDisplay[i]);
+      }
+    }
 
-
-  res.json({ user: user, userToShow: userToShow, });
+    let userFilterOnLocation = [];
+    if(filterFront.localisation == 'France') {
+      res.json({userToShow: userToShow, user:user})
+    } else {
+      for(var i = 0; i<userToShow.length; i++){
+        console.log(userToShow[i], '<------ user to show on for loop')
+        console.log(user.localisation, '<-------- myuser localisation');
+        if(userToShow[i].localisation.coordinates[0]){
+          let distance = getDistanceFromLatLonInKm(user.localisation.coordinates[0], user.localisation.coordinates[1], userToShow[i].localisation.coordinates[0], userToShow[i].localisation.coordinates[1])
+          if(distance <= filterFront.localisation){
+            userFilterOnLocation.push(userToShow[i])
+          }
+        }
+      }
+    res.json({userToShow:userFilterOnLocation, user:user});
+    console.log(userFilterOnLocation, '<---------- USER TO SHOW ON LOCATION')
+  }
 });
 
 
@@ -286,8 +299,6 @@ router.get('/show-msg', async function (req, res, next) {
     askNewConversation = true
   }
 
-  console.log('???', askNewConversation)
-
   if (req.query && req.query.user_id === '') {
     res.json({
       conversations
@@ -309,7 +320,7 @@ router.get('/show-msg', async function (req, res, next) {
     participants: { $in: [myConnectedId] },
     demand: askNewConversation,
   })
-  
+
   // console.log('conversationsPerPart = ', conversationsPerPart)
 
   await Promise.all(conversationsPerPart.map(async (element, index) => {
@@ -319,8 +330,6 @@ router.get('/show-msg', async function (req, res, next) {
       to_id: new ObjectId(myConnectedId),
       read: false,
     })
-    console.log('no lu ', allUnreadMsg.length)
-
 
     // construit un tableau listant le dernier message de chaque conversation
     var lastMsg = await MessagesModel.find({
@@ -332,18 +341,33 @@ router.get('/show-msg', async function (req, res, next) {
 
     // construit un tableau des infos de mes contacts (avatar, pseudo...)
     const notMe = element.participants[0] == myConnectedId ? element.participants[1] : element.participants[0]
-    const myFriends = await UserModel.findById(notMe)
-    friendsData.push(myFriends)
+    let myFriend = await UserModel.findById(notMe)
 
+    // le confindent est Online ?? analyse date dernier message
+    const lastMsgFriend = await MessagesModel.findOne({
+      from_id: notMe,
+    }).sort({ date: -1 })
+
+    now = new Date()
+
+    let statusOnLine = 'off'
+    statusOnLine = now - lastMsgFriend.date < 1800000 ? 'recent' : 'off'  // - de 30 min, soit 1000 * 30 * 60 = 1800000 ms
+    statusOnLine = now - lastMsgFriend.date < 900000 ? 'on' : 'recent'    // - de 15 min, soit 1000 * 15 * 60 = 900000 ms
+    console.log(lastMsgFriend.date)
+    myFriend = { ...myFriend.toObject(), statusOnLine }
+
+    friendsData.push(myFriend)
     conversations.push({
       nbUnreadMsg: allUnreadMsg.length,
       lastMessage: lastMsg[0],
-      friendsDatas: myFriends,
+      friendsDatas: myFriend,
     })
 
     // tri du tableau pour mettre les blocs avec des messages non lus en haut
     conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1)
   }))
+
+
 
   res.json({
     conversations,
@@ -415,16 +439,16 @@ router.post('/send-msg', async function (req, res, next) {
   var newMsg = await msg.save()
 
   var allMsg = await MessagesModel.find(
-    {conversation_id: searchConvWithUser._id}
+    { conversation_id: searchConvWithUser._id }
   )
 
-  for(var i=0; i< allMsg.length; i++){
-    if(allMsg[i].to_id == req.body.myId){
-    // condition fonctionnelle mais à améliorer
+  for (var i = 0; i < allMsg.length; i++) {
+    if (allMsg[i].to_id == req.body.myId) {
+      // condition fonctionnelle mais à améliorer
       var updateStatusConv = await ConversationsModel.updateOne(
-        {_id: searchConvWithUser._id},
+        { _id: searchConvWithUser._id },
         { demand: false }
-     );
+      );
     }
   }
 

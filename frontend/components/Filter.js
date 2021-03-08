@@ -17,20 +17,28 @@ function Filter(props) {
 
   const [ageMin, setAgeMin] = useState(null)
   const [ageMax, setAgeMax] = useState(null)
-  const [localisation, setLocalisation] = useState(null)
+  const [localisation, setLocalisation] = useState()
   const [problems, setProblems] = useState(['Amoureux'])
   const [genderSelected, setGenderSelected] = useState(['other'])
   const [isAdult, setIsAdult] = useState(false)
+
+  var franceLocalisation = 'France'
   // const [problemsStatut, setProblemsStatut] = useState({ Amoureux: false, Familial: false, Physique: false, Professionnel: false, Scolaire: false })
   // const [genderStatut, setGenderStatut] = useState({other: true, male: true, female: true })
 
   useEffect(() => {
     AsyncStorage.getItem("filter", function(error, data) {
       var dataStorage = JSON.parse(data)
+      if(dataStorage.localisation[0] > 90) {
+        console.log('in condition')
+       setLocalisation(franceLocalisation)
+      }else {
+        setLocalisation(dataStorage.localisation[0])
+        console.log(dataStorage.localisation[0], '<------- set localisation array ?')
+      }
       setProblems(dataStorage.problemsTypes);
       setAgeMin(dataStorage.age.minAge);
       setAgeMax(dataStorage.age.maxAge);
-      setLocalisation(dataStorage.localisation);
       setGenderSelected(dataStorage.gender);
      });
   }, []);
@@ -106,6 +114,7 @@ function Filter(props) {
         localisation: localisation
       }
     ));
+    console.log(localisation, '<----- state took data storage value, france if > 90');
     props.navigation.navigate('BottomNavigator', { screen: 'HomeScreen' })
   }
   
@@ -168,7 +177,7 @@ function Filter(props) {
           />
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <Text style={styles.titleProblems}>Distance :</Text>
-            <Text style={styles.textDynamic}>{localisation == 'France' || localisation > 90 ? 'France' : `${localisation} km`}</Text>
+            <Text style={styles.textDynamic}>{localisation == 'France' || localisation > 90 ? franceLocalisation : `${localisation} km`}</Text>
           </View>
           <MultiSlider
             selectedStyle={styles.selectedStyle}
@@ -178,7 +187,7 @@ function Filter(props) {
             max={100}
             values={[18]}
             enabledTwo
-            onValuesChange={value => setLocalisation(value)}
+            onValuesChange={value => { value > 90 ? setLocalisation(franceLocalisation) : setLocalisation(value)}}
             pressedMarkerStyle={styles.stepLabelStyle}
             allowOverlap={false}
 

@@ -35,6 +35,9 @@ function ConversationScreen(props) {
         setMyContactId(props.route.params.myContactId)
     }
 
+    var infoUser= props.route.params
+    console.log(infoUser,'<------ INFO À RENVOYER')
+
     useEffect(() => {
         AsyncStorage.getItem("token", function (error, tokenValue) {
             setToken(tokenValue)
@@ -99,7 +102,16 @@ function ConversationScreen(props) {
                     <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
                 </TouchableOpacity>
                 <View style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <Image source={{ uri: avatar }} style={{ borderWidth: 3, borderRadius: 50, borderColor: '#EC9A1F', width: 75, height: 75 }} />
+                <TouchableOpacity onPress={()=> props.navigation.navigate('UserProfilScreen', {
+                      pseudo: infoUser.pseudo,
+                      gender: infoUser.gender,
+                      subscriptionDate: infoUser.subscriptionDate,
+                      problemDesc : infoUser.problemDesc,
+                      problems_types : infoUser.problems_types,
+                      avatar: infoUser.avatar
+                    })}> 
+                  <Image source={{uri: infoUser.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
+                </TouchableOpacity>
                     <Text style={styles.pseudo}>{pseudo}</Text>
                 </View>
                 <TouchableOpacity style={styles.button}>

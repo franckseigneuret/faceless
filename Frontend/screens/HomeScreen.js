@@ -38,10 +38,10 @@ function HomeScreen(props) {
   const handleData = () => {
      AsyncStorage.multiGet(['token', 'filter'], async function (error, data){
        
-          let token = data[0][0];
-          let tokenValue = data[0][1]
-          let filter = data[1][0]
-          let filterValue = JSON.parse(data[1][1]) 
+        let token = data[0][0];
+        let tokenValue = data[0][1]
+        let filter = data[1][0]
+        let filterValue = JSON.parse(data[1][1]) 
 
         var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${tokenValue}&filterFront=${JSON.stringify(filterValue)}`);
         var response = await rawResponse.json();
