@@ -124,7 +124,7 @@ export default function ProfilScreen(props) {
       }
 
       if (response.userSaved.password) {
-        setPassword(response.userSaved.password);
+        // setPassword(response.userSaved.password);
         setMdpVisible(false);
       }
 
@@ -179,10 +179,11 @@ export default function ProfilScreen(props) {
       var localisation = response.userFromBack.localisation.label;
       setLocalisation(localisation);
 
-      var password = response.userFromBack.password;
-      setPassword(password);
+      // var password = response.userFromBack.password;
+      // setPassword(password);
 
       var gender = response.userFromBack.gender;
+      setGender(gender)
       if (gender == null) {
         setIsSelected(0);
       } 

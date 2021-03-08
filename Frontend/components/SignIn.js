@@ -48,19 +48,17 @@ function SignIn(props) {
     if (data.error) {
       setErrorsSignIn(data.error);
     }
-    console.log(data.user.is_adult, "is adult ?????????");
 
     if (data.user.is_adult == true) {
       AsyncStorage.setItem(
         "filter",
         JSON.stringify({
           // si isAdult == true alors on set le min age du filter à l'âge de l'user et le max age à l'age de l'user +10 ans
-          problemsTypes: problems,
-          gender: "all",
+          problemsTypes: data.user.problems_types, // problems
+          gender: ['other', 'male', 'female'],
           age: {
-            minAge: Math.floor(differenceDates / (86400000 * 365)),
-            maxAge: "all",
-            isAdult: isAdult,
+            minAge: 18,
+            maxAge: 100,
           },
           localisation: "France",
         })
@@ -70,16 +68,20 @@ function SignIn(props) {
         "filter",
         JSON.stringify({
           // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
-          problemsTypes: problems,
-          gender: "all",
+          problemsTypes: data.user.problems_types, 
+          gender: ['other', 'male', 'female'],
           age: {
-            minAge: Math.floor(differenceDates / (86400000 * 365)),
+            minAge: 13, //Math.floor(new Date(new Date() - data.user.birthDate))
             maxAge: 17,
           },
           localisation: "France",
         })
       );
     }
+
+    AsyncStorage.getItem("filter", function(error, data) {
+      console.log(data, 'DATA DU ASYNC ')
+  })
   };
 
   var tabErrorsSignIn = listErrorsSignIn.map((error, i) => {

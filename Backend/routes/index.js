@@ -140,6 +140,7 @@ router.post('/sign-in', async function(req, res, next) {
   })
   console.log(user, 'user find sign in ');
 
+  console.log(req.body.passwordFromFront, user.password, 'PASSWORD')  
     if(user){
       if(bcrypt.compareSync(req.body.passwordFromFront, user.password)){
         token = user.token
