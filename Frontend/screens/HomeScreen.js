@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Image, Button } from 'react-native';
 import {useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold} from "@expo-google-fonts/montserrat";
 import { Ionicons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
+import { useIsFocused } from "@react-navigation/native";
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,7 +15,7 @@ const windowHeight = Dimensions.get('window').height;
 
 
 function HomeScreen(props) {
-
+  const isFocused = useIsFocused();
   const [userToDisplay, setUserToDisplay] = useState([]);
   const [pseudo, setPseudo] = useState('');
 
@@ -40,7 +41,8 @@ function HomeScreen(props) {
      })
   }; 
   handleData()
-  }, []);
+  console.log('use effect on home')
+  }, [isFocused]);
 
   
   async function createConv(contactId) {
@@ -68,6 +70,13 @@ function HomeScreen(props) {
 
   });
 
+  var noCard = 
+    <View style={styles.noCardContainer}>
+      <Text style={styles.noCardText}>Aucun profil à afficher, étends ta recherche pour rencontrer de nouvelles personnes !</Text>
+      <Button title='Étendre la recherche' style={styles.noCardButton}/>
+    </View>
+
+
   var CardToSwipe = userToDisplay.map((e, i) => {
     // console.log(e.problem_description,'<---- avatar')
      
@@ -83,7 +92,7 @@ function HomeScreen(props) {
                   <Text style={{ color: "#264653", fontFamily: "Montserrat_400Regular",}} numberOfLines={4}>{e.problem_description}</Text>
                 </View>
                 <View style={styles.problemContainer}>
-                  <Text style={styles.subtitle}>Type de probleme(s)</Text>
+                  <Text style={styles.subtitle}>Type(s) de probleme(s)</Text>
                   <View style={styles.problemBadge}>
                     {e.problems_types.map((arg, i) => {
                       return ( <View style={styles.badge} key={i}><Text style={styles.fontBadge}>{arg}</Text></View>)
@@ -101,26 +110,31 @@ function HomeScreen(props) {
                                 })}
                               ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
                   </TouchableOpacity>
+                  <TouchableOpacity 
+                    onPress={()=> props.navigation.navigate('UserProfilScreen')}
+                    style={styles.buttonInfo}>     
+                    <Text style={styles.textInfo}>i</Text>
+                  </TouchableOpacity>
                   </View>
                 </View>
               </Animatable.View>)
 });
 
-  var handleSubmit = () => {
+  var handlePressFilter = () => {
     props.navigation.navigate('Filter')
   }
 
   if (!fontsLoaded) {
     return <AppLoading />;
   } else {
-
+    if(userToDisplay.length >0){
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor:'#FFEEDD'}}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent:'space-between', marginTop: 40, marginBottom:20, width: '65%', left:30}}>
           <Text style={styles.textTitle}>
             Salut {pseudo} !
           </Text>
-          <TouchableOpacity style={styles.buttonDate} onPress={() => handleSubmit()}>
+          <TouchableOpacity style={styles.buttonDate} onPress={() => handlePressFilter()}>
             <Ionicons name="funnel" size={25} color="#5571D7" style={{alignSelf: 'center', marginTop: 3}}/>
           </TouchableOpacity>
         </View>
@@ -136,7 +150,21 @@ function HomeScreen(props) {
         ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
         </TouchableOpacity>
       </View>
-    )};
+    )
+  } else {
+    return (
+      <View style={styles.noCardContainer}>
+          <Text style={styles.textTitle}>
+            Salut {pseudo} !
+          </Text>
+        <Text style={styles.noCardText}>Aucun profil à afficher, étends ta recherche pour rencontrer de nouvelles personnes !</Text>
+        <TouchableOpacity style={styles.noCardButton} onPress={() => handlePressFilter()}>
+          <Text style={styles.noCardButtonText}>Étendre la recherche</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+};
 }
 
 export default HomeScreen;
@@ -233,6 +261,11 @@ const styles = StyleSheet.create({
     justifyContent:'center',
     alignItems:'center', 
   },
+  textInfo: {
+    fontFamily: 'Montserrat_800ExtraBold',
+    fontSize: 20,
+    color: "#FFEEDD"
+  },
   badge : {
     backgroundColor:'#5571D7',
     margin:2,
@@ -268,5 +301,33 @@ const styles = StyleSheet.create({
     marginLeft:3,
     marginBottom:5,
     transform: [{rotate:'-45deg'}]
+  },
+  noCardContainer:{
+    width: '100%',
+    height: windowHeight -50,
+    backgroundColor: "#FFEEDD",
+    display:'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  noCardText:{
+    fontFamily: 'Montserrat_700Bold',
+    fontSize: 22,
+    color: '#EC9A1F',
+    textAlign: 'left',
+    width: '80%'
+  },
+  noCardButton:{
+    backgroundColor: "#5571D7",
+    borderRadius: 86,
+    margin: 20,
+    padding: 10
+  },
+  noCardButtonText:{
+    fontFamily: 'Montserrat_700Bold',
+    fontSize: 22,
+    color: '#FFEEDD',
+    textAlign: 'center'
   }
   })

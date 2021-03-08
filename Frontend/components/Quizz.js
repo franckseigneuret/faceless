@@ -11,6 +11,7 @@ import  HTTP_IP_DEV from '../mon_ip'
 
 import {
   useFonts,
+  Montserrat_400Regular,
   Montserrat_700Bold,
   Montserrat_900Black,
   Montserrat_800ExtraBold,
@@ -23,9 +24,14 @@ function quizz(props) {
 
   const [email, setEmail] = useState('')
   const [emailStatut, setEmailStatut] = useState(true)
+  const [emailError, setEmailError] = useState('')
+  const [emailRegex, setEmailRegex] = useState(true)
+  const [emailRegexError, setEmailRegexError] = useState('')
+  const [emailCondition, setEmailCondition] = useState(true)
   const [password, setPassword] = useState('')
   const [passwordStatut, setPasswordStatut] = useState(true)
   const [pseudo, setPseudo] = useState('')
+  const [pseudoError, setPseudoError] = useState('')
   const [pseudoStatut, setPseudoStatut] = useState(true)
   const [birthDate, setBirthDate] = useState(new Date())
   const [birthDateStatut, setBirthDateStatut] = useState(true)
@@ -34,6 +40,7 @@ function quizz(props) {
 
 
   let [fontsLoaded] = useFonts({
+    Montserrat_400Regular,
     Montserrat_700Bold,
     Montserrat_900Black,
     Montserrat_800ExtraBold,
@@ -76,8 +83,20 @@ function quizz(props) {
     var response = await rawResponse.json()
     if(response.result == true) {
       setEmailStatut(true)
+      setEmailError(response.error)
     } else {
       setEmailStatut(false)
+    }
+    if(response.resultRegex == false) {
+      setEmailRegex(true)
+      setEmailRegexError(response.errorRegex)
+    } else {
+      setEmailRegex(true)
+    }
+    if(emailRegex || emailStatut == true) {
+      setEmailCondition(true)
+    } else {
+      setEmailCondition(false)
     }
   }
 
@@ -91,11 +110,12 @@ function quizz(props) {
     var response = await rawResponse.json()
     if(response.result == true) {
       setPseudoStatut(true)
+      setPseudoError(response.error)
+      console.log(pseudoError, '<------ state pseudo error')
     } else {
       setPseudoStatut(false)
     }
   }
-
 
 
   const handleSelectProblem = (index) => {
@@ -154,10 +174,7 @@ function quizz(props) {
 
       isAdult == true ? AsyncStorage.setItem("filter", JSON.stringify({ // si isAdult == true alors on set le min age du filter à l'âge de l'user et le max age à l'age de l'user +10 ans
         problemsTypes: problems, 
-        gender: {
-          other: true, 
-          male: true, 
-          female: true }, 
+        gender: ['other', 'male', 'female'],
         age: {
           minAge: 18, 
           maxAge: 100,
@@ -166,7 +183,7 @@ function quizz(props) {
         localisation: 'France'
       })) : AsyncStorage.setItem("filter", JSON.stringify({ // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
           problemsTypes: problems, 
-          gender: {other: true, male: true, female: true }, 
+          gender: ['other', 'male', 'female'], 
           age: {minAge: 13, maxAge: 17},
           localisation: 'France'
         }))
@@ -213,7 +230,7 @@ function quizz(props) {
               nextBtnStyle={styles.buttonNext}
               nextBtnTextStyle={styles.buttonNextText}
               onNext={handleOnNextEmail}
-              errors={emailStatut}
+              errors={emailCondition}
             >
               <View style={styles.stepContainer}>
                 <Text style={styles.textTitleQuizz}>Salut,</Text>
@@ -223,6 +240,8 @@ function quizz(props) {
                   inputContainerStyle={styles.inputQuizz}
                   onChangeText={email => {setEmail(email)}}
                 />
+                {emailStatut == true ? <Text style={styles.emailError}>{emailError}</Text> : <View></View>}
+                {emailRegex == true ? <Text style={styles.emailError}>{emailRegexError}</Text> : <View></View>}
               </View>
             </ProgressStep>
             <ProgressStep
@@ -251,7 +270,7 @@ function quizz(props) {
               previousBtnText='Revoir'
               previousBtnStyle={styles.buttonPrevious}
               onNext={handleOnNextPseudo}
-              // errors={pseudoStatut}
+              errors={pseudoStatut}
             >
               <View style={styles.stepContainer}>
                 <Text style={styles.textQuizz}>Comment veux-tu qu'on t'appelle ?</Text>
@@ -261,6 +280,7 @@ function quizz(props) {
                   onChangeText={pseudo => {setPseudo(pseudo)}}
                   value={pseudo}
                 />
+                {pseudoStatut == true ? <Text style={styles.pseudoError}>{pseudoError}</Text> : <View></View>}
               </View>
             </ProgressStep>
             <ProgressStep
@@ -439,5 +459,15 @@ const styles = StyleSheet.create({
   birthDate: {
     fontFamily: 'Montserrat_700Bold',
     fontSize: 18
+  },
+  emailError: {
+    fontFamily: 'Montserrat_400Regular',
+    fontSize: 18,
+    color: 'red',
+  },
+  pseudoError: {
+    fontFamily: 'Montserrat_400Regular',
+    fontSize: 18,
+    color: 'red',
   }
 });

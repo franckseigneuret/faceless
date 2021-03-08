@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, Dimensions, TouchableOpacity, StyleSheet, Image, } from 'react-native';
+import { Text, View, Dimensions, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Button } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold } from "@expo-google-fonts/montserrat";
-import HomeScreen from '../screens/HomeScreen'
 import AppLoading from 'expo-app-loading';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,54 +15,27 @@ const windowHeight = Dimensions.get('window').height;
 
 function Filter(props) {
 
-
-
-  const [ageMin, setAgeMin] = useState()
-  const [ageMax, setAgeMax] = useState()
-  const [localisation, setLocalisation] = useState()
-  const [problems, setProblems] = useState()
-  const [problemsStatut, setProblemsStatut] = useState({ Amoureux: false, Familial: false, Physique: false, Professionnel: false, Scolaire: false })
-  const [genderStatut, setGenderStatut] = useState({other: true, male: true, female: true })
-  const [genderSelected, setGenderSelected] = useState([])
-
+  const [ageMin, setAgeMin] = useState(null)
+  const [ageMax, setAgeMax] = useState(null)
+  const [localisation, setLocalisation] = useState(null)
+  const [problems, setProblems] = useState(['Amoureux'])
+  const [genderSelected, setGenderSelected] = useState(['other'])
+  const [isAdult, setIsAdult] = useState(false)
+  // const [problemsStatut, setProblemsStatut] = useState({ Amoureux: false, Familial: false, Physique: false, Professionnel: false, Scolaire: false })
+  // const [genderStatut, setGenderStatut] = useState({other: true, male: true, female: true })
 
   useEffect(() => {
-    const handleData = async () => {
-      AsyncStorage.getItem("filter", function (error, data) {
-        var problemsArriving;
-        var data = JSON.parse(data)
-        setAgeMin(data.age.minAge)
-        setAgeMax(data.age.maxAge)
-        setLocalisation(data.localisation)
-        
-        setProblems(data.problemsTypes)
-        if (data.problemsTypes.includes('Amoureux')){
-          problemsArriving= {...problemsStatut};
-          problemsArriving[`Amoureux`] = true;
-          setProblemsStatut(problemsArriving)
-        } else if (data.problemsTypes.includes('Familial')){
-          problemsArriving= {...problemsStatut};
-          problemsArriving[`Familial`] = true;
-          setProblemsStatut(problemsArriving)
-        } else if (data.problemsTypes.includes('Physique')){
-          problemsArriving= {...problemsStatut};
-          problemsArriving[`Physique`] = true;
-          setProblemsStatut(problemsArriving);
-        } else if (data.problemsTypes.includes('Professionnel')){
-          problemsArriving= {...problemsStatut};
-          problemsArriving[`Professionnel`] = true;
-          setProblemsStatut(problemsArriving)
-        } else if (data.problemsTypes.includes('Scolaire')){
-          problemsArriving= {...problemsStatut};
-          problemsArriving[`Scolaire`] = true;
-          setProblemsStatut(problemsArriving);
-        }
-        setGenderStatut(data.gender)
-        setLocalisation(data.localisation)
-      });
-    };
-    handleData()
+
+    AsyncStorage.getItem("filter", function(error, data) {
+      var dataStorage = JSON.parse(data)
+      setProblems(dataStorage.problemsTypes);
+      setAgeMin(dataStorage.age.minAge);
+      setAgeMax(dataStorage.age.maxAge);
+      setLocalisation(dataStorage.localisation);
+      setGenderSelected(dataStorage.gender);
+     });
   }, []);
+
 
   const problemsContent = [
     {
@@ -101,46 +73,33 @@ function Filter(props) {
   }
 
   const handleSelectGender = (element) => {
-    var genderStatutCopy = { ...genderStatut }
-    if (genderStatutCopy[element] == false) {
-      genderStatutCopy[element] = true;
-      setGenderStatut(genderStatutCopy);
-    } else {
-      genderStatutCopy[element] = false
-      setGenderStatut(genderStatutCopy)
-    }
-  } // on fait pas de map et on execute une fonction avec en argument (male ou female ou other), on change un état d'objet
-
-  const handleSelectProblems = (element) => {
-    var problemsStatutCopy = { ...problemsStatut }
-    var problemsTypesCopy = [...problems]
-    if (problemsStatutCopy[element] == false && problemsTypesCopy.includes(element) == false) {
-      problemsStatutCopy[element] = true;
-      setProblemsStatut(problemsStatutCopy);
-      problemsTypesCopy.push(element);
-      setProblems(problemsTypesCopy)
-      console.log(problemsTypesCopy, '<------- problems types copy')
-    } else {
-      problemsStatutCopy[element] = false
-      setProblemsStatut(problemsStatutCopy)
-      problemsTypesCopy = problemsTypesCopy.filter(e => e != element)
-      setProblems(problemsTypesCopy)
-      console.log(problemsTypesCopy, '<------- problems types copy')
+    if(genderSelected.includes(element) == false){
+      var genderCopy = [...genderSelected];
+      genderCopy.push(element);
+      setGenderSelected(genderCopy);
+    } else if (genderSelected.includes(element) == true) {
+      var genderCopy = [...genderSelected];
+      genderCopy = genderCopy.filter(e => e != element);
+      setGenderSelected(genderCopy);
     }
   }
-  var problemsArray = []
-  var genderArray = []
+
+  const handleSelectProblems = (element) => {
+    var problemsCopy = [...problems]
+    if(problemsCopy.includes(element) == false) {
+      problemsCopy.push(element);
+      setProblems(problemsCopy);
+    } else {
+     problemsCopy = problemsCopy.filter(e => e != element);
+      setProblems(problemsCopy);
+    }
+  }
 
   const handleSaveFilter = () => {
-    for (const [key, value] of Object.entries(problemsStatut)) {
-      if(value == true && problemsArray.includes(key) == false)
-      problemsArray.push(key)
-    }
-    console.log(problemsArray, '<----- problems on save')
     AsyncStorage.setItem('filter', JSON.stringify(
       {
-        problemsTypes: problemsArray, 
-        gender: genderStatut, 
+        problemsTypes: problems, 
+        gender: genderSelected, 
         age: {
           minAge: ageMin, 
           maxAge: ageMax,
@@ -148,15 +107,16 @@ function Filter(props) {
         localisation: localisation
       }
     ));
+    props.navigation.navigate('BottomNavigator', { screen: 'HomeScreen' })
   }
   
  
   var problemsBadge = [
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problemsStatut['Amoureux'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Amoureux</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problemsStatut['Familial'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Familial</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={problemsStatut['Physique'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Physique</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={problemsStatut['Professionnel'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Professionnel</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={problemsStatut['Scolaire'] == true ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Scolaire</Text></TouchableOpacity>
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problems.includes('Amoureux') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Amoureux</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problems.includes('Familial') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Familial</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={ problems.includes('Physique') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Physique</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={ problems.includes('Professionnel') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Professionnel</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={ problems.includes('Scolaire') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Scolaire</Text></TouchableOpacity>
   ]
 
   var imagesGender = [
@@ -164,12 +124,6 @@ function Filter(props) {
     { unSelected: <TouchableOpacity onPress={() => { handleSelectGender(`male`) }}><Image source={require('../assets/gender_male.png')} /></TouchableOpacity>, selected: <TouchableOpacity onPress={() => { handleSelectGender(`male`) }}><Image source={require('../assets/gender_male_selected.png')} /></TouchableOpacity> },
     { unSelected: <TouchableOpacity onPress={() => { handleSelectGender(`female`) }}><Image source={require('../assets/gender_female.png')} /></TouchableOpacity>, selected: <TouchableOpacity onPress={() => { handleSelectGender(`female`) }}><Image source={require('../assets/gender_female_selected.png')} /></TouchableOpacity> },
   ];
-
-  // var genderImages = images.map((img, key) => {
-  //   return <TouchableOpacity key={key} onPress={() => {handleSelectGender(key)}}>
-  //       {gender[key] ? img.selected : img.unSelected}
-  //  </TouchableOpacity>
-  // })
 
 
   if (!fontsLoaded) {
@@ -185,7 +139,7 @@ function Filter(props) {
           <Text style={styles.textTitle}>Mes filtres</Text>
         </View>
         <View style={styles.problemsSelect}>
-          <Text style={styles.titleProblems}>J'aimerais parler de...</Text>
+          <Text style={styles.titleProblems}>J'aimerais parler de problèmes...</Text>
           <View style={styles.badgeContainer}>
             {problemsBadge}
           </View>
@@ -193,9 +147,9 @@ function Filter(props) {
         <View style={styles.bottomContainer}>
           <Text style={styles.titleProblems}>Je veux parler avec :</Text>
           <View style={styles.genderContainer}>
-            {genderStatut.other == false ? imagesGender[0].unSelected : imagesGender[0].selected}
-            {genderStatut.male == false ? imagesGender[1].unSelected : imagesGender[1].selected}
-            {genderStatut.female == false ? imagesGender[2].unSelected : imagesGender[2].selected}
+            {genderSelected.includes(`other`) ? imagesGender[0].selected : imagesGender[0].unSelected }
+            {genderSelected.includes(`male`) ? imagesGender[1].selected : imagesGender[1].unSelected}
+            {genderSelected.includes(`female`) ? imagesGender[2].selected : imagesGender[2].unSelected}
           </View>
           <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
             <Text style={styles.titleProblems}>Age :</Text>
