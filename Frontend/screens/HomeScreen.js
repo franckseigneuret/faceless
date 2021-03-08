@@ -141,14 +141,6 @@ function HomeScreen(props) {
         <ScrollView showsHorizontalScrollIndicator={false} snapToInterval={windowWidth} decelerationRate='fast' horizontal >
           {CardToSwipe}
         </ScrollView >
-
-        {/* delete */}
-        <TouchableOpacity 
-          style={styles.buttonSend}
-          //renvoyer en argument de createConv l'ID de mon contact
-          onPress={()=> createConv("603f618c78727809c7e1ad9a")}
-        ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
-        </TouchableOpacity>
       </View>
     )
   } else {

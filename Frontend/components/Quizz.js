@@ -81,7 +81,8 @@ function quizz(props) {
      body: `emailFront=${email}`
     });
     var response = await rawResponse.json()
-    if(response.result == true) {
+    console.log(response, '<------- response email check')
+    if(response.result == false) {
       setEmailStatut(true)
       setEmailError(response.error)
     } else {
@@ -91,13 +92,16 @@ function quizz(props) {
       setEmailRegex(true)
       setEmailRegexError(response.errorRegex)
     } else {
-      setEmailRegex(true)
+      setEmailRegex(false)
     }
-    if(emailRegex || emailStatut == true) {
+    if(emailRegex == true || emailStatut == true) {
       setEmailCondition(true)
     } else {
       setEmailCondition(false)
     }
+    console.log(emailCondition, '<---- email condition');
+    console.log(emailRegex, '<------ email regex')
+    console.log(emailStatut, '<------- email statut');
   }
 
   const handleOnNextPseudo = async () => {
