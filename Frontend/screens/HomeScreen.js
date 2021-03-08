@@ -40,6 +40,10 @@ function HomeScreen(props) {
         console.log(filterValue, '<-------- filter multiget')
 
         var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${tokenValue}&filterFront=${JSON.stringify(filterValue)}`);
+          var response = await rawResponse.json();
+          setUserToDisplay(response.userToShow)
+          setPseudo(response.user.pseudo)  
+        var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${tokenValue}&filterFront=${JSON.stringify(filterValue)}`);
         var response = await rawResponse.json();
         setUserToDisplay(response.userToShow)
         setPseudo(response.user.pseudo)
@@ -62,12 +66,6 @@ function HomeScreen(props) {
     handleData()
     console.log('use effect on home')
   }, [isFocused]);
-
-  AsyncStorage.getItem("filter", function (error, data) {
-    // console.log(JSON.parse(data), '<<<<<-------- new filter')
-  });
-
-  // console.log("USER TO DISPLAY", userToDisplay)
 
   async function createConv(contactId) {
     console.log('myId', myId)

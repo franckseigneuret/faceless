@@ -23,32 +23,21 @@ router.get('/', async function (req, res, next) {
 router.post('/email-check', async function (req, res, next) {
 
   var user = await UserModel.findOne({ email: req.body.emailFront })
+
   var result;
   var error;
-  var errorRegex
-  if (user) {
-    result = true;
-    error = 'Cet adresse mail est déjà associée à un compte'
-  } else {
-    result = false;
-    error = 'Aucun email semblable trouvé en BDD, next step'
-  }
 
   const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var testEmail = regex.test(String(req.body.emailFront).toLowerCase());
-  if (testEmail == true) {
-    errorRegex = 'Email valide !'
-    resultRegex = true
+   if (testEmail == false) {
+    res.json({result: false, error: 'Ça ne ressemble pas à un email valide !'})
+  } else if(user) {
+  res.json({result: false, error:'Cet email est déjà associé à un compte existant'})
   } else {
-    errorRegex = 'Ça ne ressemble pas à un email valide !'
-    resultRegex = false
+    res.json({result: true})
   }
-  console.log(testEmail, 'testEmail ')
-
-
-  res.json({ result, resultRegex, error, errorRegex })
-})
-
+});
+  
 
 router.post('/pseudo-check', async function (req, res, next) {
   var user = await UserModel.findOne({ pseudo: req.body.pseudoFront })
@@ -210,18 +199,44 @@ router.get('/show-card', async function (req, res, next) {
     is_adult: user.is_adult,
     birthDate: { $gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString()) },
   })
+  var distance;
+  function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1); 
+    var a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      ; 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c; // Distance in km
+    distance = d;
+  }
+
+  console.log(filterFront, '<----- filter front')
 
   // console.log(userToDisplay, '<----- userTO DISPLAU')
 
-  var userToShow = [];
-  for (let i = 0; i < userToDisplay.length; i++) {
+  var userToShow =[];
+if(filterFront.localisation == 'France') {
+  for (let i=0; i<userToDisplay.length; i++) {
     if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
-      filterFront.gender.includes(userToDisplay[i].gender) == true) {
+    filterFront.gender.includes(userToDisplay[i].gender) == true ) {
       userToShow.push(userToDisplay[i]);
     }
   }
-
-  // console.log(userToShow,'<---------User filtrés')
+} else {
+  for (let i=0; i<userToDisplay.length; i++) {
+    getDistanceFromLatLonInKm(user.localisation.coordinates[0], user.localisation.coordinates[1], userToDisplay[i].localisation.coordinates[0], userToDisplay[i].localisation.coordinates[1])
+    if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
+    filterFront.gender.includes(userToDisplay[i].gender) == true && distance <= filterFront.localisation[0]) {
+      userToShow.push(userToDisplay[i]);
+    }
+  }
+}
+  console.log(userToShow,'<---------User filtrés')
+  
 
 
   res.json({ user: user, userToShow: userToShow, });
@@ -386,30 +401,34 @@ response : newMessageData
 */
 router.post('/send-msg', async function (req, res, next) {
 
-  console.log("req.body.myContactId", req.body.myContactId)
-
   const searchConvWithUser = await ConversationsModel.findOne({
     participants: { $all: [req.body.myId, req.body.myContactId] }
   })
 
-  console.log("searchConvWithUser", searchConvWithUser)
-
-  var msg = await new MessagesModel({
+  var msg = new MessagesModel({
     conversation_id: searchConvWithUser._id,
     from_id: req.body.myId,
     to_id: req.body.myContactId,
-    // from_id: ObjectId('603f7b5163ca3a5cbd0a4746'),
-    // to_id: ObjectId(req.body.myContactId),
     content: req.body.msg,
     date: new Date(),
     read: false
   })
 
-  var mewMsg = await msg.save()
+  var newMsg = await msg.save()
 
-  // var msgs = await MessagesModel.find(
-  //   { conversation_id: searchConvWithUser._id }
-  // );
+  var allMsg = await MessagesModel.find(
+    {conversation_id: searchConvWithUser._id}
+  )
+
+  for(var i=0; i< allMsg.length; i++){
+    if(allMsg[i].to_id == req.body.myId){
+    // condition fonctionnelle mais à améliorer
+      var updateStatusConv = await ConversationsModel.updateOne(
+        {_id: searchConvWithUser._id},
+        { demand: false }
+     );
+    }
+  }
 
   res.json({ result: true });
 });
@@ -418,14 +437,12 @@ router.post('/create-conv', async function (req, res, next) {
   console.log(" req.body.myContactId", req.body.myContactId)
   console.log(" req.body.myId", req.body.myId)
 
-  var conv = await new ConversationsModel({
+  var conv = new ConversationsModel({
     participants: [req.body.myContactId, req.body.myId],
-    demand: true,
+    demand: true
   })
 
   var newConv = await conv.save()
-
-  console.log("newConv", newConv._id)
 
   res.json({
     result: true,
