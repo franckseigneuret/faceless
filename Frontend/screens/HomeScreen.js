@@ -111,7 +111,7 @@ function HomeScreen(props) {
                               ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton}/>
                   </TouchableOpacity>
                   <TouchableOpacity 
-                    onPress={()=> props.navigation.navigate('UserProfilScreen')}
+                    onPress={()=> props.navigation.navigate('UserProfilScreen', { token })}
                     style={styles.buttonInfo}>     
                     <Text style={styles.textInfo}>i</Text>
                   </TouchableOpacity>
