@@ -38,15 +38,47 @@ function SignIn(props) {
       body: `emailFromFront=${signInEmail}&passwordFromFront=${signInPassword}`,
     });
     const data = await rawData.json();
-    console.log(data, "After Fetch");
+    console.log(data, "<----- After Fetch");
 
     if (data.result == true) {
       AsyncStorage.setItem("token", data.token);
       props.navigation.navigate("BottomNavigator");
     }
-    console.log(data.error);
+
     if (data.error) {
       setErrorsSignIn(data.error);
+    }
+    console.log(data.user.is_adult, "is adult ?????????");
+
+    if (data.user.is_adult == true) {
+      AsyncStorage.setItem(
+        "filter",
+        JSON.stringify({
+          // si isAdult == true alors on set le min age du filter à l'âge de l'user et le max age à l'age de l'user +10 ans
+          problemsTypes: problems,
+          gender: "all",
+          age: {
+            minAge: Math.floor(differenceDates / (86400000 * 365)),
+            maxAge: "all",
+            isAdult: isAdult,
+          },
+          localisation: "France",
+        })
+      );
+    } else {
+      AsyncStorage.setItem(
+        "filter",
+        JSON.stringify({
+          // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
+          problemsTypes: problems,
+          gender: "all",
+          age: {
+            minAge: Math.floor(differenceDates / (86400000 * 365)),
+            maxAge: 17,
+          },
+          localisation: "France",
+        })
+      );
     }
   };
 

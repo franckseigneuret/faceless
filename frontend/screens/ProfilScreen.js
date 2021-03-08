@@ -331,7 +331,7 @@ export default function ProfilScreen(props) {
             {!cityVisible ? (
               <>
                 <Text style={styles.subtitle}>
-                  {/* localisation.label */}
+                  {/* {localisation.label} */}
                   {localisation == "" ? "France" : localisation}
                 </Text>
                 <TouchableOpacity onPress={handlePressCity}>
@@ -497,30 +497,6 @@ export default function ProfilScreen(props) {
             onPress={() => handleDeactivate()}
           />
         </View>
-
-        {/* <View style={styles.viewDeleteDisable}>
-          <Text style={styles.textFin}>Supprimer mon compte </Text>
-
-          <Text style={styles.textFin}> Désactiver mon compte</Text>
-        </View>
-
-        <View style={styles.viewToggle}>
-          <Switch
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={isEnabledDelete ? "#f5dd4b" : "#f4f3f4"}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleSwitchDelete}
-            value={isEnabledDelete}
-          />
-
-          <Switch
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={isEnabledDesactivate ? "#f5dd4b" : "#f4f3f4"}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleSwitchDesactivate}
-            value={isEnabledDesactivate}
-          />
-        </View> */}
       </View>
     </ScrollView>
   );

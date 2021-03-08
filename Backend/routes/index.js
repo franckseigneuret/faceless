@@ -136,16 +136,9 @@ router.post('/sign-in', async function(req, res, next) {
 
 
   user = await UserModel.findOne({
-    email: req.body.emailFromFront,
-    // et le PWD pour sécuriser  
+    email: req.body.emailFromFront, 
   })
   console.log(user, 'user find sign in ');
-
-    // user = await UserModel.findOne({
-    //   email: req.body.emailFromFront,
-    //   // et le PWD pour sécuriser  
-    // })
-    // console.log(user, 'user find sign in ');
 
     if(user){
       if(bcrypt.compareSync(req.body.passwordFromFront, user.password)){
