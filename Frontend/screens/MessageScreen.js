@@ -5,11 +5,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SwitchSelector from "react-native-switch-selector";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Octicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const windowSize = Dimensions.get('window');
+const windowSize = Dimensions.get('screen');
+// console.log('windowSize = ', windowSize)
 
 function MessageScreen(props) {
 
@@ -70,6 +72,21 @@ function MessageScreen(props) {
       let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
         + ' à ' + when.toLocaleTimeString('fr-FR')
 
+      let onLineColor = ''
+      switch (el.friendsDatas.statusOnLine) {
+        case 'on':
+          onLineColor = 'green'
+          break;
+
+        case 'recent':
+          onLineColor = 'orange'
+          break;
+          
+        default:
+          onLineColor = 'red'
+          break;
+      }
+
       return <TouchableOpacity
         activeOpacity={1}
         key={i}
@@ -96,7 +113,7 @@ function MessageScreen(props) {
           }
           <View style={styles.lastMessage}>
             <Text style={styles.friend}>
-              {el.friendsDatas.pseudo}
+              {el.friendsDatas.pseudo} <Octicons name="primitive-dot" size={16} color={onLineColor} />
             </Text>
             <Text style={styles.date}>
               {whenFormat}
@@ -195,7 +212,8 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: '#ffeddb'
+    backgroundColor: '#ffeddb',
+    height: '100%',
   },
   main: {
     // borderWidth: 1,
