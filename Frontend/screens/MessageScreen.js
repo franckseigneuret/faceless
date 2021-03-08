@@ -17,12 +17,14 @@ function MessageScreen(props) {
   const [myId, setMyId] = useState(null)
   const [conversations, setConversations] = useState([])
   const [unreadPerConversation, setUnreadPerConversation] = useState([])
+  const [part, setPart] = useState('confidents')
+  const [nbDemand, setNbDemand] = useState(0)
 
   const loadConversations = async (params) => {
     console.log('myId', myId)
     if (myId) { // l'id obtenue à partir du token existe bien
       let uri = `${HTTP_IP_DEV}/show-msg?user_id=${myId}`
-      if(params.demandes) {
+      if (params.demandes) {
         uri += `&demandes=oui`
       }
       const dialogues = await fetch(uri, { method: 'GET' })
@@ -30,6 +32,7 @@ function MessageScreen(props) {
       const dialoguesWithFriends = await dialogues.json()
       // console.log('dialoguesWithFriends.conversations = ', dialoguesWithFriends.conversations)
       setConversations(dialoguesWithFriends.conversations)
+      setNbDemand(dialoguesWithFriends.nbNewConversations)
 
       let nolu = []
       dialoguesWithFriends.conversations.forEach(element => {
@@ -55,7 +58,7 @@ function MessageScreen(props) {
       getId()
     })
 
-    loadConversations({demandes:false})
+    loadConversations({ demandes: false })
     // setInterval(() => loadConversations(), 5000) // ne marche pas !!
 
   }, [myId])
@@ -123,51 +126,61 @@ function MessageScreen(props) {
 
     <View style={styles.container}>
       {
-        conversations.length > 0 ?
-          <View style={styles.main}>
-            <Text style={styles.mainTitle}>Messagerie</Text>
-            <SwitchSelector style={styles.switch}
-              initial={0}
-              onPress={value => {
-                value === 'demandes' ? loadConversations({demandes:true}) : loadConversations({demandes:false})
-              }}
-              textColor={'#5571D7'}
-              selectedColor={'#FFF'}
-              backgroundColor={'#b9c7f3'}
-              buttonColor={'#5571D7'}
-              borderColor={'#BCC8F0'}
-              hasPadding
-              fontSize={18}
-              options={[
-                { label: "Confidents", value: 'confidents' },
-                { label: "Demandes (0)", value: 'demandes' },
-              ]}
-            />
-            <View style={styles.conversations}>
-              <Image style={styles.loader} source={{ uri: 'https://i.imgur.com/WtX0jT0.gif' }} />
-              <View style={styles.scrollContent}>
-                <ScrollView
-                  showsVerticalScrollIndicator={true} style={styles.ScrollView}
-                  onMomentumScrollEnd={() => {
-                    Vibration.vibrate(10);
-                    loadConversations()
-                  }}
-                >
-                  {items}
-                </ScrollView>
+        <View style={styles.main}>
+          <Text style={styles.mainTitle}>Messagerie</Text>
+          <SwitchSelector style={styles.switch}
+            initial={0}
+            onPress={value => {
+              value === 'demandes' ? loadConversations({ demandes: true }) : loadConversations({ demandes: false })
+              setPart(value)
+            }}
+            textColor={'#5571D7'}
+            selectedColor={'#FFF'}
+            backgroundColor={'#b9c7f3'}
+            buttonColor={'#5571D7'}
+            borderColor={'#BCC8F0'}
+            hasPadding
+            fontSize={18}
+            options={[
+              { label: "Confidents", value: 'confidents' },
+              { label: `Demandes (${nbDemand})`, value: 'demandes' },
+            ]}
+          />
+          {
+            conversations.length > 0 ?
+              <View style={styles.conversations}>
+                <Image style={styles.loader} source={{ uri: 'https://i.imgur.com/WtX0jT0.gif' }} />
+                <View style={styles.scrollContent}>
+                  <ScrollView
+                    showsVerticalScrollIndicator={true} style={styles.ScrollView}
+                    onMomentumScrollEnd={() => {
+                      Vibration.vibrate(10);
+                      let bool = part === 'demandes' ? true : false
+                      loadConversations({ demandes: bool })
+                    }}
+                  >
+                    {items}
+                  </ScrollView>
+                </View>
               </View>
-            </View>
-          </View>
-          :
-          <View style={styles.ScrollView}>
-            <Text style={{ textAlign: 'center' }}>
-              Vous n'avez pas de confident !
-            </Text>
-            <Text>
-              <Button title="Rechercher des confidents"
-                onPress={() => props.navigation.navigate("HomeScreen")} />
-            </Text>
-          </View>
+              :
+
+              <View style={styles.ScrollView}>
+                {
+                  <View style={{ textAlign: 'center', marginTop: 30 }}>
+                    <Text style={{ textAlign: 'center', marginBottom: 30 }}>{
+                      part === 'confidents' ?
+                        'Vous n\'avez pas de confident !'
+                        :
+                        'Vous n\'avez aucune demande !'
+                    }</Text>
+                    <Button title="Rechercher des confidents"
+                      onPress={() => props.navigation.navigate("HomeScreen")} />
+                  </View>
+                }
+              </View>
+          }
+        </View>
       }
     </View>
 
@@ -188,6 +201,7 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
     // borderColor: "#CCC",
     height: windowSize.height * .9,
+    width: windowSize.width * .9,
   },
   mainTitle: {
     fontSize: 26,
