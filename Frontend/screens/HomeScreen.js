@@ -87,7 +87,7 @@ function HomeScreen(props) {
     await fetch(`${HTTP_IP_DEV}/send-msg`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `msg=${message}&myContactId=${myContactId}`
+      body: `msg=${message}&myContactId=${myContactId}&myId=${myId}`
     });
     setCurrentMsg("")
     setModalVisible(!modalVisible)

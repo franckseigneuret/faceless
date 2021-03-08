@@ -13,6 +13,7 @@ const Stack = createStackNavigator();
 function ConversationScreen(props) {
 
     const [token, setToken] = useState(null)
+    const [myId, setMyId] = useState(null)
     const [data, setData] = useState([])
     const [currentMsg, setCurrentMsg] = useState("")
     const [myContactId, setMyContactId] = useState("")
@@ -35,6 +36,16 @@ function ConversationScreen(props) {
     useEffect(() => {
         AsyncStorage.getItem("token", function (error, tokenValue) {
             setToken(tokenValue)
+            const getId = () => {
+                fetch(HTTP_IP_DEV + '/get-id-from-token?token=' + tokenValue, { method: 'GET' })
+                    .then(r => r.json())
+                    .then(data => {
+                        setMyId(data.id)
+                    }).catch((e) =>
+                        console.log('error', e)
+                    )
+            }
+            getId()
         })
         loadMsg()
     }, [props.route.params.convId, token])
@@ -43,7 +54,7 @@ function ConversationScreen(props) {
         await fetch(`${HTTP_IP_DEV}/send-msg`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `msg=${currentMsg}&myContactId=${myContactId}`
+            body: `msg=${currentMsg}&myContactId=${myContactId}&myId=${myId}`
         });
         setCurrentMsg("")
         loadMsg()

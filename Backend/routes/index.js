@@ -379,14 +379,14 @@ router.post('/send-msg', async function (req, res, next) {
   console.log("req.body.myContactId", req.body.myContactId)
 
   const searchConvWithUser = await ConversationsModel.findOne({
-    participants: { $all: ['604290d10dee5248be25bf7e', req.body.myContactId] }
+    participants: { $all: [req.body.myId, req.body.myContactId] }
   })
 
   console.log("searchConvWithUser", searchConvWithUser)
 
   var msg = await new MessagesModel({
     conversation_id: searchConvWithUser._id,
-    from_id: '604290d10dee5248be25bf7e',
+    from_id: req.body.myId,
     to_id: req.body.myContactId,
     // from_id: ObjectId('603f7b5163ca3a5cbd0a4746'),
     // to_id: ObjectId(req.body.myContactId),
@@ -417,7 +417,10 @@ router.post('/create-conv', async function (req, res, next) {
 
   console.log("newConv", newConv._id)
 
-  res.json({result: true});
+  res.json({
+    result: true,
+    convId: newConv._id,
+  });
 });
 
 /*update-filter -> mettre à jour le filtre pour permettre de mettre à jour la page card-show 
