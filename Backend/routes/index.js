@@ -29,15 +29,12 @@ router.post('/email-check', async function (req, res, next) {
   const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var testEmail = regex.test(String(req.body.emailFront).toLowerCase());
   if (testEmail) {
-    res.json({result = true})
+    res.json({result: true})
   } else if (testEmail == false) {
-    return (result = false, error= 'Ça ne ressemble pas à un email valide !')
+    res.json({result: false, error: 'Ça ne ressemble pas à un email valide !'})
   } else {
-    return (result = true)
+    res.json({result: true})
   }
-
-
-  res.json({ result, resultRegex, error, errorRegex })
 })
 
 
