@@ -26,14 +26,6 @@ router.post('/email-check', async function (req, res, next) {
   var result;
   var error;
   var errorRegex
-  if (user) {
-    result = false;
-    error = 'Cet adresse mail est déjà associée à un compte'
-  } else {
-    result = true;
-    error = 'Aucun email semblable trouvé en BDD, next step'
-  }
-
     const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     var testEmail = regex.test(String(req.body.emailFront).toLowerCase());
     if(testEmail == true) {
