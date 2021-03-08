@@ -382,24 +382,31 @@ router.post('/send-msg', async function (req, res, next) {
     participants: { $all: [req.body.myId, req.body.myContactId] }
   })
 
-  console.log("searchConvWithUser", searchConvWithUser)
+  // console.log("allMsg", allMsg)
 
   var msg = await new MessagesModel({
     conversation_id: searchConvWithUser._id,
     from_id: req.body.myId,
     to_id: req.body.myContactId,
-    // from_id: ObjectId('603f7b5163ca3a5cbd0a4746'),
-    // to_id: ObjectId(req.body.myContactId),
     content: req.body.msg,
     date: new Date(),
     read: false
   })
 
-  var mewMsg = await msg.save()
+  var newMsg = await msg.save()
 
-  // var msgs = await MessagesModel.find(
-  //   { conversation_id: searchConvWithUser._id }
-  // );
+  var allMsg = await MessagesModel.find(
+    {conversation_id: searchConvWithUser._id}
+  )
+
+  for(var i=0; i< allMsg.length; i++){
+    if(allMsg[i].from_id == req.body.myId){
+      var updateStatusConv = await ConversationsModel.updateOne(
+        {_id: searchConvWithUser._id},
+        { demand: false }
+     );
+    }
+  }
 
   res.json({ result: true });
 });
