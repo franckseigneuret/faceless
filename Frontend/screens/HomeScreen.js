@@ -9,7 +9,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HTTP_IP_DEV from '../mon_ip'
-
+import moment from "moment";
+import 'moment/locale/fr'
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -34,14 +35,13 @@ function HomeScreen(props) {
   useEffect(() => {
     var token;
     var filter;
-    const handleData = () => {
-      AsyncStorage.multiGet(['token', 'filter'], async function (error, data) {
-
-        let token = data[0][0];
-        let tokenValue = data[0][1]
-        let filter = data[1][0]
-        let filterValue = JSON.parse(data[1][1])
-        console.log(filterValue, '<-------- filter multiget')
+  const handleData = () => {
+     AsyncStorage.multiGet(['token', 'filter'], async function (error, data){
+       
+          let token = data[0][0];
+          let tokenValue = data[0][1]
+          let filter = data[1][0]
+          let filterValue = JSON.parse(data[1][1]) 
 
         var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${tokenValue}&filterFront=${JSON.stringify(filterValue)}`);
           var response = await rawResponse.json();
@@ -127,9 +127,10 @@ function HomeScreen(props) {
     </View>
 
 
-  var CardToSwipe = userToDisplay.map((e, i) => {
-    // console.log(e.problem_description,'<---- avatar')
-
+  
+    var CardToSwipe = userToDisplay.map((e, i) => {
+      moment.locale('fr');
+    var NewDate = moment(e.subscriptionDate).format('Do MMMM YYYY')
     return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
       <View style={styles.topCard}>
         <Overlay isVisible={visible} overlayBackgroundColor="pink" overlayStyle={{ backgroundColor: "rgba(255, 241, 226, 0.5)"}}>
@@ -157,9 +158,18 @@ function HomeScreen(props) {
             </View>
           </View>
         </Overlay>
-        <Image source={{ uri: e.avatar }} style={{ borderWidth: 3, borderRadius: 50, borderColor: '#EC9A1F', width: 100, height: 100 }} />
+        <TouchableOpacity onPress={()=> props.navigation.navigate('UserProfilScreen', {
+                      pseudo: e.pseudo,
+                      gender: e.gender,
+                      subscriptionDate: e.subscriptionDate,
+                      problemDesc : e.problem_description,
+                      problems_types : e.problems_types,
+                      avatar: e.avatar
+                    })}> 
+                  <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
+        </TouchableOpacity>
         <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
-        <Text style={styles.member}>Membre depuis le 12 février 2020</Text>
+        <Text style={styles.member}>Membre depuis le {NewDate}</Text>
         {/* <Text style={{marginTop: 5}}><Ionicons name='location' size={15} /> Region de {e.localisation.label == undefined ? 'France' : e.localisation.label}</Text> */}
       </View>
       <View style={styles.problemDesc}>
@@ -180,11 +190,18 @@ function HomeScreen(props) {
             onPress={() => { setVisible(true), createConv(e._id), setMyContactId(e._id), toggleOverlay() }}
           ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => props.navigation.navigate('UserProfilScreen')}
-            style={styles.buttonInfo}>
-            <Text style={styles.textInfo}>i</Text>
-          </TouchableOpacity>
+          <TouchableOpacity 
+                    onPress={()=> props.navigation.navigate('UserProfilScreen', {
+                      pseudo: e.pseudo,
+                      gender: e.gender,
+                      subscriptionDate: e.subscriptionDate,
+                      problemDesc : e.problem_description,
+                      problems_types : e.problems_types,
+                      avatar: e.avatar
+                    })}
+                    style={styles.buttonInfo}>     
+                    <Text style={styles.textInfo}>i</Text>
+                  </TouchableOpacity>
         </View>
       </View>
     </Animatable.View>)
