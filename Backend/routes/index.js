@@ -23,23 +23,21 @@ router.get('/', async function (req, res, next) {
 router.post('/email-check', async function (req, res, next) {
 
   var user = await UserModel.findOne({ email: req.body.emailFront })
+
   var result;
   var error;
-  var errorRegex
+
   const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var testEmail = regex.test(String(req.body.emailFront).toLowerCase());
-  if (testEmail) {
-    res.json({result = true})
-  } else if (testEmail == false) {
-    return (result = false, error= 'Ça ne ressemble pas à un email valide !')
+   if (testEmail == false) {
+    res.json({result: false, error: 'Ça ne ressemble pas à un email valide !'})
+  } else if(user) {
+  res.json({result: false, error:'Cet email est déjà associé à un compte existant'})
   } else {
-    return (result = true)
+    res.json({result: true})
   }
-
-
-  res.json({ result, resultRegex, error, errorRegex })
-})
-
+});
+  
 
 router.post('/pseudo-check', async function (req, res, next) {
   var user = await UserModel.findOne({ pseudo: req.body.pseudoFront })
