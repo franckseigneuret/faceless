@@ -27,10 +27,10 @@ router.post('/email-check', async function (req, res, next) {
   var error;
   var errorRegex
   if (user) {
-    result = true;
+    result = false;
     error = 'Cet adresse mail est déjà associée à un compte'
   } else {
-    result = false;
+    result = true;
     error = 'Aucun email semblable trouvé en BDD, next step'
   }
 
@@ -210,17 +210,42 @@ router.get('/show-card', async function(req, res, next) {
     is_adult: user.is_adult, 
     birthDate: {$gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString())},
   })
+  var distance;
+  function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1); 
+    var a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      ; 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c; // Distance in km
+    distance = d;
+  }
+
+  console.log(filterFront, '<----- filter front')
 
   // console.log(userToDisplay, '<----- userTO DISPLAU')
 
   var userToShow =[];
+if(filterFront.localisation == 'France') {
   for (let i=0; i<userToDisplay.length; i++) {
     if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
-    filterFront.gender.includes(userToDisplay[i].gender) == true) {
+    filterFront.gender.includes(userToDisplay[i].gender) == true ) {
       userToShow.push(userToDisplay[i]);
     }
   }
-
+} else {
+  for (let i=0; i<userToDisplay.length; i++) {
+    getDistanceFromLatLonInKm(user.localisation.coordinates[0], user.localisation.coordinates[1], userToDisplay[i].localisation.coordinates[0], userToDisplay[i].localisation.coordinates[1])
+    if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
+    filterFront.gender.includes(userToDisplay[i].gender) == true && distance <= filterFront.localisation[0]) {
+      userToShow.push(userToDisplay[i]);
+    }
+  }
+}
   console.log(userToShow,'<---------User filtrés')
   
 
