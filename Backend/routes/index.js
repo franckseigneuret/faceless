@@ -26,24 +26,15 @@ router.post('/email-check', async function (req, res, next) {
   var result;
   var error;
   var errorRegex
-  if (user) {
-    result = false;
-    error = 'Cet adresse mail est déjà associée à un compte'
+  const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  var testEmail = regex.test(String(req.body.emailFront).toLowerCase());
+  if (testEmail) {
+    res.json({result = true})
+  } else if (testEmail == false) {
+    return (result = false, error= 'Ça ne ressemble pas à un email valide !')
   } else {
-    result = true;
-    error = 'Aucun email semblable trouvé en BDD, next step'
+    return (result = true)
   }
-
-    const regex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    var testEmail = regex.test(String(req.body.emailFront).toLowerCase());
-    if(testEmail == true) {
-      errorRegex = 'Email valide !'
-      resultRegex = true
-    } else {
-      errorRegex = 'Ça ne ressemble pas à un email valide !'
-      resultRegex = false
-    }
-    console.log(testEmail, 'testEmail ')
 
 
   res.json({ result, resultRegex, error, errorRegex })
