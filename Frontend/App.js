@@ -92,7 +92,6 @@ export default function App() {
           <Stack.Screen name='BottomNavigator' component={BottomNavigator} />
           <Stack.Screen name='ConversationScreen' component={ConversationScreen} />
           <Stack.Screen name='Filter' component={Filter} />
-
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

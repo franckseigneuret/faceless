@@ -177,7 +177,7 @@ router.get('/show-card', async function(req, res, next) {
 
   //traitement date 
   var filterFront = JSON.parse(req.query.filterFront);
-  console.log(filterFront, '<<<<<------ filter front')
+  // console.log(filterFront, '<<<<<------ filter front')
   var user = await UserModel.findOne({token: req.query.tokenFront})
   var userToDisplay = await UserModel.find({
     token: {$ne : req.query.tokenFront}, 
@@ -186,14 +186,14 @@ router.get('/show-card', async function(req, res, next) {
   })
 
   var userToShow =[];
-  console.log(userToDisplay,'<---------- user to display')
+  // console.log(userToDisplay,'<---------- user to display')
   for (let i=0; i<userToDisplay.length; i++) {
     if (filterFront.problemsTypes.some(r=> userToDisplay[i].problems_types.includes(r)) == true) {
       userToShow.push(userToDisplay[i]);
     }
   }
 
-  console.log(userToShow,'<---------User filtrés')
+  // console.log(userToShow,'<---------User filtrés')
   
 
   res.json({user:user, userToShow:userToShow, });
@@ -334,13 +334,17 @@ response : newMessageData
 */
 router.post('/send-msg', async function (req, res, next) {
 
+  console.log("req.body.myContactId", req.body.myContactId)
+
   const searchConvWithUser = await ConversationsModel.findOne({
-    participants: { $all: ['603f7b5163ca3a5cbd0a4746', req.body.myContactId] }
+    participants: { $all: ['604290d10dee5248be25bf7e', req.body.myContactId] }
   })
+
+  console.log("searchConvWithUser", searchConvWithUser)
 
   var msg = await new MessagesModel({
     conversation_id: searchConvWithUser._id,
-    from_id: '603f7b5163ca3a5cbd0a4746',
+    from_id: '604290d10dee5248be25bf7e',
     to_id: req.body.myContactId,
     // from_id: ObjectId('603f7b5163ca3a5cbd0a4746'),
     // to_id: ObjectId(req.body.myContactId),
@@ -351,9 +355,9 @@ router.post('/send-msg', async function (req, res, next) {
 
   var mewMsg = await msg.save()
 
-  var msgs = await MessagesModel.find(
-    { conversation_id: searchConvWithUser._id }
-  );
+  // var msgs = await MessagesModel.find(
+  //   { conversation_id: searchConvWithUser._id }
+  // );
 
   res.json({ result: true });
 });
@@ -363,14 +367,15 @@ router.post('/create-conv', async function (req, res, next) {
   console.log(" req.body.myId",  req.body.myId)
 
   var conv = await new ConversationsModel({
-    participants: [req.body.myContactId, req.body.myId]
+    participants: [req.body.myContactId,  ObjectId(req.body.myId)],
+    demand: true,
   })
 
   var newConv = await conv.save()
 
   console.log("newConv", newConv._id)
 
-  res.json({ convId: newConv._id });
+  res.json({result: true});
 });
 
 /*update-filter -> mettre à jour le filtre pour permettre de mettre à jour la page card-show 
