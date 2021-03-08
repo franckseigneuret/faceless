@@ -405,7 +405,7 @@ router.post('/send-msg', async function (req, res, next) {
     participants: { $all: [req.body.myId, req.body.myContactId] }
   })
 
-  var msg = await new MessagesModel({
+  var msg = new MessagesModel({
     conversation_id: searchConvWithUser._id,
     from_id: req.body.myId,
     to_id: req.body.myContactId,
@@ -421,7 +421,8 @@ router.post('/send-msg', async function (req, res, next) {
   )
 
   for(var i=0; i< allMsg.length; i++){
-    if(allMsg[i].from_id == req.body.myId){
+    if(allMsg[i].to_id == req.body.myId){
+    // condition fonctionnelle mais à améliorer
       var updateStatusConv = await ConversationsModel.updateOne(
         {_id: searchConvWithUser._id},
         { demand: false }
@@ -436,13 +437,12 @@ router.post('/create-conv', async function (req, res, next) {
   console.log(" req.body.myContactId", req.body.myContactId)
   console.log(" req.body.myId", req.body.myId)
 
-  var conv = await new ConversationsModel({
-    participants: [req.body.myContactId, req.body.myId]
+  var conv = new ConversationsModel({
+    participants: [req.body.myContactId, req.body.myId],
+    demand: true
   })
 
   var newConv = await conv.save()
-
-  console.log("newConv", newConv._id)
 
   res.json({
     result: true,
