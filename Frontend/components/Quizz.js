@@ -23,10 +23,7 @@ const windowHeight = Dimensions.get('window').height;
 function quizz(props) {
 
   const [email, setEmail] = useState('')
-  const [emailStatut, setEmailStatut] = useState(true)
   const [emailError, setEmailError] = useState('')
-  const [emailRegex, setEmailRegex] = useState(true)
-  const [emailRegexError, setEmailRegexError] = useState('')
   const [emailCondition, setEmailCondition] = useState(true)
   const [password, setPassword] = useState('')
   const [passwordStatut, setPasswordStatut] = useState(true)
@@ -81,23 +78,13 @@ function quizz(props) {
      body: `emailFront=${email}`
     });
     var response = await rawResponse.json()
-    if(response.result == true) {
-      setEmailStatut(true)
+    if(response.result == false){
       setEmailError(response.error)
-    } else {
-      setEmailStatut(false)
-    }
-    if(response.resultRegex == false) {
-      setEmailRegex(true)
-      setEmailRegexError(response.errorRegex)
-    } else {
-      setEmailRegex(true)
-    }
-    if(emailRegex || emailStatut == true) {
       setEmailCondition(true)
     } else {
       setEmailCondition(false)
     }
+    
   }
 
   const handleOnNextPseudo = async () => {
@@ -240,8 +227,7 @@ function quizz(props) {
                   inputContainerStyle={styles.inputQuizz}
                   onChangeText={email => {setEmail(email)}}
                 />
-                {emailStatut == true ? <Text style={styles.emailError}>{emailError}</Text> : <View></View>}
-                {emailRegex == true ? <Text style={styles.emailError}>{emailRegexError}</Text> : <View></View>}
+                {emailCondition == true ? <Text style={styles.emailError}>{emailError}</Text> : <View></View>}
               </View>
             </ProgressStep>
             <ProgressStep
