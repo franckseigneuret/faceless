@@ -18,6 +18,11 @@ function HomeScreen(props) {
   const isFocused = useIsFocused();
   const [userToDisplay, setUserToDisplay] = useState([]);
   const [pseudo, setPseudo] = useState('');
+  const [myToken, setMyToken] = useState('');
+  const [myContactId, setMyContactId] = useState('');
+  const [myId, setMyId] = useState(null)
+  const [newConvId, setNewConvId] = useState('');
+  const [currentMsg, setCurrentMsg] = useState("")
 
 
 
@@ -38,29 +43,56 @@ function HomeScreen(props) {
           setUserToDisplay(response.userToShow)
           setPseudo(response.user.pseudo)   
 
-     })
-  }; 
-  handleData()
-  console.log('use effect on home')
+        var rawResponse = await fetch(`${HTTP_IP_DEV}/show-card?tokenFront=${tokenValue}&filterFront=${JSON.stringify(filterValue)}`);
+        var response = await rawResponse.json();
+        setUserToDisplay(response.userToShow)
+        setPseudo(response.user.pseudo)
+        //recupere mon token
+        setMyToken(response.user.token)
+
+
+        const getId = () => {
+          fetch(HTTP_IP_DEV + '/get-id-from-token?token=' + tokenValue, { method: 'GET' })
+            .then(r => r.json())
+            .then(data => {
+              setMyId(data.id)
+            }).catch((e) =>
+              console.log('error', e)
+            )
+        }
+        getId()
+      })
+    };
+    handleData()
+    console.log('use effect on home')
   }, [isFocused]);
 
   
   async function createConv(contactId) {
+    console.log('myId', myId)
+    console.log('contactId', contactId)
     var rawResponse = await fetch(`${HTTP_IP_DEV}/create-conv`, {
       method: 'POST',
       headers: {'Content-Type':'application/x-www-form-urlencoded'},
       //remplacer mon ID avec celui recuperer du back
-      body: `myContactId=${contactId}&myId=${"603f7b5163ca3a5cbd0a4746"}`
+      body: `myContactId=${contactId}&myId=${myId}`
     });
     var response = await rawResponse.json();
     console.log("create conv", response.convId)
-    props.navigation.navigate('ConversationScreen', {
-        // myId: myConnectedId,
-        //recuperer l'ID de la card pour le renvoyer 
-        myContactId: contactId,
-        convId: response.convId,
-      })
-}
+    // setNewConvId(response.convId)
+  }
+
+  var sendMsg = async (myContactId, message) => {
+    await fetch(`${HTTP_IP_DEV}/send-msg`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `msg=${message}&myContactId=${myContactId}&myId=${myId}`
+    });
+    setCurrentMsg("")
+    setModalVisible(!modalVisible)
+  }
+
+  console.log("current msg", currentMsg)
 
   let [fontsLoaded] = useFonts({
     Montserrat_400Regular,
