@@ -260,10 +260,17 @@ router.get('/get-id-from-token', async function (req, res, next) {
     token: req.query.token
   })
 
-  res.json({
-    error: false,
-    id: me._id
-  })
+  if(me) {
+    res.json({
+      error: false,
+      id: me._id
+    })
+  } else {
+    res.json({
+      error: true,
+      id: undefined,
+    })
+  }
 })
 
 /**
@@ -284,7 +291,6 @@ router.get('/show-msg', async function (req, res, next) {
   }
 
   const myConnectedId = req.query.user_id
-  console.log('myConnectedId', myConnectedId)
 
   // load les conversations avec mes contacts
   const allMyConversations = await ConversationsModel.find({
@@ -380,12 +386,12 @@ response : newMessageData
 router.post('/send-msg', async function (req, res, next) {
 
   const searchConvWithUser = await ConversationsModel.findOne({
-    participants: { $all: ['603f7b5163ca3a5cbd0a4746', req.body.myContactId] }
+    participants: { $all: [req.body.myId, req.body.myContactId] }
   })
 
   var msg = await new MessagesModel({
     conversation_id: searchConvWithUser._id,
-    from_id: '603f7b5163ca3a5cbd0a4746',
+    from_id: req.body.myId,
     to_id: req.body.myContactId,
     // from_id: ObjectId('603f7b5163ca3a5cbd0a4746'),
     // to_id: ObjectId(req.body.myContactId),
@@ -415,7 +421,10 @@ router.post('/create-conv', async function (req, res, next) {
 
   console.log("newConv", newConv._id)
 
-  res.json({ convId: newConv._id });
+  res.json({
+    result: true,
+    convId: newConv._id,
+  });
 });
 
 /*update-filter -> mettre à jour le filtre pour permettre de mettre à jour la page card-show 
