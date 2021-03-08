@@ -17,7 +17,7 @@ function MessageScreen(props) {
   const [myId, setMyId] = useState(null)
   const [conversations, setConversations] = useState([])
   const [unreadPerConversation, setUnreadPerConversation] = useState([])
-  const [part, setPart] = useState('confident')
+  const [part, setPart] = useState('confidents')
   const [nbDemand, setNbDemand] = useState(0)
 
   const loadConversations = async (params) => {
@@ -155,8 +155,8 @@ function MessageScreen(props) {
                     showsVerticalScrollIndicator={true} style={styles.ScrollView}
                     onMomentumScrollEnd={() => {
                       Vibration.vibrate(10);
-                      let bool = part === 'demandes' ?  true : false
-                      loadConversations({ demandes: bool})
+                      let bool = part === 'demandes' ? true : false
+                      loadConversations({ demandes: bool })
                     }}
                   >
                     {items}
@@ -166,13 +166,18 @@ function MessageScreen(props) {
               :
 
               <View style={styles.ScrollView}>
-                <Text style={{ textAlign: 'center' }}>
-                  Vous n'avez pas de confident !
-            </Text>
-                <Text>
-                  <Button title="Rechercher des confidents"
-                    onPress={() => props.navigation.navigate("HomeScreen")} />
-                </Text>
+                {
+                  <View style={{ textAlign: 'center', marginTop: 30 }}>
+                    <Text style={{ textAlign: 'center', marginBottom: 30 }}>{
+                      part === 'confidents' ?
+                        'Vous n\'avez pas de confident !'
+                        :
+                        'Vous n\'avez aucune demande !'
+                    }</Text>
+                    <Button title="Rechercher des confidents"
+                      onPress={() => props.navigation.navigate("HomeScreen")} />
+                  </View>
+                }
               </View>
           }
         </View>
