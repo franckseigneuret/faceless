@@ -1,14 +1,20 @@
 import HTTP_IP_DEV from '../mon_ip'
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView, Dimensions, Vibration } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { SafeAreaView,RefreshControl, StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView, Dimensions, Vibration, TouchableHighlight, Animated} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SwitchSelector from "react-native-switch-selector";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Octicons } from '@expo/vector-icons';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const wait = (timeout) => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+}
 
 const windowSize = Dimensions.get('screen');
 // console.log('windowSize = ', windowSize)
@@ -99,7 +105,26 @@ function MessageScreen(props) {
           break;
       }
 
-      return <TouchableOpacity
+      const leftContent = <Text>Pull to activate</Text>;
+
+const rightButtons = [
+  <TouchableHighlight><Text>Button 1</Text></TouchableHighlight>,
+  <TouchableHighlight><Text>Button 2</Text></TouchableHighlight>
+];
+
+const rightActions = () => {
+  return (<View style={{width:100, backgroundColor:'black'}}>
+            <Text>LALLALALA</Text>
+          </View>
+  )
+}
+
+      return <Swipeable 
+      renderRightActions={() => rightActions()}
+      onSwipeableLeftOpen={() => console.log('opening')}
+      >
+        <TouchableHighlight
+        underlayColor
         activeOpacity={1}
         key={i}
         onPress={() => {
@@ -120,17 +145,16 @@ function MessageScreen(props) {
             avatar: el.friendsDatas.avatar
           })
         }}>
-
-        <View style={styles.conversationsItem}>
+        <Animated.View style={styles.conversationsItem}>
           {
             unreadPerConversation[i] ?
-              <View style={styles.nonLuContent}>
+              <Animated.View style={styles.nonLuContent}>
                 <Text style={styles.nonLuText}>{unreadPerConversation[i]}</Text>
-              </View>
+              </Animated.View>
               :
               <Text />
           }
-          <View style={styles.lastMessage}>
+          <Animated.View style={styles.lastMessage}>
             <Text style={styles.friend}>
               {el.friendsDatas.pseudo} <Octicons name="primitive-dot" size={16} color={onLineColor} />
             </Text>
@@ -140,8 +164,8 @@ function MessageScreen(props) {
             <Text style={styles.msg} numberOfLines={4} ellipsizeMode='tail'>
               <Text style={styles.last}>Dernier message : </Text>{el.lastMessage.content}
             </Text>
-          </View>
-          <View>
+          </Animated.View>
+          <Animated.View>
             {
               el.friendsDatas.avatar && el.friendsDatas.avatar !== undefined && el.friendsDatas.avatar !== '' ?
 
@@ -149,14 +173,24 @@ function MessageScreen(props) {
                 :
                 <Text />
             }
-          </View>
-        </View>
+          </Animated.View>
+        </Animated.View>
 
-      </TouchableOpacity>
+      </TouchableHighlight>
+      </Swipeable>
 
     }
 
   })
+
+  const [showLoader, setShowLoader] = useState(styles.loader);
+  const onRefresh = React.useCallback(() => {
+    setShowLoader(styles.loader),
+    Vibration.vibrate(10);
+    let bool = part === 'demandes' ? true : false
+    loadConversations({ demandes: bool })
+  }, []);
+
 
   return (
 
@@ -185,15 +219,15 @@ function MessageScreen(props) {
           {
             conversations.length > 0 ?
               <View style={styles.conversations}>
-                <Image style={styles.loader} source={{ uri: 'https://i.imgur.com/WtX0jT0.gif' }} />
+                <Image style={showLoader} source={{ uri: 'https://i.imgur.com/WtX0jT0.gif' }}/>
                 <View style={styles.scrollContent}>
                   <ScrollView
                     showsVerticalScrollIndicator={true} style={styles.ScrollView}
-                    onMomentumScrollEnd={() => {
-                      Vibration.vibrate(10);
-                      let bool = part === 'demandes' ? true : false
-                      loadConversations({ demandes: bool })
-                    }}
+                    refreshControl={
+                      <RefreshControl
+                        onRefresh={onRefresh}
+                      />
+                    }
                   >
                     {items}
                   </ScrollView>
@@ -258,12 +292,15 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
   },
+  loaderOff: {
+    display:'none',
+  },
   scrollContent: {
     position: 'absolute',
     top: -10,
     left: -10,
     height: windowSize.height * .7,
-    width: '900%'
+    width: '900%',
   },
   scrollView: {
     height: windowSize.height * .7,
