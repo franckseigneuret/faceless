@@ -97,7 +97,7 @@ function Filter(props) {
       problemsCopy.push(element);
       setProblems(problemsCopy);
     } else {
-     problemsCopy = problemsCopy.filter(e => e != element);
+      problemsCopy = problemsCopy.filter(e => e != element);
       setProblems(problemsCopy);
     }
   }

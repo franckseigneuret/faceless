@@ -126,6 +126,7 @@ function HomeScreen(props) {
 
   
     var CardToSwipe = userToDisplay.map((e, i) => {
+      console.log(e,'INFOS USERS')
       moment.locale('fr');
     var NewDate = moment(e.subscriptionDate).format('Do MMMM YYYY')
     return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
@@ -214,7 +215,7 @@ function HomeScreen(props) {
     if (userToDisplay.length > 0) {
       return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFEEDD' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 40, marginBottom: 20, width: '65%', left: 30 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 40, marginBottom: 20, width: '65%' }}>
             <Text style={styles.textTitle}>
               Salut {pseudo} !
           </Text>
@@ -264,6 +265,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     textAlign: 'center',
     color: '#5571D7',
+    marginRight:5
   },
   cardContainer: {
     width: windowWidth - 40,
