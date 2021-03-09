@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Button } from "react-native-elements";
-import { StyleSheet, View, Dimensions, Image } from "react-native";
+import { StyleSheet, View, Dimensions, Image, Text,Animated } from "react-native";
 import AppLoading from "expo-app-loading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -15,6 +15,9 @@ import {
   Montserrat_900Black,
   Montserrat_800ExtraBold,
 } from "@expo-google-fonts/montserrat";
+import { color } from "react-native-reanimated";
+import { ScrollView } from "react-native-gesture-handler";
+const scrollElementHeightPercent = 45;
 
 export default function registration(props) {
   var alreadyIn;
@@ -45,46 +48,73 @@ export default function registration(props) {
     Montserrat_800ExtraBold,
   });
 
+  var imgDiscover = [
+    'https://i.imgur.com/tWhKFyA.png',
+    'https://i.imgur.com/tWy4xO8.jpg',
+    'https://i.imgur.com/sObtyNi.jpg',
+    'https://i.imgur.com/I1T2t2M.jpg',
+]
+
+  // var handleScroll = function(event) {
+  //   console.log('scroll')
+  //   // console.log(nativeEvent.contentOffset.y);
+  //  }
+
+var scrollX = new Animated.Value(0)
+let position = Animated.divide(scrollX, windowWidth);
+console.log(position,'position')
+
+var imgDiscover = imgDiscover.map((url, key) => {
+  return <View style={{width:windowWidth}}><Image source={{uri: url}} style={{width:300, height:400, top:70, left:40}}/></View>
+})
+
+
   if (!fontsLoaded) {
     return <AppLoading />;
   } else {
     return (
       <View style={styles.container}>
-        <View style={styles.logo}>
-          <Image source={require("../assets/logo-faceless.png")} />
-        </View>
-        <View style={styles.btn}>
-          <Button
-            title="S'inscrire"
-            type="solid"
-            buttonStyle={styles.buttonNext}
-            titleStyle={{
-              fontFamily: "Montserrat_700Bold",
-            }}
-            onPress={() => props.navigation.navigate("Quizz")}
-          />
-
-          <Button
-            title="Se connecter"
-            type="solid"
-            buttonStyle={styles.buttonNext}
-            titleStyle={{
-              fontFamily: "Montserrat_700Bold",
-            }}
-            onPress={() => props.navigation.navigate("SignIn")}
-          />
-
-          <Button
-            title="découvrir"
-            type="clear"
-            titleStyle={{
-              color: "#EC9A1F",
-              textDecorationLine: "underline",
-              fontFamily: "Montserrat_700Bold",
-            }}
-            onPress={() => props.navigation.navigate("Quizz")}
-          />
-        </View>
+          <ScrollView pagingEnabled={true} scrollEventThrottle={16} onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }] )} contentContainerStyle={styles.logo} showsHorizontalScrollIndicator={false} snapToInterval={windowWidth} decelerationRate='fast' horizontal >
+            
+              {imgDiscover}
+            
+          </ScrollView>
+          <View style={{ flexDirection: 'row' }}>
+             {imgDiscover.map((_, i) => {
+              let opacity = position.interpolate({
+                inputRange: [i - 1, i, i + 1], 
+                outputRange: [0.3, 1, 0.3],
+                extrapolate: 'clamp' 
+              });
+              return (
+                <Animated.View
+                  key={i}
+                  style={{ opacity, height: 10, width: 10, backgroundColor: '#5571D7', margin: 8, borderRadius: 5 }}
+                />
+              );
+            })}
+          </View>
+          <View style={styles.btn}>
+            <Button
+              title="S'inscrire"
+              type="solid"
+              buttonStyle={styles.buttonNext}
+              titleStyle={{
+                fontFamily: "Montserrat_700Bold",
+              }}
+              onPress={() => props.navigation.navigate("Quizz")}
+            />
+            <Button
+              title="Se connecter"
+              type="solid"
+              buttonStyle={styles.buttonConnection}
+              titleStyle={{
+                fontFamily: "Montserrat_700Bold",
+                color: '#5571D7',
+              }}
+              onPress={() => props.navigation.navigate("SignIn")}
+            />
+          </View>
       </View>
     );
   }
@@ -93,26 +123,34 @@ export default function registration(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF1E2",
+    backgroundColor: "#feeddb",
     alignItems: "center",
     justifyContent: "center",
   },
   buttonNext: {
     backgroundColor: "#5571D7",
     borderRadius: 86,
-    width: 159,
-    margin: 20,
+    width: 200,
+    margin: 10,
+  },
+  buttonConnection: {
+    backgroundColor: "#FFF1E2",
+    borderWidth:3,
+    borderColor: '#5571D7',
+    borderRadius: 86,
+    width: 200,
+    margin: 10,
   },
   logo: {
-    flex: 1,
-    height: windowHeight / 2,
-    display: "flex",
-    alignItems: "flex-end",
-    marginTop: windowHeight / 5,
-    margin: 0,
+    marginTop:50,
+    height:windowHeight/3,
+    alignContent:'center',
+    alignItems:'center',
+    justifyContent:'center',
   },
   btn: {
     flex: 1,
-    marginTop: windowHeight / 15,
+    flexDirection: "column",
+    marginTop: 40,
   },
 });

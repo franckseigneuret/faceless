@@ -6,13 +6,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import Swipeable from 'react-native-gesture-handler/Swipeable';
+// import { GestureHandler } from 'expo';
+import * as GestureHandler from 'react-native-gesture-handler'
+const { Swipeable } = GestureHandler
+
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 
 function ConversationScreen(props) {
-    
+
+    const [demandEnd, setDemandeEnd] = useState(false)
     const [token, setToken] = useState(null)
     const [myId, setMyId] = useState(null)
     const [data, setData] = useState([])
@@ -20,23 +27,22 @@ function ConversationScreen(props) {
     const [myContactId, setMyContactId] = useState("")
     const [pseudo, setPseudo] = useState("")
     const [avatar, setAvatar] = useState("https://i.imgur.com/P3rBF8E.png")
+    const [showDate, setShowDate] = useState(false)
     const [disableSendBtn, setDisableSendBtn] = useState(true)
+
     const scrollViewRef = useRef();
-
-    // console.log("props.route.params.convId", props.route.params.convId)
-
 
     async function loadMsg() {
         var rawResponse = await fetch(`${HTTP_IP_DEV}/show-convers?convId=${props.route.params.convId}&myContactId=${props.route.params.myContactId}&token=${token}`, { method: 'GET' });
         var response = await rawResponse.json();
         setData(response.allMessagesWithOneUser)
         setPseudo(response.pseudo)
-        setAvatar(response.avatar)
+        // setAvatar(response.avatar)
         setMyContactId(props.route.params.myContactId)
     }
 
     var infoUser= props.route.params
-    console.log(infoUser,'<------ INFO À RENVOYER')
+    // console.log(infoUser,'<------ INFO À RENVOYER')
 
     useEffect(() => {
         AsyncStorage.getItem("token", function (error, tokenValue) {
@@ -56,41 +62,89 @@ function ConversationScreen(props) {
     }, [props.route.params.convId, token])
 
     var sendMsg = async () => {
-        await fetch(`${HTTP_IP_DEV}/send-msg`, {
+        const rawResponseDemand = await fetch(`${HTTP_IP_DEV}/send-msg`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `msg=${currentMsg}&myContactId=${myContactId}&myId=${myId}`
         });
-        setCurrentMsg("")
+        setCurrentMsg('')
         loadMsg()
+        setDisableSendBtn(true)
+
+        const responseDemand = await rawResponseDemand.json()
+
+        if (responseDemand.demandEnd) {
+            setDemandeEnd(responseDemand.demandEnd)
+        }
     }
 
     var checkTextSize = (val) => {
-        if(val.length>0){
+        if (val.length > 0) {
             setDisableSendBtn(false)
         } else {
             setDisableSendBtn(true)
         }
     }
 
+    var rightActions = (val) => {
+        return (
+            <View style={{justifyContent: "center"}}><Text style={styles.hoursRight}>{val}</Text></View>
+        )
+    }
+
+    var leftActions = (val) => {
+        return (
+            <View style={{justifyContent: "center"}}><Text style={styles.hoursLeft}>{val}</Text></View>
+        )
+    }
+    
+
+    let dateCheck 
+    let dateToShow
+
     var tabMsg = data.map((item, i) => {
         let when = new Date(item.date)
-        let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
-            + ' à ' + when.toLocaleTimeString('fr-FR')
-        if (item.to_id === myContactId) {
-            return <View style={styles.blocRight} key={i}>
-                <View style={styles.msgRight}>
-                    <Text style={styles.date} >{whenFormat}</Text>
-                    <Text style={styles.textRight} >{item.content}</Text>
-                </View>
-            </View>
+        // let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'numeric', day: 'numeric' })
+        //     + ' à ' + when.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        let hours = when.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        let date = when.toLocaleDateString('fr-FR', { weekday: 'long', month: 'short', day: 'numeric' })
+        if(date != dateCheck){
+            dateCheck = date
+            dateToShow = dateCheck
         } else {
-            return <View style={styles.blocLeft} key={i}>
-                <View style={styles.msgLeft}>
-                    <Text style={styles.date} >{whenFormat}</Text>
-                    <Text style={styles.textLeft} >{item.content}</Text>
+            dateToShow = null
+        }
+
+        if (item.to_id === myContactId) {
+            return  (
+            <View >
+                <Text style={styles.date}>{dateToShow}</Text>
+                <View style={{justifyContent: "center", marginBottom: 10}}>
+                    <Swipeable renderRightActions={()=> rightActions(hours)}>
+                        <View style={styles.blocRight} key={i} >
+                            <View style={styles.msgRight}>
+                                <Text style={styles.textRight} >{item.content}</Text>
+                            </View>
+                        </View>
+                    </Swipeable>
+                </View>
+            </View>)
+
+        } else {
+            return( 
+            <View>
+                <Text style={styles.date}>{dateToShow}</Text>
+                <View style={{justifyContent: "center", marginBottom: 10}}>
+                    <Swipeable renderLeftActions={()=> leftActions(hours)}>
+                        <View style={styles.blocLeft} key={i}>
+                            <View style={styles.msgLeft}>
+                                <Text style={styles.textLeft} >{item.content}</Text>
+                            </View>
+                        </View>
+                    </Swipeable>
                 </View>
             </View>
+            )
         }
     })
 
@@ -98,7 +152,7 @@ function ConversationScreen(props) {
 
         <View style={{ flex: 1, alignItems: 'center', justifyContent: "space-between", backgroundColor: '#FFEEDD', paddingTop: 20, height: "100%" }}>
             <View style={styles.header}>
-                <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate('MessageScreen')}>
+                <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate('MessageScreen', { demandEnd })}>
                     <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
                 </TouchableOpacity>
                 <View style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -134,7 +188,7 @@ function ConversationScreen(props) {
                     multiline={true}
                     value={currentMsg}
                     onChangeText={(val) => {
-                        setCurrentMsg(val) 
+                        setCurrentMsg(val)
                         checkTextSize(val)
                     }}
                 />
@@ -189,7 +243,6 @@ const styles = StyleSheet.create({
         maxWidth: "80%",
         padding: 12,
         borderRadius: 15,
-        marginBottom: 10
     },
     textLeft: {
         textAlign: "left",
@@ -200,14 +253,14 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-end",
-        width: "100%"
+        width: "100%",
+
     },
     msgRight: {
         backgroundColor: "#5571D7",
         maxWidth: "80%",
         padding: 12,
         borderRadius: 15,
-        marginBottom: 10
     },
     textRight: {
         textAlign: "right",
@@ -253,7 +306,19 @@ const styles = StyleSheet.create({
         transform: [{ rotate: '-45deg' }]
     },
     date: {
-        color: 'red',
-        textAlign: 'right'
+        color: '#767676',
+        textAlign: 'center',
+        fontSize: 15,
+        marginBottom: 8,
+    },
+    hoursRight: {
+        color: '#767676',
+        textAlign: 'center',
+        marginLeft: 7
+    },
+    hoursLeft: {
+        color: '#767676',
+        textAlign: 'center',
+        marginRight: 7
     }
 })

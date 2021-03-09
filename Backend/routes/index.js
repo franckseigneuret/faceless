@@ -1,9 +1,11 @@
 var express = require('express');
 var router = express.Router();
 const UserModel = require('../models/users');
-const MessagesModel = require('../models/messages')
 const ConversationsModel = require('../models/conversations')
 const SignalementModel = require('../models/signalement')
+const MessagesModel = require('../models/messages');
+const DeletedUserModel = require('../models/DeletedUsers');
+
 var bcrypt = require('bcrypt');
 var uid2 = require('uid2');
 
@@ -79,6 +81,7 @@ router.post('/sign-up-first-step', async function (req, res, next) {
     subscriptionDate: new Date(),
     problems_types: JSON.parse(req.body.problemsFront),
     is_adult: isAdult,
+    statut: 'active',
   })
 
   var userSaved = await user.save()
@@ -348,13 +351,16 @@ router.get('/show-msg', async function (req, res, next) {
       from_id: notMe,
     }).sort({ date: -1 })
 
+    console.log("lastMsgFriend", lastMsgFriend)
+
     now = new Date()
 
     let statusOnLine = 'off'
-    statusOnLine = now - lastMsgFriend.date < 1800000 ? 'recent' : 'off'  // - de 30 min, soit 1000 * 30 * 60 = 1800000 ms
-    statusOnLine = now - lastMsgFriend.date < 900000 ? 'on' : 'recent'    // - de 15 min, soit 1000 * 15 * 60 = 900000 ms
-    console.log(lastMsgFriend.date)
-    myFriend = { ...myFriend.toObject(), statusOnLine }
+    if(lastMsgFriend){
+      statusOnLine = now - lastMsgFriend.date < 1800000 ? 'recent' : 'off'  // - de 30 min, soit 1000 * 30 * 60 = 1800000 ms
+      statusOnLine = now - lastMsgFriend.date < 900000 ? 'on' : 'recent'    // - de 15 min, soit 1000 * 15 * 60 = 900000 ms
+      myFriend = { ...myFriend.toObject(), statusOnLine }
+    }
 
     friendsData.push(myFriend)
     conversations.push({
@@ -363,8 +369,11 @@ router.get('/show-msg', async function (req, res, next) {
       friendsDatas: myFriend,
     })
 
-    // tri du tableau pour mettre les blocs avec des messages non lus en haut
-    conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1)
+    // tri du tableau 
+    conversations.sort((a, b) => {
+      a.lastMessage && b.lastMessage && a.lastMessage.date > b.lastMessage.date ? -1 : 1
+    }) // par date dernier message
+    conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1) // messages non lus en 1er
   }))
 
 
@@ -409,14 +418,6 @@ router.get('/show-convers', async function (req, res, next) {
   res.json({ allMessagesWithOneUser, pseudo, avatar })
 });
 
-/* first-message -> création de la convers en base.
-body : idReceiverFront: 1234, tokenSenderFront: 1234, avatarReceiverFront : 'exemple.jpg', pseudoReceiverFront: 'gigatank3000', 
-response : new_conversation_data
-*/
-router.post('/first-msg', function (req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
 /* send-msg -> envoyer un message.
 body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, contentFront: 'il est né le divin enfant'
 response : newMessageData
@@ -438,21 +439,26 @@ router.post('/send-msg', async function (req, res, next) {
 
   var newMsg = await msg.save()
 
-  var allMsg = await MessagesModel.find(
-    { conversation_id: searchConvWithUser._id }
-  )
-
-  for (var i = 0; i < allMsg.length; i++) {
-    if (allMsg[i].to_id == req.body.myId) {
-      // condition fonctionnelle mais à améliorer
-      var updateStatusConv = await ConversationsModel.updateOne(
-        { _id: searchConvWithUser._id },
-        { demand: false }
-      );
+  let demandEnd = false
+  
+  if(searchConvWithUser.demand) {
+    var allMsg = await MessagesModel.find(
+      { conversation_id: searchConvWithUser._id }
+    )
+  
+    for (var i = 0; i < allMsg.length; i++) {
+      if (allMsg[i].to_id == req.body.myId) {
+        // condition fonctionnelle mais à améliorer
+        var updateStatusConv = await ConversationsModel.updateOne(
+          { _id: searchConvWithUser._id },
+          { demand: false }
+        );
+        demandEnd = true
+      }
     }
   }
 
-  res.json({ result: true });
+  res.json({ result: true, demandEnd });
 });
 
 router.post('/create-conv', async function (req, res, next) {
@@ -531,7 +537,9 @@ router.post('/signalement-user', function (req, res, next) {
 
 /* loadProfil : mettre à jour les information en BDD de l'utilisateur qui modifie son profil. */
 router.post('/loadProfil', async function (req, res, next) {
+
   var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
+
   res.json({ userFromBack: userBeforeUpdate });
 });
 
@@ -546,6 +554,8 @@ router.put("/update-profil", async function (req, res, next) {
   var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   console.log(userBeforeUpdate, '<---- userBeforeUpdate')
 
+  var problemsTypeParse = JSON.parse(req.body.problemsTypeFront)
+
   // ajout du genre et descriptionProblemFront
   var userUpdate = await UserModel.updateOne(
     { token: req.body.tokenFront },
@@ -554,7 +564,8 @@ router.put("/update-profil", async function (req, res, next) {
       localisation: req.body.localisationFront,
       password: hash,
       gender: req.body.genderFront,
-      problem_description: req.body.descriptionProblemFront
+      problem_description: req.body.descriptionProblemFront,
+      problems_types: problemsTypeParse,
     }
   );
 
@@ -565,6 +576,30 @@ router.put("/update-profil", async function (req, res, next) {
   userAfterUpdate ? result = true : result = false
 
   res.json({ userSaved: userAfterUpdate, result });
+});
+
+/* delete-my-profil: au clic sur le toggle sur supprimer mon compte, je veux modifier le statut de l'utilisateur en BDD 
+body: tokenFront : 1234,
+response: result: true
+*/
+router.post('/delete-my-profil', async function (req, res, next) {
+
+  console.log('click du back')
+  var userSupp = await UserModel.findOne(
+    { token: req.body.tokenFront }
+  );
+
+  var userDeleted = await new DeletedUserModel({
+    id: userSupp.token,
+    email: userSupp.email,
+  })
+
+  var user = await userDeleted.save();
+
+  var result;
+  user ? result = true : result = false
+
+  res.json({ userDeleted, result });
 });
 
 /* show-profil : montrer le profil de l'utilisateur au clic sur l'icône user de la bottom tab 
@@ -580,14 +615,6 @@ body: idUserSelectedFront: 1234
 response: userSelected
  */
 router.get('/show-user-profil', function (req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-/* delete-my-profil: au clic sur le toggle sur supprimer mon compte, je veux modifier le statut de l'utilisateur en BDD 
-body: tokenFront : 1234,
-response: result: true
-*/
-router.delete('/delete-my-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
