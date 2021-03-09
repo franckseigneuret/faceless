@@ -79,6 +79,7 @@ router.post('/sign-up-first-step', async function (req, res, next) {
     subscriptionDate: new Date(),
     problems_types: JSON.parse(req.body.problemsFront),
     is_adult: isAdult,
+    statut: 'active',
   })
 
   var userSaved = await user.save()
@@ -499,7 +500,9 @@ router.post('/signalement-user', function (req, res, next) {
 
 /* loadProfil : mettre à jour les information en BDD de l'utilisateur qui modifie son profil. */
 router.post('/loadProfil', async function (req, res, next) {
+
   var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
+
   res.json({ userFromBack: userBeforeUpdate });
 });
 
@@ -522,7 +525,8 @@ router.put("/update-profil", async function (req, res, next) {
       localisation: req.body.localisationFront,
       password: hash,
       gender: req.body.genderFront,
-      problem_description: req.body.descriptionProblemFront
+      problem_description: req.body.descriptionProblemFront,
+      problems_types: req.body.problemsTypeFront,
     }
   );
 
@@ -533,6 +537,26 @@ router.put("/update-profil", async function (req, res, next) {
   userAfterUpdate ? result = true : result = false
 
   res.json({ userSaved: userAfterUpdate, result });
+});
+
+/* delete-my-profil: au clic sur le toggle sur supprimer mon compte, je veux modifier le statut de l'utilisateur en BDD 
+body: tokenFront : 1234,
+response: result: true
+*/
+router.put('/delete-my-profil', async function (req, res, next) {
+
+  console.log('click du back')
+  var userUpdate = await UserModel.updateOne(
+    { token: req.body.tokenFront },
+    {
+      statut: 'delete'
+    }
+  );
+
+  var result;
+  userUpdate ? result = true : result = false
+
+  res.json({ result });
 });
 
 /* show-profil : montrer le profil de l'utilisateur au clic sur l'icône user de la bottom tab 
@@ -548,14 +572,6 @@ body: idUserSelectedFront: 1234
 response: userSelected
  */
 router.get('/show-user-profil', function (req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-/* delete-my-profil: au clic sur le toggle sur supprimer mon compte, je veux modifier le statut de l'utilisateur en BDD 
-body: tokenFront : 1234,
-response: result: true
-*/
-router.delete('/delete-my-profil', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
