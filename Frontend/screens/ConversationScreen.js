@@ -69,6 +69,7 @@ function ConversationScreen(props) {
         });
         setCurrentMsg('')
         loadMsg()
+        setDisableSendBtn(true)
 
         const responseDemand = await rawResponseDemand.json()
 
@@ -86,15 +87,12 @@ function ConversationScreen(props) {
     }
 
     var rightActions = (val) => {
-        console.log("val", val)
         return (
             <View style={{justifyContent: "center"}}><Text style={styles.hoursRight}>{val}</Text></View>
         )
     }
 
-
     var leftActions = (val) => {
-        console.log("val", val)
         return (
             <View style={{justifyContent: "center"}}><Text style={styles.hoursLeft}>{val}</Text></View>
         )
