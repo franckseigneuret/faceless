@@ -112,13 +112,14 @@ function SignIn(props) {
       </View>
       {tabErrorsSignIn}
       <Button
-        title="connexion"
-        titleStyle={{
-          fontFamily: "Montserrat_700Bold",
-        }}
-        buttonStyle={styles.buttonValider}
-        onPress={() => handleSubmitSignIn()}
-      />
+              title="connexion"
+              type="solid"
+              buttonStyle={styles.buttonNext}
+              titleStyle={{
+                fontFamily: "Montserrat_700Bold",
+              }}
+              onPress={() => handleSubmitSignIn()}
+            />
     </View>
   );
 }
@@ -144,14 +145,12 @@ const styles = StyleSheet.create({
   inputConnect: {
     width: "75%",
   },
-  buttonValider: {
+  buttonNext: {
     backgroundColor: "#5571D7",
+    marginTop:40,
     borderRadius: 86,
-    width: 159,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    marginTop: windowHeight / 20,
-    height: 40,
+    width: 200,
+    margin: 10,
   },
 });
 

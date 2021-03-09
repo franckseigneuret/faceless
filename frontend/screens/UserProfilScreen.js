@@ -20,6 +20,8 @@ function UserProfilScreen(props) {
     moment.locale('fr');
     var NewDate = moment(props.route.params.subscriptionDate).format('Do MMMM YYYY')
 
+    console.log(props.route.params,'PARAMS')
+
 var imageGender = ''
   if (props.route.params.gender == 'male'){
     imageGender = <Image source={require('../assets/gender_male.png')} style={{width: 40, height: 40}}/>
