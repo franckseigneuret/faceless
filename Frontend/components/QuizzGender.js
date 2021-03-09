@@ -37,18 +37,13 @@ function QuizzGender(props) {
       Montserrat_900Black,
       Montserrat_800ExtraBold,
   });
-  
-  var images = [
-    {unSelected: <Image source={require('../assets/gender_1.png')}/>, selected: <Image source={require('../assets/gender_1_selected.png')}/>},
-    {unSelected: <Image source={require('../assets/gender_male.png')}/>, selected: <Image source={require('../assets/gender_male_selected.png')}/>},
-    {unSelected: <Image source={require('../assets/gender_female.png')}/>, selected: <Image source={require('../assets/gender_female_selected.png')}/>},
-  ];
 
-  // var images = [
-  //   {unSelected: <Image source={{uri: 'https://i.imgur.com/wK81q24.png'}}/>, selected: <Image source={{uri: 'https://i.imgur.com/EvKcqi9.png'}}/>},
-  //   {unSelected: <Image source={{uri: 'https://i.imgur.com/U0HK9Zb.png'}}/>, selected: <Image source={{uri: 'https://i.imgur.com/FNaPA8d.png'}}/>},
-  //   {unSelected: <Image source={{uri: 'https://i.imgur.com/XDpv4eo.png'}}/>, selected: <Image source={{uri: 'https://i.imgur.com/S1xUry1.png'}}/>},
-  // ];
+
+  var images = [
+    {unSelected: <Image source={{uri: 'https://i.imgur.com/wK81q24.png'}} style={{width: 110, height: 110}}/>, selected: <Image source={{uri: 'https://i.imgur.com/EvKcqi9.png'}} style={{width: 110, height: 110}}/>},
+    {unSelected: <Image source={{uri: 'https://i.imgur.com/U0HK9Zb.png'}} style={{width: 110, height: 110}}/>, selected: <Image source={{uri: 'https://i.imgur.com/FNaPA8d.png'}} style={{width: 110, height: 110}}/>},
+    {unSelected: <Image source={{uri: 'https://i.imgur.com/XDpv4eo.png'}} style={{width: 110, height: 110}}/>, selected: <Image source={{uri: 'https://i.imgur.com/S1xUry1.png'}} style={{width: 110, height: 110}}/>},
+  ];
 
   var image = images.map((img, key) => {
       return <TouchableOpacity key={key} onPress={() => {setIsSelected(key), updateGender(key)}}>
