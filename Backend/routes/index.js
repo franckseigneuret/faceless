@@ -353,7 +353,6 @@ router.get('/show-msg', async function (req, res, next) {
     let statusOnLine = 'off'
     statusOnLine = now - lastMsgFriend.date < 1800000 ? 'recent' : 'off'  // - de 30 min, soit 1000 * 30 * 60 = 1800000 ms
     statusOnLine = now - lastMsgFriend.date < 900000 ? 'on' : 'recent'    // - de 15 min, soit 1000 * 15 * 60 = 900000 ms
-    console.log(lastMsgFriend.date)
     myFriend = { ...myFriend.toObject(), statusOnLine }
 
     friendsData.push(myFriend)
@@ -364,7 +363,9 @@ router.get('/show-msg', async function (req, res, next) {
     })
 
     // tri du tableau 
-    conversations.sort((a, b) => a.lastMessage.date > b.lastMessage.date ? -1 : 1) // par date dernier message
+    conversations.sort((a, b) => {
+      a.lastMessage && a.lastMessage && a.lastMessage.date > b.lastMessage.date ? -1 : 1
+    }) // par date dernier message
     conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1) // messages non lus en 1er
   }))
 

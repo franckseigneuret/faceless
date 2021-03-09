@@ -94,7 +94,7 @@ function ConversationScreen(props) {
         )
     }
 
-    let dateToShow = null
+    let dateToShow
 
     var tabMsg = data.map((item, i) => {
         let when = new Date(item.date)
@@ -105,25 +105,25 @@ function ConversationScreen(props) {
         console.log("item", item)
         if (item.to_id === myContactId) {
             return  <View>
-                {dateToShow != null ? <Text style={styles.dateRight}>{date}</Text> : null}
+                {/* {dateToShow != null ? <Text style={styles.dateRight}>{date}</Text> : null} */}
+                <Text style={styles.dateRight}>{date}</Text>
             <Swipeable 
             renderRightActions={() => rightActions(hours)}
             >
             <View style={styles.blocRight} key={i}>
-                        {showDate ?  <Text style={styles.dateRight} show={showDate} >{whenFormat}</Text> : null}
-                        <View style={styles.msgRight}>
-                        <Text style={styles.textRight} >{item.content}</Text>
-                    </View>
+                {/* {showDate ?  <Text style={styles.dateRight} show={showDate} >{whenFormat}</Text> : null} */}
+                <View style={styles.msgRight}>
+                    <Text style={styles.textRight} >{item.content}</Text>
+                </View>
             </View>
             </Swipeable>
             </View>
 
         } else {
             return <View>
-                {dateToShow != null ? <Text style={styles.dateLeft}>{date}</Text> : null}
-
+            <Text style={styles.dateLeft}>{date}</Text>
             <View style={styles.blocLeft} key={i}>
-                {showDate ?  <Text style={styles.dateLeft} show={showDate} >{whenFormat}</Text> : null}
+                {/* {showDate ?  <Text style={styles.dateLeft} show={showDate} >{whenFormat}</Text> : null} */}
                 <View style={styles.msgLeft}>
                     <Text style={styles.textLeft} >{item.content}</Text>
                 </View>
