@@ -22,6 +22,11 @@ function MessageScreen(props) {
   const [part, setPart] = useState('confidents')
   const [nbDemand, setNbDemand] = useState(0)
 
+  let demandEnd = null;
+  if (props.route && props.route.params && props.route.params.demandEnd) {
+    demandEnd = props.route.params.demandEnd
+  }
+
   const loadConversations = async (params) => {
     console.log('myId', myId)
     if (myId) { // l'id obtenue à partir du token existe bien
@@ -65,6 +70,13 @@ function MessageScreen(props) {
 
   }, [myId])
 
+  useEffect(() => {
+
+    loadConversations({ demandes: false })
+
+  }, [demandEnd])
+
+
   const items = conversations.map((el, i) => {
 
     if (el.lastMessage && el.friendsDatas) {
@@ -81,7 +93,7 @@ function MessageScreen(props) {
         case 'recent':
           onLineColor = 'orange'
           break;
-          
+
         default:
           onLineColor = 'red'
           break;
@@ -94,7 +106,7 @@ function MessageScreen(props) {
           let noluCopy = [...unreadPerConversation]
           noluCopy[i] = 0
           setUnreadPerConversation(noluCopy)
-          console.log(el.friendsDatas,'<<<<----- props à renvoyer')
+          // console.log(el.friendsDatas,'<<<<----- props à renvoyer')
           props.navigation.navigate('ConversationScreen', {
             token,
             myId,
@@ -103,8 +115,8 @@ function MessageScreen(props) {
             pseudo: el.friendsDatas.pseudo,
             gender: el.friendsDatas.gender,
             subscriptionDate: el.friendsDatas.subscriptionDate,
-            problemDesc : el.friendsDatas.problem_description,
-            problems_types : el.friendsDatas.problems_types,
+            problemDesc: el.friendsDatas.problem_description,
+            problems_types: el.friendsDatas.problems_types,
             avatar: el.friendsDatas.avatar
           })
         }}>

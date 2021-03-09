@@ -12,31 +12,28 @@ const Stack = createStackNavigator();
 
 
 function ConversationScreen(props) {
-    
+
+    const [demandEnd, setDemandeEnd] = useState(false)
     const [token, setToken] = useState(null)
     const [myId, setMyId] = useState(null)
     const [data, setData] = useState([])
     const [currentMsg, setCurrentMsg] = useState("")
     const [myContactId, setMyContactId] = useState("")
     const [pseudo, setPseudo] = useState("")
-    const [avatar, setAvatar] = useState("https://i.imgur.com/P3rBF8E.png")
+    // const [avatar, setAvatar] = useState("https://i.imgur.com/P3rBF8E.png")
     const [disableSendBtn, setDisableSendBtn] = useState(true)
     const scrollViewRef = useRef();
-
-    // console.log("props.route.params.convId", props.route.params.convId)
-
 
     async function loadMsg() {
         var rawResponse = await fetch(`${HTTP_IP_DEV}/show-convers?convId=${props.route.params.convId}&myContactId=${props.route.params.myContactId}&token=${token}`, { method: 'GET' });
         var response = await rawResponse.json();
         setData(response.allMessagesWithOneUser)
         setPseudo(response.pseudo)
-        setAvatar(response.avatar)
+        // setAvatar(response.avatar)
         setMyContactId(props.route.params.myContactId)
     }
 
-    var infoUser= props.route.params
-    console.log(infoUser,'<------ INFO À RENVOYER')
+    var infoUser = props.route.params
 
     useEffect(() => {
         AsyncStorage.getItem("token", function (error, tokenValue) {
@@ -56,17 +53,23 @@ function ConversationScreen(props) {
     }, [props.route.params.convId, token])
 
     var sendMsg = async () => {
-        await fetch(`${HTTP_IP_DEV}/send-msg`, {
+        const rawResponseDemand = await fetch(`${HTTP_IP_DEV}/send-msg`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `msg=${currentMsg}&myContactId=${myContactId}&myId=${myId}`
         });
-        setCurrentMsg("")
+        setCurrentMsg('')
         loadMsg()
+
+        const responseDemand = await rawResponseDemand.json()
+
+        if (responseDemand.demandEnd) {
+            setDemandeEnd(responseDemand.demandEnd)
+        }
     }
 
     var checkTextSize = (val) => {
-        if(val.length>0){
+        if (val.length > 0) {
             setDisableSendBtn(false)
         } else {
             setDisableSendBtn(true)
@@ -98,20 +101,20 @@ function ConversationScreen(props) {
 
         <View style={{ flex: 1, alignItems: 'center', justifyContent: "space-between", backgroundColor: '#FFEEDD', paddingTop: 20, height: "100%" }}>
             <View style={styles.header}>
-                <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate('MessageScreen')}>
+                <TouchableOpacity style={styles.button} onPress={() => props.navigation.navigate('MessageScreen', { demandEnd })}>
                     <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
                 </TouchableOpacity>
                 <View style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <TouchableOpacity onPress={()=> props.navigation.navigate('UserProfilScreen', {
-                      pseudo: infoUser.pseudo,
-                      gender: infoUser.gender,
-                      subscriptionDate: infoUser.subscriptionDate,
-                      problemDesc : infoUser.problemDesc,
-                      problems_types : infoUser.problems_types,
-                      avatar: infoUser.avatar
-                    })}> 
-                  <Image source={{uri: infoUser.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
-                </TouchableOpacity>
+                    <TouchableOpacity onPress={() => props.navigation.navigate('UserProfilScreen', {
+                        pseudo: infoUser.pseudo,
+                        gender: infoUser.gender,
+                        subscriptionDate: infoUser.subscriptionDate,
+                        problemDesc: infoUser.problemDesc,
+                        problems_types: infoUser.problems_types,
+                        avatar: infoUser.avatar
+                    })}>
+                        <Image source={{ uri: infoUser.avatar }} style={{ borderWidth: 3, borderRadius: 50, borderColor: '#EC9A1F', width: 100, height: 100 }} />
+                    </TouchableOpacity>
                     <Text style={styles.pseudo}>{pseudo}</Text>
                 </View>
                 <TouchableOpacity style={styles.button}>
@@ -133,7 +136,7 @@ function ConversationScreen(props) {
                     multiline={true}
                     value={currentMsg}
                     onChangeText={(val) => {
-                        setCurrentMsg(val) 
+                        setCurrentMsg(val)
                         checkTextSize(val)
                     }}
                 />
