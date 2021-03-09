@@ -14,8 +14,9 @@ const windowHeight = Dimensions.get('window').height
 
 export default function Geolocalisation(props) {
 
+  const lieu = props.lieu ? props.lieu : ''
   const [townList, setTownList] = useState([])
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(lieu)
   const [selectedTown, setSelectedTown] = useState(null)
 
   const onChangeText = async (search) => {

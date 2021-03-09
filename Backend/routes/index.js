@@ -507,6 +507,8 @@ router.post('/loadProfil', async function (req, res, next) {
 
   var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
 
+  console.log(userBeforeUpdate, 'userBeforeUpdate loadProfil')
+
   res.json({ userFromBack: userBeforeUpdate });
 });
 
@@ -527,6 +529,7 @@ router.put("/update-profil", async function (req, res, next) {
   var userUpdate = await UserModel.updateOne(
     { token: req.body.tokenFront },
     {
+      avatar: req.body.avatarFront,
       email: req.body.emailFront,
       localisation: req.body.localisationFront,
       password: hash,
