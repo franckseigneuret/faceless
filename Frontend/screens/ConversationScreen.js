@@ -156,16 +156,17 @@ function ConversationScreen(props) {
                     <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
                 </TouchableOpacity>
                 <View style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <TouchableOpacity onPress={() => props.navigation.navigate('UserProfilScreen', {
-                        pseudo: infoUser.pseudo,
-                        gender: infoUser.gender,
-                        subscriptionDate: infoUser.subscriptionDate,
-                        problemDesc: infoUser.problemDesc,
-                        problems_types: infoUser.problems_types,
-                        avatar: infoUser.avatar
-                    })}>
-                        <Image source={{ uri: infoUser.avatar }} style={{ borderWidth: 3, borderRadius: 50, borderColor: '#EC9A1F', width: 100, height: 100 }} />
-                    </TouchableOpacity>
+                <TouchableOpacity onPress={()=> props.navigation.navigate('UserProfilScreen', {
+                      pseudo: infoUser.pseudo,
+                      gender: infoUser.gender,
+                      subscriptionDate: infoUser.subscriptionDate,
+                      problemDesc : infoUser.problemDesc,
+                      problems_types : infoUser.problems_types,
+                      avatar: infoUser.avatar,
+                      userID: infoUser.myContactId
+                    })}> 
+                  <Image source={{uri: infoUser.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
+                </TouchableOpacity>
                     <Text style={styles.pseudo}>{pseudo}</Text>
                 </View>
                 <TouchableOpacity style={styles.button}>

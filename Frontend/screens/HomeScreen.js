@@ -162,7 +162,8 @@ function HomeScreen(props) {
                       subscriptionDate: e.subscriptionDate,
                       problemDesc : e.problem_description,
                       problems_types : e.problems_types,
-                      avatar: e.avatar
+                      avatar: e.avatar,
+                      userID: e._id,
                     })}> 
                   <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
         </TouchableOpacity>
@@ -195,7 +196,8 @@ function HomeScreen(props) {
                       subscriptionDate: e.subscriptionDate,
                       problemDesc : e.problem_description,
                       problems_types : e.problems_types,
-                      avatar: e.avatar
+                      avatar: e.avatar,
+                      userID: e._id,
                     })}
                     style={styles.buttonInfo}>     
                     <Text style={styles.textInfo}>i</Text>
