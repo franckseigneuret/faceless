@@ -19,6 +19,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Ionicons } from "@expo/vector-icons";
 
+import Geolocalisation from '../components/Geolocalisation'
+
 import {
   useFonts,
   Montserrat_400Regular,
@@ -52,7 +54,11 @@ export default function ProfilScreen(props) {
   //{pseudo, mail, ville , mdp , gender, pblDescription, prblType}
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
-  const [localisation, setLocalisation] = useState("");
+  const [localisation, setLocalisation] = useState({
+    label:'',
+    postcode:'',
+    coordinates:{},
+  });
   const [password, setPassword] = useState("");
   const [genderFromToken, setGenderFromToken] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
@@ -97,7 +103,7 @@ export default function ProfilScreen(props) {
       });
       var response = await rawResponse.json();
 
-      console.log(response, 'RESPONSE DU LOAD DATA')
+      // console.log(response, 'RESPONSE DU LOAD DATA')
 
       var pseudo = response.userFromBack.pseudo;
       setPseudo(pseudo);
@@ -105,8 +111,11 @@ export default function ProfilScreen(props) {
       var email = response.userFromBack.email;
       setEmail(email);
 
-      var localisation = response.userFromBack.localisation.label;
-      setLocalisation(localisation);
+      var localisation = response.userFromBack.localisation;
+      if(response.userFromBack.localisation) {
+
+        setLocalisation(localisation);
+      }
 
       var gender = response.userFromBack.gender;
       setGender(gender)
@@ -166,21 +175,21 @@ export default function ProfilScreen(props) {
   const handleSaveChange = () => {
 
     var problemsTypeStringify = JSON.stringify(problems)
-    console.log(problemsTypeStringify, "<--- problemsTypeStringify changé")
+    // console.log(problemsTypeStringify, "<--- problemsTypeStringify changé")
 
     async function updateUser() {
       
-      console.log(localisation, "<--- localisation changé localisation on ASYNC handleSaveChange");
-      console.log(problems, "<--- problems changé problems on ASYNC handleSaveChange")
+      // console.log(localisation, "<--- localisation changé localisation on ASYNC handleSaveChange");
+      // console.log(problems, "<--- problems changé problems on ASYNC handleSaveChange")
 
       var rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `tokenFront=${tokenAsync}&emailFront=${email}&localisationFront=${localisation}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}&problemsTypeFront=${problemsTypeStringify}`,
+        body: `tokenFront=${tokenAsync}&emailFront=${email}&localisationFront=${JSON.stringify(localisation)}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}&problemsTypeFront=${problemsTypeStringify}`,
       });
       var response = await rawResponse.json();
 
-      console.log(response, "-------- RESPONSE --------");
+      // console.log(response, "-------- RESPONSE --------");
 
       if (response.userSaved.email) {
         setEmail(response.userSaved.email);
@@ -307,13 +316,6 @@ export default function ProfilScreen(props) {
     );
   });
 
-  var problemsBadge = [
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problems.includes('Amoureux') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Amoureux</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problems.includes('Familial') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Familial</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={ problems.includes('Physique') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Physique</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={ problems.includes('Professionnel') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Professionnel</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={ problems.includes('Scolaire') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Scolaire</Text></TouchableOpacity>
-  ]
 
   if (!fontsLoaded) {
     return <AppLoading />;
@@ -375,7 +377,7 @@ export default function ProfilScreen(props) {
               <>
                 <Text style={styles.subtitle}>
                   {/* {localisation.label} */}
-                  {localisation == " " || localisation == "undefined" ? "France" : localisation}
+                  {localisation.label == " " || localisation.label == "undefined" ? "France" : localisation.label}
                 </Text>
                 <TouchableOpacity onPress={handlePressCity}>
                   <Ionicons name="pencil" size={18} color="#5571D7" />
@@ -383,13 +385,14 @@ export default function ProfilScreen(props) {
               </>
             ) : (
               <>
-                <TextInput
+              <Geolocalisation getValueParent={(value)=>setLocalisation(value)} lieu={localisation.label} />
+                {/* <TextInput
                   style={styles.subtitleChanged}
                   placeholder="Tu peux changer ta ville  "
                   onChangeText={(value) => {
                     setLocalisation(value);
                   }}
-                />
+                /> */}
               </>
             )}
           </View>
@@ -449,7 +452,7 @@ export default function ProfilScreen(props) {
             </Text>
           </View>
 
-          <Overlay
+          {/* <Overlay
             isVisible={visible}
             onBackdropPress={toggleOverlayDescription}
             backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
@@ -478,7 +481,7 @@ export default function ProfilScreen(props) {
               }}
               onPress={() => handleSaveDescription()}
             />
-          </Overlay>
+          </Overlay> */}
         </KeyboardAvoidingView>
 
         <View style={styles.viewTitleOrange}>
@@ -487,7 +490,21 @@ export default function ProfilScreen(props) {
 
         <View>
           <View style={styles.badgeContainer}>
-            {problemsBadge}
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problems.includes('Amoureux') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Amoureux</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problems.includes('Familial') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Familial</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={ problems.includes('Physique') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Physique</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={ problems.includes('Professionnel') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Professionnel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={ problems.includes('Scolaire') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Scolaire</Text>
+          </TouchableOpacity>
           </View>
         </View>
 

@@ -187,8 +187,8 @@ function quizz(props) {
       <Pressable key={i} style={visible[i] ? styles.problemCardBis : styles.problemCard}
         onPress={() => {handleSelectProblem(i);}}
       >
-        <Ionicons key={i} name={item.icon} size={24} color="#5571D7" />
-        <Text key={i} style={styles.textProblem}>{item.name}</Text>
+        <Ionicons name={item.icon} size={24} color="#5571D7" />
+        <Text style={styles.textProblem}>{item.name}</Text>
       </Pressable>)
   }
   )
@@ -222,6 +222,7 @@ function quizz(props) {
                 <Text style={styles.textTitleQuizz}>Salut,</Text>
                 <Text style={styles.textQuizz}>C'est quoi ton email ?</Text>
                 <Input
+                  keyboardType={"email-address"}
                   placeholder='helicoptere530@gmail.com'
                   inputContainerStyle={styles.inputQuizz}
                   onChangeText={email => {setEmail(email)}}

@@ -525,7 +525,7 @@ router.put("/update-profil", async function (req, res, next) {
     { token: req.body.tokenFront },
     {
       email: req.body.emailFront,
-      localisation: req.body.localisationFront,
+      localisation: JSON.parse(req.body.localisationFront),
       password: hash,
       gender: req.body.genderFront,
       problem_description: req.body.descriptionProblemFront,
