@@ -85,50 +85,68 @@ function ConversationScreen(props) {
         }
     }
 
-
-    const rightActions = (a) => {
+    var rightActions = (val) => {
+        console.log("val", val)
         return (
-            <View>
-                <Text style={styles.dateRight} >{a}</Text>
-            </View>
+            <View style={{justifyContent: "center"}}><Text style={styles.hoursRight}>{val}</Text></View>
         )
     }
 
+
+    var leftActions = (val) => {
+        console.log("val", val)
+        return (
+            <View style={{justifyContent: "center"}}><Text style={styles.hoursLeft}>{val}</Text></View>
+        )
+    }
+    
+
+    let dateCheck 
     let dateToShow
 
     var tabMsg = data.map((item, i) => {
         let when = new Date(item.date)
-        let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'numeric', day: 'numeric' })
-            + ' à ' + when.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        // let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'numeric', day: 'numeric' })
+        //     + ' à ' + when.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
         let hours = when.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
         let date = when.toLocaleDateString('fr-FR', { weekday: 'long', month: 'short', day: 'numeric' })
-        console.log("item", item)
+        if(date != dateCheck){
+            dateCheck = date
+            dateToShow = dateCheck
+        } else {
+            dateToShow = null
+        }
+
         if (item.to_id === myContactId) {
-            return  <View>
-                {/* {dateToShow != null ? <Text style={styles.dateRight}>{date}</Text> : null} */}
-                <Text style={styles.dateRight}>{date}</Text>
-            <Swipeable 
-            renderRightActions={() => rightActions(hours)}
-            >
-            <View style={styles.blocRight} key={i}>
-                {/* {showDate ?  <Text style={styles.dateRight} show={showDate} >{whenFormat}</Text> : null} */}
-                <View style={styles.msgRight}>
-                    <Text style={styles.textRight} >{item.content}</Text>
+            return  (
+            <View >
+                <Text style={styles.date}>{dateToShow}</Text>
+                <View style={{justifyContent: "center", marginBottom: 10}}>
+                    <Swipeable renderRightActions={()=> rightActions(hours)}>
+                        <View style={styles.blocRight} key={i} >
+                            <View style={styles.msgRight}>
+                                <Text style={styles.textRight} >{item.content}</Text>
+                            </View>
+                        </View>
+                    </Swipeable>
                 </View>
-            </View>
-            </Swipeable>
-            </View>
+            </View>)
 
         } else {
-            return <View>
-            <Text style={styles.dateLeft}>{date}</Text>
-            <View style={styles.blocLeft} key={i}>
-                {/* {showDate ?  <Text style={styles.dateLeft} show={showDate} >{whenFormat}</Text> : null} */}
-                <View style={styles.msgLeft}>
-                    <Text style={styles.textLeft} >{item.content}</Text>
+            return( 
+            <View>
+                <Text style={styles.date}>{dateToShow}</Text>
+                <View style={{justifyContent: "center", marginBottom: 10}}>
+                    <Swipeable renderLeftActions={()=> leftActions(hours)}>
+                        <View style={styles.blocLeft} key={i}>
+                            <View style={styles.msgLeft}>
+                                <Text style={styles.textLeft} >{item.content}</Text>
+                            </View>
+                        </View>
+                    </Swipeable>
                 </View>
             </View>
-            </View>
+            )
         }
     })
 
@@ -226,7 +244,6 @@ const styles = StyleSheet.create({
         maxWidth: "80%",
         padding: 12,
         borderRadius: 15,
-        marginBottom: 10
     },
     textLeft: {
         textAlign: "left",
@@ -237,14 +254,14 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-end",
-        width: "100%"
+        width: "100%",
+
     },
     msgRight: {
         backgroundColor: "#5571D7",
         maxWidth: "80%",
         padding: 12,
         borderRadius: 15,
-        marginBottom: 10
     },
     textRight: {
         textAlign: "right",
@@ -289,18 +306,20 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         transform: [{ rotate: '-45deg' }]
     },
-    dateRight: {
+    date: {
         color: '#767676',
-        textAlign: 'right',
-        fontSize: 12,
-        marginBottom: 5,
-        marginRight: 3
+        textAlign: 'center',
+        fontSize: 15,
+        marginBottom: 8,
     },
-    dateLeft: {
+    hoursRight: {
         color: '#767676',
-        textAlign: 'left',
-        fontSize: 12,
-        marginBottom: 5 ,
-        marginLeft: 3
+        textAlign: 'center',
+        marginLeft: 7
+    },
+    hoursLeft: {
+        color: '#767676',
+        textAlign: 'center',
+        marginRight: 7
     }
 })
