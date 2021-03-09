@@ -150,7 +150,7 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
             <Overlay isVisible={visible} onBackdropPress={toggleOverlay} overlayStyle={styles.overlay}>
 
           { signalerVisible == false && alerterVisible == false ?
-            <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
+            <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', marginVertical: 20}}>
               <Text style={styles.textNeedHelp}>Cette personne a besoin d'aide:</Text>
             <TouchableOpacity 
             style={styles.touchableOverlay} 
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
       },
       touchableOverlay: {
-        width: '90%',
+        width: '50%',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
       },
       touchableOverlayBis: {
-        width: '90%',
+        width: '50%',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
       textButtonWarning: {
         fontFamily: 'Montserrat_500Medium',
         fontSize: 22,
-        textAlign: 'center'
+        textAlign: 'center',
       },
       textButtonWarningBis: {
         fontFamily: 'Montserrat_500Medium',
@@ -442,6 +442,8 @@ const styles = StyleSheet.create({
         fontSize:20,
         fontFamily: "Montserrat_700Bold",
         marginBottom: 10,
+        width: '60%',
+        textAlign: 'center'
       },
       reasonsSignalement: {
         width: '100%',
@@ -468,6 +470,9 @@ const styles = StyleSheet.create({
       containerReasons: {
         width: '90%',
         padding: 10,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
       },
       textReasonsSignalement: {
         fontFamily: 'Montserrat_500Medium',
