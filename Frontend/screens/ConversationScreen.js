@@ -108,7 +108,8 @@ function ConversationScreen(props) {
                       subscriptionDate: infoUser.subscriptionDate,
                       problemDesc : infoUser.problemDesc,
                       problems_types : infoUser.problems_types,
-                      avatar: infoUser.avatar
+                      avatar: infoUser.avatar,
+                      userID: infoUser.myContactId
                     })}> 
                   <Image source={{uri: infoUser.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
                 </TouchableOpacity>

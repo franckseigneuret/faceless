@@ -6,6 +6,7 @@ import { useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Blac
 import AppLoading from 'expo-app-loading';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused } from "@react-navigation/native";
 
 import HTTP_IP_DEV from '../mon_ip'
 
@@ -14,6 +15,8 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 function Filter(props) {
+
+  const isFocused = useIsFocused();
 
   const [ageMin, setAgeMin] = useState(null)
   const [ageMax, setAgeMax] = useState(null)
@@ -27,45 +30,20 @@ function Filter(props) {
   // const [genderStatut, setGenderStatut] = useState({other: true, male: true, female: true })
 
   useEffect(() => {
-    AsyncStorage.getItem("filter", function(error, data) {
-      var dataStorage = JSON.parse(data)
-      if(dataStorage.localisation[0] > 90) {
-        console.log('in condition')
-       setLocalisation(franceLocalisation)
+    AsyncStorage.getItem("filter", async function(error, data) {
+      var dataStorage = await JSON.parse(data)
+      console.log(dataStorage, '<------ DATA STORAGE ON USEFFECT')
+      if(dataStorage.localisation[0] >= 90 || dataStorage.localisation == 'France') {
+        setLocalisation(franceLocalisation)
       }else {
         setLocalisation(dataStorage.localisation[0])
-        console.log(dataStorage.localisation[0], '<------- set localisation array ?')
       }
       setProblems(dataStorage.problemsTypes);
       setAgeMin(dataStorage.age.minAge);
       setAgeMax(dataStorage.age.maxAge);
       setGenderSelected(dataStorage.gender);
      });
-  }, []);
-
-
-  const problemsContent = [
-    {
-      name: 'Amoureux',
-      icon: 'heart',
-    },
-    {
-      name: 'Familial',
-      icon: 'people-sharp',
-    },
-    {
-      name: 'Physique',
-      icon: 'body',
-    },
-    {
-      name: 'Professionnel',
-      icon: 'briefcase',
-    },
-    {
-      name: 'Scolaire',
-      icon: 'school',
-    },
-  ]
+  }, [isFocused]);
 
   let [fontsLoaded] = useFonts({
     Montserrat_400Regular,
@@ -114,7 +92,6 @@ function Filter(props) {
         localisation: localisation
       }
     ));
-    console.log(localisation, '<----- state took data storage value, france if > 90');
     props.navigation.navigate('BottomNavigator', { screen: 'HomeScreen' })
   }
   
@@ -171,7 +148,7 @@ function Filter(props) {
             markerStyle={styles.markerStyle}
             min={18}
             max={100}
-            values={[18, 100]}
+            values={[ageMin, ageMax]}
             enabledTwo
             onValuesChangeFinish={value => { setAgeMin(value[0]); setAgeMax(value[1]) }}
           />
@@ -183,9 +160,9 @@ function Filter(props) {
             selectedStyle={styles.selectedStyle}
             unselectedStyle={styles.unselectedStyle}
             markerStyle={styles.markerStyle}
-            min={18}
+            min={0}
             max={100}
-            values={[18]}
+            values={localisation != "France" ? [localisation] : [91]}
             enabledTwo
             onValuesChange={value => { value > 90 ? setLocalisation(franceLocalisation) : setLocalisation(value)}}
             pressedMarkerStyle={styles.stepLabelStyle}

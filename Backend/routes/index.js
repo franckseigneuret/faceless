@@ -3,7 +3,7 @@ var router = express.Router();
 const UserModel = require('../models/users');
 const MessagesModel = require('../models/messages')
 const ConversationsModel = require('../models/conversations')
-
+const SignalementModel = require('../models/signalement')
 var bcrypt = require('bcrypt');
 var uid2 = require('uid2');
 
@@ -98,7 +98,7 @@ router.post('/sign-up-second-step', async function (req, res, next) {
   var gender = req.body.genderFront;
   var problemDesc = req.body.problemDescriptionFront;
   var avatar = req.body.avatarFront;
-  req.body.localisationFront == 'undefined' ? localisation = 'France' : localisation = JSON.parse(req.body.localisationFront);
+  req.body.localisationFront == 'undefined' || req.body.localisationFront == undefined ? localisation = 'France' : localisation = JSON.parse(req.body.localisationFront);
   req.body.genderFront == 'undefined' ? gender = '' : gender = req.body.genderFront;
   req.body.problemDescriptionFront == 'undefined' ? problemDesc = '' : problemDesc = req.body.problemDescriptionFront;
   req.body.avatarFront == 'undefined' ? avatar = 'https://i.imgur.com/Xqf1Ilk.png' : avatar = req.body.avatarFront;
@@ -489,11 +489,43 @@ body: idUserSignaledFront: 1234, warningSignalFront: 1234
 response: result: true ? message: Nous avons bien pris en compte votre signalement : message: 'Erreur, l'utilisateur n'a pas pu être signalé, vous
 pouvez nous envoyer un email à l'adresse mail....'
  */
-router.post('/signalement-help', function (req, res, next) {
-  res.render('index', { title: 'Express' });
+router.post('/signalement-help', async function (req, res, next) {
+
+
+  var user = await UserModel.findOne({token: req.body.tokenFront})
+  var confident = await UserModel.findOne({_id: req.body.confidentIdFront})
+
+  signalementFind = await SignalementModel.findOne({
+    user_emitter_id: user._id,
+    user_receiver_id: confident._id,
+    type: req.body.typeFront
+  })
+
+  var reason;
+  req.body.reasonFront == '' ? reason = req.body.reasonOtherFront : reason= req.body.reasonFront;
+
+  console.log(user, '<-------- USER')
+  console.log(confident, '<-------- confident');
+
+
+  if(signalementFind == undefined){
+    var newSignalement = new SignalementModel({
+      type: req.body.typeFront,
+      reason: reason,
+      user_emitter_id: user._id,
+      user_receiver_id: confident._id
+    });
+    var signalementSave = await newSignalement.save();
+  }
+
+  console.log(signalementSave, '<------- signalement saved');
+
+  res.json();
 });
 
 router.post('/signalement-user', function (req, res, next) {
+
+
   res.json();
 });
 
