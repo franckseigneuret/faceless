@@ -446,6 +446,7 @@ router.post('/send-msg', async function (req, res, next) {
           { demand: false }
         );
         demandEnd = true
+      }
     }
   }
 
