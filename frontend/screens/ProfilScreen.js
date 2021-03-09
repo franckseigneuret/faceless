@@ -4,13 +4,10 @@ import {
   View,
   Image,
   Text,
-  Switch,
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
   ScrollView,
   Dimensions,
 } from "react-native";
@@ -132,8 +129,6 @@ export default function ProfilScreen(props) {
       var problems_types = response.userFromBack.problems_types;
       setProblems(problems_types)
 
-      // var problemBack = response.userFromBack.problems_types;
-      // setProblemType(problemBack);
     }
   }, []);
 
@@ -170,20 +165,20 @@ export default function ProfilScreen(props) {
 
   const handleSaveChange = () => {
 
-    console.log(gender, "<--- gender changé");
-    console.log(problemDescription, "<--- problemDescription changé");
+    var problemsTypeStringify = JSON.stringify(problems)
+    console.log(problemsTypeStringify, "<--- problemsTypeStringify changé")
 
     async function updateUser() {
       
       console.log(localisation, "<--- localisation changé localisation on ASYNC handleSaveChange");
       console.log(problems, "<--- problems changé problems on ASYNC handleSaveChange")
 
-      rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
+      var rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `tokenFront=${tokenAsync}&emailFront=${email}&localisationFront=${localisation}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}&problemsTypeFront=${problems}`,
+        body: `tokenFront=${tokenAsync}&emailFront=${email}&localisationFront=${localisation}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}&problemsTypeFront=${problemsTypeStringify}`,
       });
-      response = await rawResponse.json();
+      var response = await rawResponse.json();
 
       console.log(response, "-------- RESPONSE --------");
 
@@ -209,10 +204,9 @@ export default function ProfilScreen(props) {
         setProblemDescription(response.userSaved.problem_description);
       }
 
-      // FAIRE LES TYPES DE PROBLEMES
-      // if (response.userSaved.problems_types) {
-      //   setProblems(response.userSaved.problems_types)
-      // }
+      if (response.userSaved.problems_types) {
+        setProblems(response.userSaved.problems_types)
+      }
     }
     updateUser();
 
@@ -229,7 +223,7 @@ export default function ProfilScreen(props) {
 
     async function deactivateUser() {
       var rawResponse = await fetch(`${HTTP_IP_DEV}/delete-my-profil`, {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `tokenFront=${tokenAsync}`,
       });
@@ -381,7 +375,7 @@ export default function ProfilScreen(props) {
               <>
                 <Text style={styles.subtitle}>
                   {/* {localisation.label} */}
-                  {localisation == "" ? "France" : localisation}
+                  {localisation == " " || localisation == "undefined" ? "France" : localisation}
                 </Text>
                 <TouchableOpacity onPress={handlePressCity}>
                   <Ionicons name="pencil" size={18} color="#5571D7" />

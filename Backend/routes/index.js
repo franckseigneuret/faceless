@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router();
 const UserModel = require('../models/users');
-const MessagesModel = require('../models/messages')
-const ConversationsModel = require('../models/conversations')
+const MessagesModel = require('../models/messages');
+const ConversationsModel = require('../models/conversations');
+const DeletedUserModel = require('../models/DeletedUsers');
 
 var bcrypt = require('bcrypt');
 var uid2 = require('uid2');
@@ -517,6 +518,8 @@ router.put("/update-profil", async function (req, res, next) {
   var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   console.log(userBeforeUpdate, '<---- userBeforeUpdate')
 
+  var problemsTypeParse = JSON.parse(req.body.problemsTypeFront)
+
   // ajout du genre et descriptionProblemFront
   var userUpdate = await UserModel.updateOne(
     { token: req.body.tokenFront },
@@ -526,7 +529,7 @@ router.put("/update-profil", async function (req, res, next) {
       password: hash,
       gender: req.body.genderFront,
       problem_description: req.body.descriptionProblemFront,
-      problems_types: req.body.problemsTypeFront,
+      problems_types: problemsTypeParse,
     }
   );
 
@@ -543,20 +546,24 @@ router.put("/update-profil", async function (req, res, next) {
 body: tokenFront : 1234,
 response: result: true
 */
-router.put('/delete-my-profil', async function (req, res, next) {
+router.post('/delete-my-profil', async function (req, res, next) {
 
   console.log('click du back')
-  var userUpdate = await UserModel.updateOne(
-    { token: req.body.tokenFront },
-    {
-      statut: 'delete'
-    }
+  var userSupp = await UserModel.findOne(
+    { token: req.body.tokenFront }
   );
 
-  var result;
-  userUpdate ? result = true : result = false
+  var userDeleted = await new DeletedUserModel({
+    id: userSupp.token,
+    email: userSupp.email,
+  })
 
-  res.json({ result });
+  var user = await userDeleted.save();
+
+  var result;
+  user ? result = true : result = false
+
+  res.json({ userDeleted, result });
 });
 
 /* show-profil : montrer le profil de l'utilisateur au clic sur l'icône user de la bottom tab 
