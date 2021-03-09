@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button, Input } from "react-native-elements";
-import { StyleSheet, View, Dimensions, Image, Text } from "react-native";
+import { StyleSheet, View, Dimensions, Text, TouchableOpacity } from "react-native";
 import AppLoading from "expo-app-loading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from '@expo/vector-icons';
 import HTTP_IP_DEV from "../mon_ip";
 
 const windowWidth = Dimensions.get("window").width;
@@ -55,7 +56,7 @@ function SignIn(props) {
         JSON.stringify({
           // si isAdult == true alors on set le min age du filter à l'âge de l'user et le max age à l'age de l'user +10 ans
           problemsTypes: data.user.problems_types, // problems
-          gender: ['other', 'male', 'female'],
+          gender: ["other", "male", "female"],
           age: {
             minAge: 18,
             maxAge: 100,
@@ -68,8 +69,8 @@ function SignIn(props) {
         "filter",
         JSON.stringify({
           // sinon on set le min age du filter à l'âge et l'user et le max age à 18ans
-          problemsTypes: data.user.problems_types, 
-          gender: ['other', 'male', 'female'],
+          problemsTypes: data.user.problems_types,
+          gender: ["other", "male", "female"],
           age: {
             minAge: 13, //Math.floor(new Date(new Date() - data.user.birthDate))
             maxAge: 17,
@@ -79,9 +80,13 @@ function SignIn(props) {
       );
     }
 
-    AsyncStorage.getItem("filter", function(error, data) {
-      console.log(data, 'DATA DU ASYNC ')
-  })
+    AsyncStorage.getItem("filter", function (error, data) {
+      console.log(data, "DATA DU ASYNC ");
+    });
+  };
+
+  const handleClickBack = () => {
+    props.navigation.navigate('Registration')
   };
 
   var tabErrorsSignIn = listErrorsSignIn.map((error, i) => {
@@ -94,6 +99,20 @@ function SignIn(props) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.buttonPrevious}
+          onPress={() => handleClickBack()}
+        >
+          <Ionicons
+            name="chevron-back"
+            size={25}
+            color="#5571D7"
+            style={{ alignSelf: "center", marginTop: 3 }}
+          />
+        </TouchableOpacity>
+      </View>
+
       <Text style={styles.textTitle}>Bon retour !</Text>
       <View style={styles.containerInput}>
         <Input
@@ -128,9 +147,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFF1E2",
     alignItems: "center",
+    width: windowWidth,
     height: windowHeight,
     flexDirection: "column",
-    justifyContent: "center",
+    justifyContent: 'flex-start',
+    paddingTop: 40,
+  },
+  buttonContainer: {
+    width: "80%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  buttonPrevious: {
+    backgroundColor: "#FFEEDD",
+    padding: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 30,
+    borderColor: '#5571D7',
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.5
   },
   containerInput: {
     marginTop: 30,
@@ -140,6 +178,7 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat_900Black",
     fontSize: 43,
     width: "75%",
+    paddingTop: 90
   },
   inputConnect: {
     width: "75%",

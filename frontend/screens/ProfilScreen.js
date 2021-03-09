@@ -59,7 +59,9 @@ export default function ProfilScreen(props) {
   const [password, setPassword] = useState("");
   const [genderFromToken, setGenderFromToken] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
-  const [problemType, setProblemType] = useState([]);
+
+    // Tableau type de probs
+    const [problems, setProblems] = useState(['Amoureux'])
 
   // State pour les modifs de profils
   const [emailVisible, setEmailVisible] = useState(false);
@@ -76,6 +78,64 @@ export default function ProfilScreen(props) {
   // State pour le gender
   const [gender, setGender] = useState("");
   const [isSelected, setIsSelected] = useState(-1);
+
+  useEffect(() => {
+
+    console.log("app load");
+
+    AsyncStorage.getItem("token", function (error, data) {
+      var userData = data;
+      if (userData) {
+        console.log(userData, "<--- userData pour le token du async");
+        loadDATA(userData);
+        setTokenAsync(userData);
+      }
+    });
+
+    async function loadDATA(arg) {
+      var rawResponse = await fetch(`${HTTP_IP_DEV}/loadProfil`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `tokenFront=${arg}`,
+      });
+      var response = await rawResponse.json();
+
+      console.log(response, 'RESPONSE DU LOAD DATA')
+
+      var pseudo = response.userFromBack.pseudo;
+      setPseudo(pseudo);
+
+      var email = response.userFromBack.email;
+      setEmail(email);
+
+      var localisation = response.userFromBack.localisation.label;
+      setLocalisation(localisation);
+
+      var gender = response.userFromBack.gender;
+      setGender(gender)
+      if (gender == null) {
+        setIsSelected(0);
+      } 
+      if (gender == "other") {
+        setIsSelected(0);
+      }
+      if (gender == "male") {
+        setIsSelected(1);
+      }
+      if (gender == "female") {
+        setIsSelected(2);
+      }
+
+      var problemDescription = response.userFromBack.problem_description;
+      setProblemDescription(problemDescription);
+
+      var problems_types = response.userFromBack.problems_types;
+      setProblems(problems_types)
+
+      // var problemBack = response.userFromBack.problems_types;
+      // setProblemType(problemBack);
+    }
+  }, []);
 
   const handlePressEmail = () => {
     setEmailVisible(!emailVisible);
@@ -97,17 +157,31 @@ export default function ProfilScreen(props) {
     setSaveButton(true);
   };
 
+  const handleSelectProblems = (element) => {
+    var problemsCopy = [...problems]
+    if(problemsCopy.includes(element) == false) {
+      problemsCopy.push(element);
+      setProblems(problemsCopy);
+    } else {
+      problemsCopy = problemsCopy.filter(e => e != element);
+      setProblems(problemsCopy);
+    }
+  }
+
   const handleSaveChange = () => {
 
     console.log(gender, "<--- gender changé");
     console.log(problemDescription, "<--- problemDescription changé");
 
     async function updateUser() {
-      console.log(email, "<--- email changé email on ASYNC handleSaveChange");
+      
+      console.log(localisation, "<--- localisation changé localisation on ASYNC handleSaveChange");
+      console.log(problems, "<--- problems changé problems on ASYNC handleSaveChange")
+
       rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `tokenFront=${tokenAsync}&emailFront=${email}&localisationFront=${localisation}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}`,
+        body: `tokenFront=${tokenAsync}&emailFront=${email}&localisationFront=${localisation}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}&problemsTypeFront=${problems}`,
       });
       response = await rawResponse.json();
 
@@ -124,7 +198,6 @@ export default function ProfilScreen(props) {
       }
 
       if (response.userSaved.password) {
-        // setPassword(response.userSaved.password);
         setMdpVisible(false);
       }
 
@@ -134,10 +207,12 @@ export default function ProfilScreen(props) {
 
       if (response.userSaved.problem_description) {
         setProblemDescription(response.userSaved.problem_description);
-        // setCityVisible(false);
       }
 
       // FAIRE LES TYPES DE PROBLEMES
+      // if (response.userSaved.problems_types) {
+      //   setProblems(response.userSaved.problems_types)
+      // }
     }
     updateUser();
 
@@ -149,69 +224,34 @@ export default function ProfilScreen(props) {
     props.navigation.navigate("Registration");
     console.log(tokenAsync, "<---- token supprime");
   };
+  
+  const handleDeactivate = () => {
 
-  useEffect(() => {
-    console.log("app load");
-
-    AsyncStorage.getItem("token", function (error, data) {
-      var userData = data;
-      if (userData) {
-        console.log(userData, "<--- userData pour le token du async");
-        loadDATA(userData);
-        setTokenAsync(userData);
-      }
-    });
-
-    async function loadDATA(arg) {
-      var rawResponse = await fetch(`${HTTP_IP_DEV}/loadProfil`, {
-        method: "POST",
+    async function deactivateUser() {
+      var rawResponse = await fetch(`${HTTP_IP_DEV}/delete-my-profil`, {
+        method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `tokenFront=${arg}`,
+        body: `tokenFront=${tokenAsync}`,
       });
       var response = await rawResponse.json();
 
-      var pseudo = response.userFromBack.pseudo;
-      setPseudo(pseudo);
-
-      var email = response.userFromBack.email;
-      setEmail(email);
-
-      var localisation = response.userFromBack.localisation.label;
-      setLocalisation(localisation);
-
-      // var password = response.userFromBack.password;
-      // setPassword(password);
-
-      var gender = response.userFromBack.gender;
-      setGender(gender)
-      if (gender == null) {
-        setIsSelected(0);
-      } 
-      if (gender == "other") {
-        setIsSelected(0);
+      if(response.result === true) {
+        props.navigation.navigate("Registration");
       }
-      if (gender == "male") {
-        setIsSelected(1);
-      }
-      if (gender == "female") {
-        setIsSelected(2);
-      }
-
-      var problemDescription = response.userFromBack.problem_description;
-      setProblemDescription(problemDescription);
-
-      var problemBack = response.userFromBack.problems_types;
-      setProblemType(problemBack);
-    }
-  }, []);
+    };
+    deactivateUser();
+  }
 
   var updateGender = (index) => {
     if (index === 0) {
       setGender("other");
+      setSaveButton(true);
     } else if (index === 1) {
       setGender("male");
+      setSaveButton(true);
     } else if (index === 2) {
       setGender("female");
+      setSaveButton(true);
     }
   };
 
@@ -272,6 +312,14 @@ export default function ProfilScreen(props) {
       </TouchableOpacity>
     );
   });
+
+  var problemsBadge = [
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problems.includes('Amoureux') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Amoureux</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problems.includes('Familial') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Familial</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={ problems.includes('Physique') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Physique</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={ problems.includes('Professionnel') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Professionnel</Text></TouchableOpacity>,
+    <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={ problems.includes('Scolaire') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Scolaire</Text></TouchableOpacity>
+  ]
 
   if (!fontsLoaded) {
     return <AppLoading />;
@@ -443,14 +491,10 @@ export default function ProfilScreen(props) {
           <Text style={styles.title}>Type de problème(s): </Text>
         </View>
 
-        <View style={styles.problemBadge}>
-          {problemType.map((arg, index) => {
-            return (
-              <View style={styles.badge} index={index}>
-                <Text style={styles.fontBadge}>{arg}</Text>
-              </View>
-            );
-          })}
+        <View>
+          <View style={styles.badgeContainer}>
+            {problemsBadge}
+          </View>
         </View>
 
         <View style={styles.viewSaveDisconnect}>
@@ -478,16 +522,6 @@ export default function ProfilScreen(props) {
         </View>
 
         <View style={styles.viewSaveDisconnect}>
-          <Button
-            title="Désactiver mon compte"
-            type="solid"
-            buttonStyle={styles.buttonEnd}
-            titleStyle={{
-              fontFamily: "Montserrat_700Bold",
-            }}
-            onPress={() => handleDeactivate()}
-          />
-
           <Button
             title="Supprimer mon compte"
             type="solid"
@@ -607,25 +641,6 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat_800ExtraBold",
     fontSize: 10,
   },
-  problemBadge: {
-    width: "90%",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    flexWrap: "wrap",
-  },
-  badge: {
-    backgroundColor: "#5571D7",
-    margin: 2,
-    fontSize: 10,
-    borderRadius: 30,
-  },
-  fontBadge: {
-    color: "white",
-    marginHorizontal: 15,
-    marginVertical: 5,
-    fontFamily: "Montserrat_700Bold",
-  },
   sizeImg: {
     width: 50,
     height: 50,
@@ -678,5 +693,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "80%",
     borderColor: "#2d3436",
+  },
+  badge: {
+    backgroundColor: '#BCC8F0',
+    margin: 2,
+    fontSize: 10,
+    borderRadius: 30,
+    marginVertical: 5,
+    marginHorizontal: 3,
+  },
+  badgeBis: {
+    backgroundColor: '#5571D7',
+    margin: 2,
+    fontSize: 10,
+    borderRadius: 30,
+    marginVertical: 5,
+  },
+  fontBadge: {
+    color: 'white',
+    marginHorizontal: 15,
+    marginVertical: 5,
+    fontFamily: "Montserrat_700Bold",
+    fontSize: 16,
+  },
+  badgeContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    width: '100%'
   },
 });
