@@ -54,11 +54,7 @@ export default function ProfilScreen(props) {
   //{pseudo, mail, ville , mdp , gender, pblDescription, prblType}
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
-  const [localisation, setLocalisation] = useState({
-    label:'',
-    postcode:'',
-    coordinates:{},
-  });
+  const [localisation, setLocalisation] = useState({});
   const [password, setPassword] = useState("");
   const [genderFromToken, setGenderFromToken] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
@@ -452,24 +448,28 @@ export default function ProfilScreen(props) {
             </Text>
           </View>
 
-          {/* <Overlay
+          <Overlay
             isVisible={visible}
             onBackdropPress={toggleOverlayDescription}
             backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
             overlayStyle={styles.overlay}
           >
+            <>
             <Text style={styles.title}>En quelques mots:</Text>
             <TextInput
               onChangeText={(value) => {
                 setProblemDescription(value);
               }}
+              multiline={true}
               value={problemDescription}
               style={{
                 backgroundColor: "white",
-                borderRadius: 25,
+                borderRadius: 15,
                 width: "100%",
                 paddingVertical: 40,
+                paddingHorizontal: 10,
                 marginVertical: 15,
+                height: 150,
               }}
             ></TextInput>
             <Button
@@ -481,7 +481,8 @@ export default function ProfilScreen(props) {
               }}
               onPress={() => handleSaveDescription()}
             />
-          </Overlay> */}
+            </>
+          </Overlay>
         </KeyboardAvoidingView>
 
         <View style={styles.viewTitleOrange}>
