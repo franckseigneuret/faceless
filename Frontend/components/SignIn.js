@@ -29,7 +29,7 @@ function SignIn(props) {
   const [listErrorsSignIn, setErrorsSignIn] = useState([]);
 
   var handleSubmitSignIn = async () => {
-    console.log("Before Fetch");
+
     console.log(signInEmail, "on click signInEmail");
     console.log(signInPassword, "on click signInPassword");
 
@@ -72,7 +72,7 @@ function SignIn(props) {
           problemsTypes: data.user.problems_types,
           gender: ["other", "male", "female"],
           age: {
-            minAge: 13, //Math.floor(new Date(new Date() - data.user.birthDate))
+            minAge: 13, 
             maxAge: 17,
           },
           localisation: "France",
