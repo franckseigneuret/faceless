@@ -14,8 +14,9 @@ const windowHeight = Dimensions.get('window').height
 
 export default function Geolocalisation(props) {
 
+  const lieu = props.lieu ? props.lieu : ''
   const [townList, setTownList] = useState([])
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(lieu)
   const [selectedTown, setSelectedTown] = useState(null)
 
   const onChangeText = async (search) => {
@@ -49,18 +50,17 @@ export default function Geolocalisation(props) {
   const TownListComponent = townList.map((item, i, arr) => {
     // console.log('i', townList)
     const styleItem = [styles.town]
-    selectedTown === item ? styleItem.push(styles.townSelected) : ''
+    selectedTown === item.postcode ? styleItem.push(styles.townSelected) : ''
     arr.length - 1 === i ? styleItem.push(styles.lastItem) : ''
     return (
-      <View style={styleItem}>
+      <View style={styleItem} key={i}>
         <Text
-          key={i}
           onPress={() => {
-            setSelectedTown(item.label)
+            setSelectedTown(item.postcode)
             setSearch(item.label)
             setTimeout(() => {
               setTownList([])
-            }, 1000);
+            }, 500);
             props.getValueParent(item);
             // addTownStore(item)
           }}
@@ -110,9 +110,9 @@ const styles = StyleSheet.create({
   town: {
     paddingVertical: 5,
     paddingHorizontal: 15,
-    backgroundColor: '#FFCC99',
     borderColor: 'gray',
     borderBottomWidth: 1,
+    backgroundColor: '#FFCC99',
   },
   lastItem: {
     borderBottomWidth: 0,

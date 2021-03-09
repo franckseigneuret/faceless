@@ -10,12 +10,20 @@ import {
   Platform,
   ScrollView,
   Dimensions,
+  Modal,
+  Pressable,
+  Alert,
 } from "react-native";
+
 import { Button, Overlay } from "react-native-elements";
 import AppLoading from "expo-app-loading";
-import HTTP_IP_DEV from '../mon_ip'
+import HTTP_IP_DEV from "../mon_ip";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import Geolocalisation from "../components/Geolocalisation";
+
+import BlueButton from "../components/BlueButton";
 
 import { Ionicons } from "@expo/vector-icons";
 
@@ -45,29 +53,31 @@ export default function ProfilScreen(props) {
     setVisible(!visible);
   };
 
+  const [visibleAvatar, setVisibleAvatar] = useState(false);
+
   // State user from token
 
   const [tokenAsync, setTokenAsync] = useState("");
 
   //{pseudo, mail, ville , mdp , gender, pblDescription, prblType}
+  const [avatar, setAvatar] = useState("");
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
-  const [localisation, setLocalisation] = useState("");
+  const [localisation, setLocalisation] = useState({});
   const [password, setPassword] = useState("");
   const [genderFromToken, setGenderFromToken] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
 
-    // Tableau type de probs
-    const [problems, setProblems] = useState(['Amoureux'])
+  // Tableau type de probs
+  const [problems, setProblems] = useState(["Amoureux"]);
 
   // State pour les modifs de profils
   const [emailVisible, setEmailVisible] = useState(false);
   const [cityVisible, setCityVisible] = useState(false);
   const [mdpVisible, setMdpVisible] = useState(false);
 
-  // A FAIRE POUR QUE LE USER NE VOIT PAS SES MODIF AVANT D ENREGISTRER 
-  const [descriptionVisible, setDescriptionVisible] = useState(false)
-  
+  // A FAIRE POUR QUE LE USER NE VOIT PAS SES MODIF AVANT D ENREGISTRER
+  const [descriptionVisible, setDescriptionVisible] = useState(false);
 
   // Changement de la couleur button enregistrer bottom
   const [saveButton, setSaveButton] = useState(false);
@@ -76,8 +86,10 @@ export default function ProfilScreen(props) {
   const [gender, setGender] = useState("");
   const [isSelected, setIsSelected] = useState(-1);
 
-  useEffect(() => {
+  // state modal
+  const [modalVisible, setModalVisible] = useState(false);
 
+  useEffect(() => {
     console.log("app load");
 
     AsyncStorage.getItem("token", function (error, data) {
@@ -97,7 +109,10 @@ export default function ProfilScreen(props) {
       });
       var response = await rawResponse.json();
 
-      console.log(response, 'RESPONSE DU LOAD DATA')
+      console.log(response, "RESPONSE DU LOAD DATA");
+
+      var avatar = response.userFromBack.avatar;
+      setAvatar(avatar);
 
       var pseudo = response.userFromBack.pseudo;
       setPseudo(pseudo);
@@ -105,14 +120,17 @@ export default function ProfilScreen(props) {
       var email = response.userFromBack.email;
       setEmail(email);
 
-      var localisation = response.userFromBack.localisation.label;
-      setLocalisation(localisation);
+      var localisation = response.userFromBack.localisation;
+      if (response.userFromBack.localisation) {
+
+        setLocalisation(localisation);
+      }
 
       var gender = response.userFromBack.gender;
-      setGender(gender)
+      setGender(gender);
       if (gender == null) {
         setIsSelected(0);
-      } 
+      }
       if (gender == "other") {
         setIsSelected(0);
       }
@@ -127,10 +145,16 @@ export default function ProfilScreen(props) {
       setProblemDescription(problemDescription);
 
       var problems_types = response.userFromBack.problems_types;
-      setProblems(problems_types)
-
+      setProblems(problems_types);
     }
   }, []);
+
+  const handleAvatar = () => {
+    console.log("ici");
+    setVisibleAvatar(!visibleAvatar);
+  };
+
+  const handleClickOnAvatar = () => { };
 
   const handlePressEmail = () => {
     setEmailVisible(!emailVisible);
@@ -153,34 +177,38 @@ export default function ProfilScreen(props) {
   };
 
   const handleSelectProblems = (element) => {
-    var problemsCopy = [...problems]
-    if(problemsCopy.includes(element) == false) {
+    var problemsCopy = [...problems];
+    if (problemsCopy.includes(element) == false) {
       problemsCopy.push(element);
       setProblems(problemsCopy);
     } else {
-      problemsCopy = problemsCopy.filter(e => e != element);
+      problemsCopy = problemsCopy.filter((e) => e != element);
       setProblems(problemsCopy);
     }
-  }
+  };
 
   const handleSaveChange = () => {
 
     var problemsTypeStringify = JSON.stringify(problems)
-    console.log(problemsTypeStringify, "<--- problemsTypeStringify changé")
+    // console.log(problemsTypeStringify, "<--- problemsTypeStringify changé")
 
     async function updateUser() {
-      
-      console.log(localisation, "<--- localisation changé localisation on ASYNC handleSaveChange");
-      console.log(problems, "<--- problems changé problems on ASYNC handleSaveChange")
+
+      // console.log(localisation, "<--- localisation changé localisation on ASYNC handleSaveChange");
+      // console.log(problems, "<--- problems changé problems on ASYNC handleSaveChange")
 
       var rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `tokenFront=${tokenAsync}&emailFront=${email}&localisationFront=${localisation}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}&problemsTypeFront=${problemsTypeStringify}`,
+        body: `tokenFront=${tokenAsync}&avatarFront=${avatar}&emailFront=${email}&localisationFront=${JSON.stringify(localisation)}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}&problemsTypeFront=${problemsTypeStringify}`,
       });
       var response = await rawResponse.json();
 
-      console.log(response, "-------- RESPONSE --------");
+      // console.log(response, "-------- RESPONSE --------");
+
+      if (response.userSaved.avatar) {
+        setAvatar(response.userSaved.avatar);
+      }
 
       if (response.userSaved.email) {
         setEmail(response.userSaved.email);
@@ -205,7 +233,7 @@ export default function ProfilScreen(props) {
       }
 
       if (response.userSaved.problems_types) {
-        setProblems(response.userSaved.problems_types)
+        setProblems(response.userSaved.problems_types);
       }
     }
     updateUser();
@@ -218,9 +246,8 @@ export default function ProfilScreen(props) {
     props.navigation.navigate("Registration");
     console.log(tokenAsync, "<---- token supprime");
   };
-  
-  const handleDeactivate = () => {
 
+  const handleDeactivate = () => {
     async function deactivateUser() {
       var rawResponse = await fetch(`${HTTP_IP_DEV}/delete-my-profil`, {
         method: "POST",
@@ -229,12 +256,12 @@ export default function ProfilScreen(props) {
       });
       var response = await rawResponse.json();
 
-      if(response.result === true) {
+      if (response.result === true) {
         props.navigation.navigate("Registration");
       }
-    };
+    }
     deactivateUser();
-  }
+  };
 
   var updateGender = (index) => {
     if (index === 0) {
@@ -248,6 +275,41 @@ export default function ProfilScreen(props) {
       setSaveButton(true);
     }
   };
+
+  var imgAvatarSrc = [
+    "https://i.imgur.com/HgBDc9B.png",
+    "https://i.imgur.com/NBYvxKX.png",
+    "https://i.imgur.com/urOQgGD.png",
+    "https://i.imgur.com/clPw5Nx.png",
+    "https://i.imgur.com/Wm5vVmF.png",
+    "https://i.imgur.com/YSesoUz.png",
+    "https://i.imgur.com/mMzuMuT.png",
+    "https://i.imgur.com/EHaBuT9.png",
+    "https://i.imgur.com/21c3YgT.png",
+    "https://i.imgur.com/17T5sWH.png",
+    "https://i.imgur.com/97zBLZM.png",
+    "https://i.imgur.com/aK9HbPT.png",
+    "https://i.imgur.com/T7wBkkk.png",
+    "https://i.imgur.com/fJYbMZO.png",
+  ];
+
+  var imgAvatar = imgAvatarSrc.map((url, key) => {
+    return (
+      <TouchableOpacity
+        key={key}
+        url={url}
+        onPress={() => {
+          setAvatar(url);
+        }}
+      >
+        <Image
+          source={{ uri: url }}
+          style={{ margin: 7 }}
+          style={{ width: 100, height: 100, marginHorizontal: 5 }}
+        />
+      </TouchableOpacity>
+    );
+  });
 
   var images = [
     {
@@ -307,13 +369,6 @@ export default function ProfilScreen(props) {
     );
   });
 
-  var problemsBadge = [
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problems.includes('Amoureux') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Amoureux</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problems.includes('Familial') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Familial</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={ problems.includes('Physique') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Physique</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={ problems.includes('Professionnel') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Professionnel</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={ problems.includes('Scolaire') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Scolaire</Text></TouchableOpacity>
-  ]
 
   if (!fontsLoaded) {
     return <AppLoading />;
@@ -329,14 +384,46 @@ export default function ProfilScreen(props) {
             display: "flex",
             alignItems: "center",
             flexDirection: "column",
+            justifyContent: "center",
           }}
         >
           <Text style={styles.titleHome}>Mon Profil</Text>
 
-          <Image
-            style={{ marginTop: 15 }}
-            source={require("../assets/women_2.png")}
-          />
+          <TouchableOpacity onPress={handleAvatar}>
+            <Image
+              style={{ marginVertical: 15, width: 80, height: 80 }}
+              source={{ uri: avatar }}
+            />
+          </TouchableOpacity>
+
+          <Overlay
+            isVisible={visibleAvatar}
+            onBackdropPress={handleAvatar}
+            overlayStyle={{
+              height: "30%",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#FFF1E2",
+              textAlign: "center",
+              width: "80%",
+              borderColor: "#2d3436",
+            }}
+            backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
+          >
+            <Ionicons name="chevron-back-outline" size={40} color="#5571D7" />
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              {imgAvatar}
+            </ScrollView>
+            <Ionicons
+              name="chevron-forward-outline"
+              size={40}
+              color="#5571D7"
+            />
+          </Overlay>
 
           <Text style={styles.pseudo}>
             {pseudo}
@@ -348,6 +435,7 @@ export default function ProfilScreen(props) {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.viewContent}
         >
+          <Text style={styles.title}>Change tes infos : </Text>
           <View style={styles.containerContent}>
             {!emailVisible ? (
               <>
@@ -360,9 +448,7 @@ export default function ProfilScreen(props) {
               <>
                 <TextInput
                   style={styles.subtitleChanged}
-                  onChangeText={(value) => 
-                    setEmail(value)
-                  }
+                  onChangeText={(value) => setEmail(value)}
                   value={email}
                   placeholder="Ton email"
                 />
@@ -370,29 +456,6 @@ export default function ProfilScreen(props) {
             )}
           </View>
 
-          <View style={styles.containerContent}>
-            {!cityVisible ? (
-              <>
-                <Text style={styles.subtitle}>
-                  {/* {localisation.label} */}
-                  {localisation == " " || localisation == "undefined" ? "France" : localisation}
-                </Text>
-                <TouchableOpacity onPress={handlePressCity}>
-                  <Ionicons name="pencil" size={18} color="#5571D7" />
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <TextInput
-                  style={styles.subtitleChanged}
-                  placeholder="Tu peux changer ta ville  "
-                  onChangeText={(value) => {
-                    setLocalisation(value);
-                  }}
-                />
-              </>
-            )}
-          </View>
 
           <View style={styles.containerContent}>
             {!mdpVisible ? (
@@ -413,6 +476,13 @@ export default function ProfilScreen(props) {
                 />
               </>
             )}
+          </View>
+
+          <Text style={styles.title}>Change ta ville : </Text>
+          <View style={styles.containerContent}>
+
+            <Geolocalisation getValueParent={(value) => setLocalisation(value)} lieu={localisation.label} />
+
           </View>
 
           <Text style={styles.title}>Genre : </Text>
@@ -455,29 +525,34 @@ export default function ProfilScreen(props) {
             backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
             overlayStyle={styles.overlay}
           >
-            <Text style={styles.title}>En quelques mots:</Text>
-            <TextInput
-              onChangeText={(value) => {
-                setProblemDescription(value);
-              }}
-              value={problemDescription}
-              style={{
-                backgroundColor: "white",
-                borderRadius: 25,
-                width: "100%",
-                paddingVertical: 40,
-                marginVertical: 15,
-              }}
-            ></TextInput>
-            <Button
-              title="ok"
-              type="solid"
-              buttonStyle={styles.buttonValider}
-              titleStyle={{
-                fontFamily: "Montserrat_700Bold",
-              }}
-              onPress={() => handleSaveDescription()}
-            />
+            <>
+              <Text style={styles.title}>En quelques mots:</Text>
+              <TextInput
+                onChangeText={(value) => {
+                  setProblemDescription(value);
+                }}
+                multiline={true}
+                value={problemDescription}
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 15,
+                  width: "100%",
+                  paddingVertical: 40,
+                  paddingHorizontal: 10,
+                  marginVertical: 15,
+                  height: 150,
+                }}
+              ></TextInput>
+              <Button
+                title="ok"
+                type="solid"
+                buttonStyle={styles.buttonValider}
+                titleStyle={{
+                  fontFamily: "Montserrat_700Bold",
+                }}
+                onPress={() => handleSaveDescription()}
+              />
+            </>
           </Overlay>
         </KeyboardAvoidingView>
 
@@ -487,7 +562,21 @@ export default function ProfilScreen(props) {
 
         <View>
           <View style={styles.badgeContainer}>
-            {problemsBadge}
+            <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problems.includes('Amoureux') ? styles.badgeBis : styles.badge}>
+              <Text style={styles.fontBadge}>Amoureux</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problems.includes('Familial') ? styles.badgeBis : styles.badge}>
+              <Text style={styles.fontBadge}>Familial</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={problems.includes('Physique') ? styles.badgeBis : styles.badge}>
+              <Text style={styles.fontBadge}>Physique</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={problems.includes('Professionnel') ? styles.badgeBis : styles.badge}>
+              <Text style={styles.fontBadge}>Professionnel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={problems.includes('Scolaire') ? styles.badgeBis : styles.badge}>
+              <Text style={styles.fontBadge}>Scolaire</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -532,15 +621,12 @@ export default function ProfilScreen(props) {
 }
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: "#FFF1E2",
     alignItems: "center",
-    height: windowHeight,
     flexDirection: "column",
+    justifyContent: "center",
   },
   containerContent: {
     display: "flex",
@@ -682,14 +768,14 @@ const styles = StyleSheet.create({
     marginBottom: 36,
   },
   overlay: {
-    backgroundColor: "#FDEDDC",
+    backgroundColor: "#FFF1E2",
     textAlign: "center",
     alignItems: "center",
     width: "80%",
     borderColor: "#2d3436",
   },
   badge: {
-    backgroundColor: '#BCC8F0',
+    backgroundColor: "#BCC8F0",
     margin: 2,
     fontSize: 10,
     borderRadius: 30,
@@ -697,24 +783,24 @@ const styles = StyleSheet.create({
     marginHorizontal: 3,
   },
   badgeBis: {
-    backgroundColor: '#5571D7',
+    backgroundColor: "#5571D7",
     margin: 2,
     fontSize: 10,
     borderRadius: 30,
     marginVertical: 5,
   },
   fontBadge: {
-    color: 'white',
+    color: "white",
     marginHorizontal: 15,
     marginVertical: 5,
     fontFamily: "Montserrat_700Bold",
     fontSize: 16,
   },
   badgeContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    width: '100%'
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    width: "100%",
   },
 });
