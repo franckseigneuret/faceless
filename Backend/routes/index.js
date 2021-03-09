@@ -363,8 +363,9 @@ router.get('/show-msg', async function (req, res, next) {
       friendsDatas: myFriend,
     })
 
-    // tri du tableau pour mettre les blocs avec des messages non lus en haut
-    conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1)
+    // tri du tableau 
+    conversations.sort((a, b) => a.lastMessage.date > b.lastMessage.date ? -1 : 1) // par date dernier message
+    conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1) // messages non lus en 1er
   }))
 
 
@@ -409,14 +410,6 @@ router.get('/show-convers', async function (req, res, next) {
   res.json({ allMessagesWithOneUser, pseudo, avatar })
 });
 
-/* first-message -> création de la convers en base.
-body : idReceiverFront: 1234, tokenSenderFront: 1234, avatarReceiverFront : 'exemple.jpg', pseudoReceiverFront: 'gigatank3000', 
-response : new_conversation_data
-*/
-router.post('/first-msg', function (req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
 /* send-msg -> envoyer un message.
 body : conversationIdFront : 1234, fromIdFront: 12453, toIdFront: 11234, contentFront: 'il est né le divin enfant'
 response : newMessageData
@@ -438,21 +431,26 @@ router.post('/send-msg', async function (req, res, next) {
 
   var newMsg = await msg.save()
 
-  var allMsg = await MessagesModel.find(
-    { conversation_id: searchConvWithUser._id }
-  )
-
-  for (var i = 0; i < allMsg.length; i++) {
-    if (allMsg[i].to_id == req.body.myId) {
-      // condition fonctionnelle mais à améliorer
-      var updateStatusConv = await ConversationsModel.updateOne(
-        { _id: searchConvWithUser._id },
-        { demand: false }
-      );
+  let demandEnd = false
+  
+  if(searchConvWithUser.demand) {
+    var allMsg = await MessagesModel.find(
+      { conversation_id: searchConvWithUser._id }
+    )
+  
+    for (var i = 0; i < allMsg.length; i++) {
+      if (allMsg[i].to_id == req.body.myId) {
+        // condition fonctionnelle mais à améliorer
+        var updateStatusConv = await ConversationsModel.updateOne(
+          { _id: searchConvWithUser._id },
+          { demand: false }
+        );
+        demandEnd = true
+      }
     }
   }
 
-  res.json({ result: true });
+  res.json({ result: true, demandEnd });
 });
 
 router.post('/create-conv', async function (req, res, next) {
