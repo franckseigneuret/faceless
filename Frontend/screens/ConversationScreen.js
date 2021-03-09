@@ -6,6 +6,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import Swipeable from 'react-native-gesture-handler/Swipeable';
+// import { GestureHandler } from 'expo';
+import * as GestureHandler from 'react-native-gesture-handler'
+const { Swipeable } = GestureHandler
+
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -20,7 +26,9 @@ function ConversationScreen(props) {
     const [myContactId, setMyContactId] = useState("")
     const [pseudo, setPseudo] = useState("")
     const [avatar, setAvatar] = useState("https://i.imgur.com/P3rBF8E.png")
+    const [showDate, setShowDate] = useState(false)
     const [disableSendBtn, setDisableSendBtn] = useState(true)
+
     const scrollViewRef = useRef();
 
     // console.log("props.route.params.convId", props.route.params.convId)
@@ -36,7 +44,7 @@ function ConversationScreen(props) {
     }
 
     var infoUser= props.route.params
-    console.log(infoUser,'<------ INFO À RENVOYER')
+    // console.log(infoUser,'<------ INFO À RENVOYER')
 
     useEffect(() => {
         AsyncStorage.getItem("token", function (error, tokenValue) {
@@ -73,23 +81,49 @@ function ConversationScreen(props) {
         }
     }
 
+
+    const rightActions = (a) => {
+        return (
+            <View>
+                <Text style={styles.dateRight} >{a}</Text>
+            </View>
+        )
+    }
+
+    let dateToShow = null
+
     var tabMsg = data.map((item, i) => {
         let when = new Date(item.date)
-        let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'short', day: 'numeric' })
-            + ' à ' + when.toLocaleTimeString('fr-FR')
+        let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'numeric', day: 'numeric' })
+            + ' à ' + when.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        let hours = when.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        let date = when.toLocaleDateString('fr-FR', { weekday: 'long', month: 'short', day: 'numeric' })
+        console.log("item", item)
         if (item.to_id === myContactId) {
-            return <View style={styles.blocRight} key={i}>
-                <View style={styles.msgRight}>
-                    <Text style={styles.date} >{whenFormat}</Text>
-                    <Text style={styles.textRight} >{item.content}</Text>
-                </View>
+            return  <View>
+                {dateToShow != null ? <Text style={styles.dateRight}>{date}</Text> : null}
+            <Swipeable 
+            renderRightActions={() => rightActions(hours)}
+            >
+            <View style={styles.blocRight} key={i}>
+                        {showDate ?  <Text style={styles.dateRight} show={showDate} >{whenFormat}</Text> : null}
+                        <View style={styles.msgRight}>
+                        <Text style={styles.textRight} >{item.content}</Text>
+                    </View>
             </View>
+            </Swipeable>
+            </View>
+
         } else {
-            return <View style={styles.blocLeft} key={i}>
+            return <View>
+                {dateToShow != null ? <Text style={styles.dateLeft}>{date}</Text> : null}
+
+            <View style={styles.blocLeft} key={i}>
+                {showDate ?  <Text style={styles.dateLeft} show={showDate} >{whenFormat}</Text> : null}
                 <View style={styles.msgLeft}>
-                    <Text style={styles.date} >{whenFormat}</Text>
                     <Text style={styles.textLeft} >{item.content}</Text>
                 </View>
+            </View>
             </View>
         }
     })
@@ -251,8 +285,18 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         transform: [{ rotate: '-45deg' }]
     },
-    date: {
-        color: 'red',
-        textAlign: 'right'
+    dateRight: {
+        color: '#767676',
+        textAlign: 'right',
+        fontSize: 12,
+        marginBottom: 5,
+        marginRight: 3
+    },
+    dateLeft: {
+        color: '#767676',
+        textAlign: 'left',
+        fontSize: 12,
+        marginBottom: 5 ,
+        marginLeft: 3
     }
 })

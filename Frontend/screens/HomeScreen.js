@@ -106,6 +106,7 @@ function HomeScreen(props) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `convId=${convId}`
     });
+    setCurrentMsg("")
   }
 
   let [fontsLoaded] = useFonts({
