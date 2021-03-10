@@ -131,6 +131,7 @@ var imageGender = ''
 var badge = []
 for (let i=0; i<props.route.params.problems_types.length; i++){
   badge.push(<Button
+    key={i}
     buttonStyle={styles.badge}
     titleStyle={styles.fontBadge}
     title={props.route.params.problems_types[i]}
@@ -202,15 +203,17 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
               </Overlay>
 
               <Overlay isVisible={overlayBlockedConfirmation} onBackdropPress={handleConfirmationVisible} overlayStyle={styles.overlayBlockUser}>
+                <>
                 <View style={styles.containerBlockConfirmation}>
                   <Ionicons name="checkmark-done" size={34} color="#9DD893" />
                   <Text style={styles.textBlockedConfirmation}>{messageBlocked}</Text>  
                 </View>
+                </>
               </Overlay>
 
 
             <Overlay isVisible={visible} onBackdropPress={toggleOverlay} overlayStyle={styles.overlay}>
-
+              <>
           { signalerVisible == false && alerterVisible == false ?
             <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', marginVertical: 20}}>
               <Text style={styles.textNeedHelp}>Cette personne a besoin d'aide:</Text>
@@ -323,7 +326,7 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
         
               </View> 
  : null}
-
+              </>
             </Overlay>
         </View>
     )

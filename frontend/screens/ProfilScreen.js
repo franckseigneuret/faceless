@@ -420,6 +420,7 @@ export default function ProfilScreen(props) {
                 }}
                 backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
               >
+                <>
                 <Ionicons
                   name="chevron-back-outline"
                   size={40}
@@ -436,6 +437,7 @@ export default function ProfilScreen(props) {
                   size={40}
                   color="#5571D7"
                 />
+                </>
               </Overlay>
             </View>
 
