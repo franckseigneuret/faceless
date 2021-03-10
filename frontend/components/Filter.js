@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, Dimensions, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Button } from 'react-native-elements';
 import { Ionicons } from '@expo/vector-icons';
-import { useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold } from "@expo-google-fonts/montserrat";
+import { useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
 import AppLoading from 'expo-app-loading';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -50,7 +50,7 @@ function Filter(props) {
     Montserrat_700Bold,
     Montserrat_900Black,
     Montserrat_800ExtraBold,
-
+    Montserrat_600SemiBold
   });
 
   const handleClickBack = () => {
@@ -119,12 +119,12 @@ function Filter(props) {
       <View style={styles.container}>
         <View style={styles.topContainer}>
           <TouchableOpacity style={styles.buttonPrevious} onPress={() => handleClickBack()} >
-            <Ionicons name="chevron-back" size={25} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
+            <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center',}} />
           </TouchableOpacity>
           <Text style={styles.textTitle}>Mes filtres</Text>
         </View>
         <View style={styles.problemsSelect}>
-          <Text style={styles.titleProblems}>J'aimerais parler de problèmes...</Text>
+          <Text style={styles.titleProblems}>J'aimerais parler de soucis...</Text>
           <View style={styles.badgeContainer}>
             {problemsBadge}
           </View>
@@ -150,9 +150,10 @@ function Filter(props) {
             max={100}
             values={[ageMin, ageMax]}
             enabledTwo
+            onValuesChange={value => { setAgeMin(value[0]); setAgeMax(value[1]) }}
             onValuesChangeFinish={value => { setAgeMin(value[0]); setAgeMax(value[1]) }}
           />
-          <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={styles.titleProblems}>Distance :</Text>
             <Text style={styles.textDynamic}>{localisation == 'France' || localisation > 90 ? franceLocalisation : `${localisation} km`}</Text>
           </View>
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     borderRadius: 30,
     marginVertical: 5,
-    marginHorizontal: 3,
+    marginHorizontal: 5,
   },
   badgeBis: {
     backgroundColor: '#5571D7',
@@ -244,6 +245,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     borderRadius: 30,
     marginVertical: 5,
+    marginHorizontal: 5,
   },
   fontBadge: {
     color: 'white',
@@ -257,11 +259,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
-    width: '85%'
+    width: '85%',
+    marginBottom: 10,
   },
   titleProblems: {
-    fontFamily: 'Montserrat_800ExtraBold',
-    fontSize: 22,
+    fontFamily: 'Montserrat_600SemiBold',
+    fontSize: 20,
+    marginBottom: 10,
     color: '#5571D7'
   },
   bottomContainer: {
@@ -272,14 +276,15 @@ const styles = StyleSheet.create({
   genderContainer: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginBottom: 10,
   },
   buttonSave: {
     backgroundColor: '#5571D7',
     borderRadius: 86,
     width: 159,
-    marginTop: 50,
-    marginLeft: 60
+    marginLeft: 60,
+    marginBottom: 20,
   },
   markerStyle: {
     backgroundColor: '#EC9A1F',

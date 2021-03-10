@@ -33,7 +33,7 @@ function QuizzProbleme(props) {
 
     return(
         <View style={styles.container}>
-            <QuizzTitre title="Tu veux décrire ton problème ?" placeholder="..." getInputValueParent={getInputValue} type="inline"/>
+            <QuizzTitre title="Tu veux décrire ton soucis ?" placeholder="..." getInputValueParent={getInputValue} type="inline"/>
             <BlueButton btnTitle="enregistrer" handleClickParent={handleClick}/>
         </View>
     );

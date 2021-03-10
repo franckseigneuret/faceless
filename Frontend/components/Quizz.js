@@ -304,7 +304,7 @@ function quizz(props) {
               previousBtnStyle={styles.buttonPrevious}
               onSubmit={handleSubmit}>
               <View style={styles.stepContainer}>
-                <Text style={styles.textQuizz}>Sélectionne ton ou tes problème(s)</Text>
+                <Text style={styles.textQuizz}>Sélectionne ton ou tes soucis</Text>
                 {allProblems}
               </View>
             </ProgressStep>

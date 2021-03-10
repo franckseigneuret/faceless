@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Dimensions, Image, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons'; 
 import {useFonts, Montserrat_400Regular, Montserrat_500Medium, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold} from "@expo-google-fonts/montserrat";
 import { Button, Input, Overlay } from 'react-native-elements'
 import moment from "moment";
@@ -154,10 +155,10 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
         <View style={styles.profilContainer}>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.buttonPrevious} onPress={() => handleClickBack()} >
-                        <Ionicons name="chevron-back" size={25} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
+                        <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center',}} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttonWarning} onPress={() => handleWarning()} >
-                        <Text style={styles.textInfo}>!</Text>
+                    <Ionicons name="md-alert-sharp" size={28} color="#5571D7"/>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.topProfil}>
@@ -177,24 +178,24 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
                 </View>
             </View>
             <View style={styles.problemBadge}>
-                <Text style={styles.subtitleDesc}>Type(s) de problème(s)</Text>
+                <Text style={styles.subtitleDesc}>Type(s) de soucis</Text>
                 <View style={styles.badgeList}>
                 {badge}
                 </View>
             </View>
               <TouchableOpacity style={styles.buttonBlockUser} onPress={() => handleBlockUser()}>
-                <Entypo name="block" size={24} color="#FF7C7C" />
+              <FontAwesome name="ban" size={24} color="#FF7C7C" />
                 <Text style={styles.textBlockUser}>Bloquer</Text>
               </TouchableOpacity>
               <Overlay isVisible={blockUserVisible} onBackdropPress={handleBlockUser} overlayStyle={styles.overlayBlockUser}>
                 <>
-                <Text style={styles.textBlockOverlay}>Es-tu sûr de vouloir bloquer cet utilisateur ?</Text>  
-                <View style={{display: 'flex', flexDirection:'row', justifyContent: 'space-around', width: '80%'}}>
-                  <TouchableOpacity style={styles.buttonBlockConfirmation}>
-                    <Text style={styles.textBlockConfirmation} onPress={() => handleBlockConfirmation()}>Oui</Text>
+                <Text style={styles.textBlockOverlay}>Es-tu sûr(e) de vouloir bloquer cet(te) utilisateur(trice) ?</Text>  
+                <View style={{display: 'flex', flexDirection:'row', justifyContent: 'space-around', width: '65%'}}>
+                  <TouchableOpacity style={styles.buttonBlockConfirmation} onPress={() => handleBlockConfirmation()}>
+                  <Ionicons name="checkmark-sharp" size={28} color="#5571D7" />
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.buttonBlockCancel}>
-                    <Text style={styles.textBlockCancel} onPress={() => handleBlockUser()}>Non</Text>
+                  <TouchableOpacity style={styles.buttonBlockCancel} onPress={() => handleBlockUser()}>
+                  <Ionicons name="close-sharp" size={28} color="#FF7C7C" />
                   </TouchableOpacity>
                 </View>
                 </>
@@ -243,26 +244,26 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity 
-                style={signalementReason.includes('Cet utilisateur a des propos inquiétants.') ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
-                onPress={() => handleSelectReason('Cet utilisateur a des propos inquiétants.')}>
+                style={signalementReason.includes('Cette personne a des propos inquiétants.') ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
+                onPress={() => handleSelectReason('Cette personne a des propos inquiétants.')}>
                   <Text 
-                  style={signalementReason.includes('Cet utilisateur a des propos inquiétants.') ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
-                  Cet utilisateur a des propos inquiétants.
+                  style={signalementReason.includes('Cette personne a des propos inquiétants.') ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
+                  Cette personne a des propos inquiétants.
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                style={signalementReason.includes('Cet utilisateur a un comportement dangereux.') ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
-                onPress={() => handleSelectReason('Cet utilisateur a un comportement dangereux.')}>
+                style={signalementReason.includes('Cette personne a un comportement dangereux.') ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
+                onPress={() => handleSelectReason('Cette personne a un comportement dangereux.')}>
                   <Text 
-                  style={signalementReason.includes('Cet utilisateur a un comportement dangereux.') ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
-                    Cet utilisateur a un comportement dangereux.
+                  style={signalementReason.includes('Cette personne a un comportement dangereux.') ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
+                    Cette personne a un comportement dangereux.
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                style={signalementReason.includes("Cet utilisateur a besoin de l'aide d'un professionnel.") ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
-                onPress={() => handleSelectReason("Cet utilisateur a besoin de l'aide d'un professionnel.") }>
-                  <Text style={signalementReason.includes("Cet utilisateur a besoin de l'aide d'un professionnel.") ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
-                    Cet utilisateur a besoin de l'aide d'un professionnel.
+                style={signalementReason.includes("Cette personne a besoin de l'aide d'un professionnel.") ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
+                onPress={() => handleSelectReason("Cette personne a besoin de l'aide d'un professionnel.") }>
+                  <Text style={signalementReason.includes("Cette personne a besoin de l'aide d'un professionnel.") ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
+                    Cette personne a besoin de l'aide d'un professionnel.
                   </Text>  
                 </TouchableOpacity>
                 <Input 
@@ -284,26 +285,26 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
             { signalerVisible ?
             <View style={styles.containerReasons}>
                 <TouchableOpacity 
-                style={signalementReason.includes('Cet utilisateur a des propos déplacés') ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
-                onPress={() => handleSelectReason('Cet utilisateur a des propos déplacés')}>
+                style={signalementReason.includes('Cette personne a des propos déplacés') ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
+                onPress={() => handleSelectReason('Cette personne a des propos déplacés')}>
                   <Text 
-                  style={signalementReason.includes('Cet utilisateur a des propos déplacés') ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
-                  Cet utilisateur a des propos déplacés.
+                  style={signalementReason.includes('Cette personne a des propos déplacés') ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
+                  Cette personne a des propos déplacés.
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                style={signalementReason.includes('Cet utilisateur a un comportement aggressif.') ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
-                onPress={() => handleSelectReason('Cet utilisateur a un comportement aggressif.')}>
+                style={signalementReason.includes('Cette personne a un comportement aggressif.') ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
+                onPress={() => handleSelectReason('Cette personne a un comportement aggressif.')}>
                   <Text 
-                  style={signalementReason.includes('Cet utilisateur a un comportement aggressif.') ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
-                    Cet utilisateur a un comportement aggressif.
+                  style={signalementReason.includes('Cette personne a un comportement aggressif.') ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
+                    Cette personne a un comportement aggressif.
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                style={signalementReason.includes("Cet utilisateur n'a pas sa place sur cette application.") ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
-                onPress={() => handleSelectReason("Cet utilisateur n'a pas sa place sur cette application.") }>
-                  <Text style={signalementReason.includes("Cet utilisateur n'a pas sa place sur cette application.") ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
-                    Cet utilisateur n'a pas sa place sur cette application.
+                style={signalementReason.includes("Cette personne n'a pas sa place sur cette application.") ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
+                onPress={() => handleSelectReason("Cette personne n'a pas sa place sur cette application.") }>
+                  <Text style={signalementReason.includes("Cette personne n'a pas sa place sur cette application.") ? styles.textReasonsSignalementBis : styles.textReasonsSignalement}>
+                    Cette personne n'a pas sa place sur cette application.
                   </Text>  
                 </TouchableOpacity>
                 <Input 
@@ -354,6 +355,9 @@ const styles = StyleSheet.create({
     },  
     buttonPrevious: {
         backgroundColor: "#FFEEDD",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         padding: 10,
         width: 50,
         height: 50,
@@ -435,7 +439,7 @@ const styles = StyleSheet.create({
       textInfo: {
         fontFamily: 'Montserrat_800ExtraBold',
         fontSize: 30,
-        color: "#FF7C7C",
+        color: "#5571D7",
       },
       buttonWarning: {
         display: 'flex',
@@ -444,9 +448,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 30,
         borderColor: '#5571D7',
-        shadowColor: "#FF7C7C",
+        shadowColor: "black",
         shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.8,
+        shadowOpacity: 0.5,
         backgroundColor: "#FFEEDD",
         padding: 10,
         width: 50,
@@ -505,7 +509,7 @@ const styles = StyleSheet.create({
       },
       textNeedHelp: {
         color: "#EC9A1F",
-        fontSize:20,
+        fontSize:18,
         fontFamily: "Montserrat_700Bold",
         marginBottom: 10,
         width: '60%',
@@ -578,7 +582,7 @@ const styles = StyleSheet.create({
         color: '#FF7C7C',
       },
       overlayBlockUser: {
-        width: '70%',
+        width: '75%',
         height: 'auto',
         backgroundColor: '#FDEDDC',
         shadowColor: "#000",
@@ -598,10 +602,10 @@ const styles = StyleSheet.create({
       },
       textBlockOverlay: {
         color: "#EC9A1F",
-        fontSize:20,
+        fontSize:18,
         fontFamily: "Montserrat_700Bold",
         marginBottom: 30,
-        width: '60%',
+        width: '80%',
         textAlign: 'center'
       },
       textBlockedConfirmation: {
@@ -619,10 +623,10 @@ const styles = StyleSheet.create({
         width: 'auto',
         backgroundColor: '#FFEEDD',
         borderColor: '#5571D7',
-        shadowColor: "#FF7C7C",
+        shadowColor: "#5571D7",
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 0.8,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingVertical: 5,
         borderRadius: 19,
       },
@@ -634,19 +638,12 @@ const styles = StyleSheet.create({
         width: 'auto',
         backgroundColor: '#FFEEDD',
         borderColor: '#5571D7',
-        shadowColor: "#5571D7",
+        shadowColor: "#FF7C7C",
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 0.8,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingVertical: 5,
-
         borderRadius: 19,
-      },
-      textBlockConfirmation: {
-        fontFamily: "Montserrat_700Bold",
-        fontSize: 26,
-        color: '#FF7C7C',
-        textAlign: 'center',
       },
       containerBlockConfirmation: {
         display:'flex', 
@@ -661,10 +658,4 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 0.8,
       },
-      textBlockCancel: {
-        fontFamily: "Montserrat_700Bold",
-        fontSize: 26,
-        color: '#5571D7',
-        textAlign: 'center',
-      }
 })

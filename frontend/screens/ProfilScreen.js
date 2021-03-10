@@ -557,7 +557,7 @@ export default function ProfilScreen(props) {
         </KeyboardAvoidingView>
 
         <View style={styles.viewTitleOrange}>
-          <Text style={styles.title}>Type de problème(s): </Text>
+          <Text style={styles.title}>Type de soucis: </Text>
         </View>
 
         <View>
