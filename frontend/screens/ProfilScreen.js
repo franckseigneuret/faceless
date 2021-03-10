@@ -62,7 +62,7 @@ export default function ProfilScreen(props) {
   const [tokenAsync, setTokenAsync] = useState("");
 
   //{pseudo, mail, ville , mdp , gender, pblDescription, prblType}
-  const [avatar, setAvatar] = useState("");
+  const [avatar, setAvatar] = useState("https://i.imgur.com/atDrheA.png");
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
   const [localisation, setLocalisation] = useState({});
@@ -111,7 +111,7 @@ export default function ProfilScreen(props) {
       });
       var response = await rawResponse.json();
 
-      console.log(response, "RESPONSE DU LOAD DATA");
+      // console.log(response, "RESPONSE DU LOAD DATA");
 
       var avatar = response.userFromBack.avatar;
       setAvatar(avatar);

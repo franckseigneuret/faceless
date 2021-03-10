@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   View,
   TextInput,
   StyleSheet,
-  ScrollView,
   Dimensions,
-  YellowBox,
 } from 'react-native';
+
+import { Entypo } from '@expo/vector-icons';
+
 
 const windowWidth = Dimensions.get('window').width
 const windowHeight = Dimensions.get('window').height
 
 export default function Geolocalisation(props) {
 
-  const lieu = props.lieu ? props.lieu : ''
   const [townList, setTownList] = useState([])
-  const [search, setSearch] = useState(lieu)
+  const [search, setSearch] = useState(props.lieu)
   const [selectedTown, setSelectedTown] = useState(null)
+
+  useEffect(() => {
+    setSearch(props.lieu)
+  }, [props.lieu])
 
   const onChangeText = async (search) => {
     setSearch(search)
@@ -62,7 +66,6 @@ export default function Geolocalisation(props) {
               setTownList([])
             }, 500);
             props.getValueParent(item);
-            // addTownStore(item)
           }}
         >{item.label} ({item.postcode})</Text>
       </View>
@@ -71,18 +74,23 @@ export default function Geolocalisation(props) {
 
   return (
     <View style={styles.view}>
-      <TextInput
-        style={styles.chooseTown}
-        onChangeText={text => onChangeText(text)}
-        value={search}
-        placeholder={'Votre ville ?'}
-      />
+      <View style={styles.view2}>
+        <TextInput
+          style={styles.chooseTown}
+          onChangeText={text => onChangeText(text)}
+          value={search}
+          placeholder={'Votre ville ?'}
+        />
+        <Entypo name="cross" size={24} style={styles.delete} onPress={() => {
+          setSearch('')
+          props.getValueParent({})
+        }} />
+      </View>
       {
         TownListComponent.length > 0 && <View style={styles.townsList}>
           {TownListComponent}
         </View>
       }
-      
     </View>
   )
 }
@@ -90,14 +98,22 @@ export default function Geolocalisation(props) {
 
 const styles = StyleSheet.create({
   view: {
-    paddingLeft: windowWidth/10,
-    paddingRight: windowWidth/10,
+    paddingLeft: windowWidth / 10,
+    paddingRight: windowWidth / 10,
+  },
+  view2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  delete: {
+    color: "#5571D7",
   },
   chooseTown: {
     backgroundColor: '#FFCC99',
     paddingHorizontal: 15,
     height: 40,
-    maxWidth:150,
+    // maxWidth: 150,
+    minWidth: 150,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
@@ -106,7 +122,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 5,
-    maxWidth:150,
+    maxWidth: 150,
     overflow: 'hidden',
   },
   town: {
