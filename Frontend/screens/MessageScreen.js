@@ -1,6 +1,6 @@
 import HTTP_IP_DEV from '../mon_ip'
 import React, { useEffect, useState, useCallback } from 'react';
-import { SafeAreaView,RefreshControl, StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView, Dimensions, Vibration, TouchableHighlight, Animated} from 'react-native';
+import { SafeAreaView, RefreshControl, StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView, Dimensions, Vibration, TouchableHighlight, Animated } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SwitchSelector from "react-native-switch-selector";
@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Octicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { PanGestureHandler } from 'react-native-gesture-handler';
+import { useIsFocused } from "@react-navigation/native";
 
 
 const Tab = createBottomTabNavigator();
@@ -20,7 +21,7 @@ const windowSize = Dimensions.get('screen');
 // console.log('windowSize = ', windowSize)
 
 function MessageScreen(props) {
-
+  const isFocused = useIsFocused();
   const [token, setToken] = useState(null)
   const [myId, setMyId] = useState(null)
   const [conversations, setConversations] = useState([])
@@ -34,10 +35,10 @@ function MessageScreen(props) {
   }
 
   const loadConversations = async (params) => {
-    console.log('myId', myId)
+    // console.log('loadConversations - myId', myId)
     if (myId) { // l'id obtenue à partir du token existe bien
       let uri = `${HTTP_IP_DEV}/show-msg?user_id=${myId}`
-      if (params.demandes) {
+      if (params && params.demandes) {
         uri += `&demandes=oui`
       }
       const dialogues = await fetch(uri, { method: 'GET' })
@@ -72,7 +73,6 @@ function MessageScreen(props) {
     })
 
     loadConversations({ demandes: false })
-    // setInterval(() => loadConversations(), 5000) // ne marche pas !!
 
   }, [myId])
 
@@ -82,6 +82,18 @@ function MessageScreen(props) {
 
   }, [demandEnd])
 
+  useEffect(() => {
+    // au focus du screen, le contenu de la page se réinitialise à interval 3 secondes
+    // quand on quitte le screen, l'interval est stoppé
+    if (isFocused) {
+      const interval = setInterval(() => loadConversations({ demandes: false }), 3000)
+      return () => {
+        console.log('fin')
+        clearInterval(interval)
+      }
+    }
+
+  }, [myId, isFocused])
 
   const items = conversations.map((el, i) => {
 
@@ -119,14 +131,14 @@ const rightActions = () => {
   )
 }
 
-      return <Swipeable 
+    return <Swipeable
       renderRightActions={() => rightActions()}
       onSwipeableLeftOpen={() => console.log('opening')}
-      >
-        <TouchableHighlight
+      key={i}
+    >
+      <TouchableHighlight
         underlayColor
         activeOpacity={1}
-        key={i}
         onPress={() => {
           let noluCopy = [...unreadPerConversation]
           noluCopy[i] = 0
@@ -186,7 +198,7 @@ const rightActions = () => {
   const [showLoader, setShowLoader] = useState(styles.loader);
   const onRefresh = React.useCallback(() => {
     setShowLoader(styles.loader),
-    Vibration.vibrate(10);
+      Vibration.vibrate(10);
     let bool = part === 'demandes' ? true : false
     loadConversations({ demandes: bool })
   }, []);
@@ -219,7 +231,7 @@ const rightActions = () => {
           {
             conversations.length > 0 ?
               <View style={styles.conversations}>
-                <Image style={showLoader} source={{ uri: 'https://i.imgur.com/WtX0jT0.gif' }}/>
+                <Image style={showLoader} source={{ uri: 'https://i.imgur.com/WtX0jT0.gif' }} />
                 <View style={styles.scrollContent}>
                   <ScrollView
                     showsVerticalScrollIndicator={true} style={styles.ScrollView}
