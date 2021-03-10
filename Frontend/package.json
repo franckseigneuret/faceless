@@ -38,6 +38,7 @@
     "react-native-screens": "~2.15.2",
     "react-native-swipe-cards-deck": "^0.2.17",
     "react-native-swipe-gestures": "^1.0.5",
+    "react-native-swipeable": "^0.6.0",
     "react-native-switch-selector": "^2.0.6",
     "react-native-vector-icons": "^8.1.0",
     "react-native-web": "~0.13.12",
