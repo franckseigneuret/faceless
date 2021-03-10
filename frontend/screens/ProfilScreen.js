@@ -375,7 +375,7 @@ export default function ProfilScreen(props) {
   }
 
   return (
-    <ScrollView>
+    <ScrollView style={{backgroundColor: '#FFF1E2'}}>
       <View style={styles.container}>
         {/* UPPER SECTION  ---> Info */}
 
@@ -623,6 +623,7 @@ export default function ProfilScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: windowHeight,
     backgroundColor: "#FFF1E2",
     alignItems: "center",
     flexDirection: "column",

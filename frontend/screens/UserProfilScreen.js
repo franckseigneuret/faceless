@@ -8,6 +8,7 @@ import 'moment/locale/fr'
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HTTP_IP_DEV from '../mon_ip'
+import { Entypo } from '@expo/vector-icons'; 
 
 
 
@@ -19,17 +20,25 @@ function UserProfilScreen(props) {
   const [visible, setVisible] = useState(false);
   const [alerterVisible, setAlerterVisible] = useState(false)
   const [signalerVisible, setSignalerVisible] = useState(false)
+  const [blockUserVisible, setBlockUserVisible] = useState(false)
+  const [overlayBlockedConfirmation, setOverlayBlockedConfirmation] = useState(false)
   const [token, setToken] = useState('')
 
   const [signalementReason, setSignalementReason] = useState('')
   const [signalementReasonOther, setSignalementReasonOther] = useState('')
   const [signalementValidation, setSignalementValidation] = useState(false)
+  const [blockedResult, setBlockedResult] = useState(false)
+  const [messageBlocked, setMessageBlocked] = useState('')
 
+  const handleBlockUser = () => {
+    setBlockUserVisible(!blockUserVisible)
+  }
    
   useEffect(() => {
     AsyncStorage.getItem("token", function(error, data) {
       setToken(data)
     });  }, []);
+
 
   const toggleOverlay = () => {
     setVisible(!visible);
@@ -38,6 +47,7 @@ function UserProfilScreen(props) {
       props.navigation.goBack()
   };
      
+
   const handleSelectReason = (arg) => {
     signalementReason.includes(arg) ? setSignalementReason('') : setSignalementReason(arg)
   }
@@ -78,6 +88,33 @@ function UserProfilScreen(props) {
       body: `tokenFront=${token}&confidentIdFront=${props.route.params.userID}&reasonFront=${signalementReason}&reasonOtherFront=${signalementReasonOther}&typeFront=${'signal'}`
      });
   }
+
+  const handleBlockConfirmation = async () => {
+    // props.route.params.userID
+    var rawResponse = await fetch(`${HTTP_IP_DEV}/block-user`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      body: `tokenFront=${token}&confidentIdFront=${props.route.params.userID}`
+     });
+     var response = await rawResponse.json();
+     setBlockedResult(response.result);
+     setMessageBlocked(response.message)
+
+     if(blockedResult) {
+      setBlockUserVisible(false);
+      setOverlayBlockedConfirmation(!overlayBlockedConfirmation);
+      setTimeout(()=> props.navigation.navigate('HomeScreen') , 1000);
+     }
+  }
+
+  const handleConfirmationVisible = () => {
+    setOverlayBlockedConfirmation(!overlayBlockedConfirmation)
+  }
+
+    const handlePrevious = () => {
+      setAlerterVisible(false);
+      setSignalerVisible(false);
+    }
 
 
 var imageGender = ''
@@ -147,6 +184,30 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
                 {badge}
                 </View>
             </View>
+              <TouchableOpacity style={styles.buttonBlockUser} onPress={() => handleBlockUser()}>
+                <Entypo name="block" size={24} color="#FF7C7C" />
+                <Text style={styles.textBlockUser}>Bloquer</Text>
+              </TouchableOpacity>
+              <Overlay isVisible={blockUserVisible} onBackdropPress={handleBlockUser} overlayStyle={styles.overlayBlockUser}>
+                <Text style={styles.textBlockOverlay}>Es-tu sûr de vouloir bloquer cet utilisateur ?</Text>  
+                <View style={{display: 'flex', flexDirection:'row', justifyContent: 'space-around', width: '80%'}}>
+                  <TouchableOpacity style={styles.buttonBlockConfirmation}>
+                    <Text style={styles.textBlockConfirmation} onPress={() => handleBlockConfirmation()}>Oui</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.buttonBlockCancel}>
+                    <Text style={styles.textBlockCancel} onPress={() => handleBlockUser()}>Non</Text>
+                  </TouchableOpacity>
+                </View>
+              </Overlay>
+
+              <Overlay isVisible={overlayBlockedConfirmation} onBackdropPress={handleConfirmationVisible} overlayStyle={styles.overlayBlockUser}>
+                <View style={styles.containerBlockConfirmation}>
+                  <Ionicons name="checkmark-done" size={34} color="#FF7C7C" />
+                  <Text style={styles.textBlockedConfirmation}>{messageBlocked}</Text>  
+                </View>
+              </Overlay>
+
+
             <Overlay isVisible={visible} onBackdropPress={toggleOverlay} overlayStyle={styles.overlay}>
 
           { signalerVisible == false && alerterVisible == false ?
@@ -176,6 +237,11 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
 
             { alerterVisible ?
               <View style={styles.containerReasons}>
+                <View style={{width: '100%'}}>
+                <TouchableOpacity style={styles.buttonPrevious} onPress={() => handlePrevious()} >
+                        <Ionicons name="chevron-back" size={25} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
+                    </TouchableOpacity>
+                </View>
                 <TouchableOpacity 
                 style={signalementReason.includes('Cet utilisateur a des propos inquiétants.') ? styles.reasonsSignalementBis : styles.reasonsSignalement} 
                 onPress={() => handleSelectReason('Cet utilisateur a des propos inquiétants.')}>
@@ -295,7 +361,7 @@ const styles = StyleSheet.create({
         borderColor: '#5571D7',
         shadowColor: "black",
         shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.5
+        shadowOpacity: 0.5,
       },
       topProfil: {
         display: 'flex',
@@ -488,5 +554,117 @@ const styles = StyleSheet.create({
         fontSize:24,
         fontFamily: "Montserrat_700Bold",
         marginVertical: 10,
+      },
+      buttonBlockUser: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: 'auto',
+        backgroundColor: '#FFEEDD',
+        borderColor: '#5571D7',
+        shadowColor: "#FF7C7C",
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.8,
+        paddingHorizontal: 15,
+        paddingVertical: 6,
+        borderRadius: 19,
+        marginTop: 60,
+      },
+      textBlockUser: {
+        fontFamily: "Montserrat_700Bold",
+        fontSize: 20,
+        marginLeft: 10,
+        color: '#FF7C7C',
+      },
+      overlayBlockUser: {
+        width: '70%',
+        height: 'auto',
+        backgroundColor: '#FDEDDC',
+        shadowColor: "#000",
+        shadowOffset: {
+        	width: 0,
+        	height: 4,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 2.62,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        borderRadius: 15,
+        paddingHorizontal: 10,
+        paddingVertical: 40,
+      },
+      textBlockOverlay: {
+        color: "#EC9A1F",
+        fontSize:20,
+        fontFamily: "Montserrat_700Bold",
+        marginBottom: 30,
+        width: '60%',
+        textAlign: 'center'
+      },
+      textBlockedConfirmation: {
+        color: "#FF7C7C",
+        fontSize:20,
+        fontFamily: "Montserrat_700Bold",
+        width: '60%',
+        textAlign: 'center'
+      },
+      buttonBlockConfirmation: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: 'auto',
+        backgroundColor: '#FFEEDD',
+        borderColor: '#5571D7',
+        shadowColor: "#FF7C7C",
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.8,
+        paddingHorizontal: 20,
+        paddingVertical: 5,
+        borderRadius: 19,
+      },
+      buttonBlockCancel: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: 'auto',
+        backgroundColor: '#FFEEDD',
+        borderColor: '#5571D7',
+        shadowColor: "#5571D7",
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.8,
+        paddingHorizontal: 20,
+        paddingVertical: 5,
+
+        borderRadius: 19,
+      },
+      textBlockConfirmation: {
+        fontFamily: "Montserrat_700Bold",
+        fontSize: 26,
+        color: '#FF7C7C',
+        textAlign: 'center',
+      },
+      containerBlockConfirmation: {
+        display:'flex', 
+        flexDirection:'row', 
+        justifyContent: 'center', 
+        alignItems:'center', 
+        borderRadius: 30, 
+        padding: 5,
+        backgroundColor: '#FFEEDD',
+        borderColor: '#5571D7',
+        shadowColor: "#FF7C7C",
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.8,
+      },
+      textBlockCancel: {
+        fontFamily: "Montserrat_700Bold",
+        fontSize: 26,
+        color: '#5571D7',
+        textAlign: 'center',
       }
 })

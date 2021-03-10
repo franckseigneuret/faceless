@@ -65,7 +65,7 @@ let position = Animated.divide(scrollX, windowWidth);
 console.log(position,'position')
 
 var imgDiscover = imgDiscover.map((url, key) => {
-  return <View style={{width:windowWidth}}><Image source={{uri: url}} style={{width:300, height:400, top:70, left:40}}/></View>
+  return <View key={key} style={{width:windowWidth}}><Image key={key} source={{uri: url}} style={{width:300, height:400, top:70, left:40}}/></View>
 })
 
 

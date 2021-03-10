@@ -232,7 +232,7 @@ router.get('/show-card', async function (req, res, next) {
   var userToShow =[];
     for (let i=0; i<userToDisplay.length; i++) {
       if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
-      filterFront.gender.includes(userToDisplay[i].gender) == true ) {
+      filterFront.gender.includes(userToDisplay[i].gender) == true && user.blocked_user_id.includes(userToDisplay[i]._id) == false && user.blocked_by_id.includes(userToDisplay[i]._id) == false) {
         userToShow.push(userToDisplay[i]);
       }
     }
@@ -242,8 +242,7 @@ router.get('/show-card', async function (req, res, next) {
       res.json({userToShow: userToShow, user:user})
     } else {
       for(var i = 0; i<userToShow.length; i++){
-        console.log(userToShow[i], '<------ user to show on for loop')
-        console.log(user.localisation, '<-------- myuser localisation');
+
         if(userToShow[i].localisation.coordinates[0]){
           let distance = getDistanceFromLatLonInKm(user.localisation.coordinates[0], user.localisation.coordinates[1], userToShow[i].localisation.coordinates[0], userToShow[i].localisation.coordinates[1])
           if(distance <= filterFront.localisation){
@@ -252,7 +251,6 @@ router.get('/show-card', async function (req, res, next) {
         }
       }
     res.json({userToShow:userFilterOnLocation, user:user});
-    console.log(userFilterOnLocation, '<---------- USER TO SHOW ON LOCATION')
   }
 });
 
@@ -529,10 +527,21 @@ router.post('/signalement-help', async function (req, res, next) {
   res.json();
 });
 
-router.post('/signalement-user', function (req, res, next) {
+router.post('/block-user', async function (req, res, next) {
 
+  var user = await UserModel.findOne({token : req.body.tokenFront});
 
-  res.json();
+  var userUpdate = await UserModel.updateOne(
+    { token: req.body.tokenFront},
+    {$push: { blocked_user_id: req.body.confidentIdFront}}
+    );
+  
+  var confidentUpdate = await UserModel.updateOne(
+    {_id: req.body.confidentIdFront},
+    {$push: {blocked_by_id: user._id}}
+  );
+
+  res.json({result: true, message: "L'utilisateur a été bloqué"});
 });
 
 /* loadProfil : mettre à jour les information en BDD de l'utilisateur qui modifie son profil. */

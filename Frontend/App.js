@@ -25,6 +25,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ConversationScreen from "./screens/ConversationScreen";
 
+import { LogBox } from 'react-native';
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -82,6 +84,8 @@ const BottomNavigator = () => {
 };
 
 export default function App() {
+LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
+LogBox.ignoreAllLogs();//Ignore all log notifications
   return (
     <Provider store={store}>
       <NavigationContainer>
