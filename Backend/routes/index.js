@@ -211,14 +211,14 @@ router.get('/show-card', async function (req, res, next) {
     participants : ObjectId(user._id),
   })
 
-  console.log(conversations[0].participants[1], '<--------- my conversations !!');
   
   var conversationsWithId= []
 
+  if(conversations != undefined){
   for(var i=0; i<conversations.length; i++){
     conversations[i].participants[0] == user._id ? conversationsWithId.push(conversations[i].participants[1]) : conversationsWithId.push(conversations[i].participants[0])
  }
-  console.log(conversationsWithId, '<--------- list id with conversations')
+}
 
   var userToDisplay = await UserModel.find({
     token: { $ne: req.query.tokenFront },
@@ -327,17 +327,25 @@ router.get('/show-msg', async function (req, res, next) {
 
   const myConnectedId = req.query.user_id
 
+  const user = await UserModel.findById(myConnectedId)
+
+  const blockedBy = user.blocked_by_id
+  const allBlockedId = blockedBy.concat(user.blocked_user_id)
+
+  console.log("allBlockedId", allBlockedId)
+
   // compter le nb de demandes de conversation
   const allConversations = await ConversationsModel.find({
-    participants: { $in: [myConnectedId] },
+    participants: { $in: [myConnectedId], $nin: allBlockedId },
   })
+  console.log("allConversations", allConversations)
   allConversations.forEach(element => {
     nbNewConversations = element.demand === true ? ++nbNewConversations : nbNewConversations
   });
 
   // load les conversations avec mes contacts
   const conversationsPerPart = await ConversationsModel.find({
-    participants: { $in: [myConnectedId] },
+    participants: { $in: [myConnectedId], $nin: allBlockedId },
     demand: askNewConversation,
   })
 
@@ -551,6 +559,7 @@ router.post('/signalement-help', async function (req, res, next) {
 
 router.post('/block-user', async function (req, res, next) {
 
+  console.log('coucou');
   var user = await UserModel.findOne({token : req.body.tokenFront});
 
   var userUpdate = await UserModel.updateOne(
@@ -562,6 +571,7 @@ router.post('/block-user', async function (req, res, next) {
     {_id: req.body.confidentIdFront},
     {$push: {blocked_by_id: user._id}}
   );
+  console.log('coucou 2');
 
   res.json({result: true, message: "L'utilisateur a été bloqué"});
 });
