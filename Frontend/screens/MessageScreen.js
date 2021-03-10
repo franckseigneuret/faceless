@@ -87,13 +87,16 @@ function MessageScreen(props) {
     // quand on quitte le screen, l'interval est stoppé
     if (isFocused) {
       const interval = setInterval(() => loadConversations({ demandes: false }), 3000)
+      if(part === 'demandes') {
+        clearInterval(interval)
+      }
       return () => {
         console.log('fin')
         clearInterval(interval)
       }
     }
 
-  }, [myId, isFocused])
+  }, [myId, isFocused, part])
 
   const items = conversations.map((el, i) => {
 
@@ -305,7 +308,7 @@ const styles = StyleSheet.create({
     width: 50,
   },
   loaderOff: {
-    display:'none',
+    display: 'none',
   },
   scrollContent: {
     position: 'absolute',
@@ -347,10 +350,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 20,
     height: 20,
-    paddingLeft: 6,
     paddingTop: 2,
   },
   nonLuText: {
+    textAlign: 'center',
     color: 'white',
   },
   lastMessage: {
