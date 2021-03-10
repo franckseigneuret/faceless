@@ -107,7 +107,7 @@ router.post('/sign-up-second-step', async function (req, res, next) {
   req.body.problemDescriptionFront == 'undefined' ? problemDesc = '' : problemDesc = req.body.problemDescriptionFront;
   req.body.avatarFront == 'undefined' ? avatar = 'https://i.imgur.com/Xqf1Ilk.png' : avatar = req.body.avatarFront;
 
-  
+
 
   var user = await UserModel.updateOne(
     { token: req.body.tokenFront }, // ciblage à gauche de la virgule
@@ -119,8 +119,8 @@ router.post('/sign-up-second-step', async function (req, res, next) {
     }
   );
 
-  var userUpdated = await UserModel.findOne({token: req.body.tokenFront})
-    console.log(userUpdated, '<------- USER UPDATED')
+  var userUpdated = await UserModel.findOne({ token: req.body.tokenFront })
+  console.log(userUpdated, '<------- USER UPDATED')
   var result;
   user ? result = true : result = false
 
@@ -208,69 +208,69 @@ router.get('/show-card', async function (req, res, next) {
 
   console.log(req.query.tokenFront, '<----- token from front')
   var conversations = await ConversationsModel.find({
-    participants : ObjectId(user._id),
+    participants: ObjectId(user._id),
   })
 
-  
-  var conversationsWithId= []
 
-  if(conversations != undefined){
-  for(var i=0; i<conversations.length; i++){
-    conversations[i].participants[0] == user._id ? conversationsWithId.push(conversations[i].participants[1]) : conversationsWithId.push(conversations[i].participants[0])
- }
-}
+  var conversationsWithId = []
+
+  if (conversations != undefined) {
+    for (var i = 0; i < conversations.length; i++) {
+      conversations[i].participants[0] == user._id ? conversationsWithId.push(conversations[i].participants[1]) : conversationsWithId.push(conversations[i].participants[0])
+    }
+  }
 
   var userToDisplay = await UserModel.find({
     token: { $ne: req.query.tokenFront },
-    _id: {$nin: conversationsWithId},
+    _id: { $nin: conversationsWithId },
     is_adult: user.is_adult,
     birthDate: { $gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString()) },
   })
 
 
-  function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+  function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     console.log(lat1, lat2, lon1, lon2)
-    var R = 6371; 
-    var dLat = deg2rad(lat2-lat1); 
-    var dLon = deg2rad(lon2-lon1); 
-    var a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2)
-      ; 
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    var d = R * c; 
+    var R = 6371;
+    var dLat = deg2rad(lat2 - lat1);
+    var dLon = deg2rad(lon2 - lon1);
+    var a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2)
+      ;
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c;
     return d;
   }
-  
+
   function deg2rad(deg) {
-    return deg * (Math.PI/180)
+    return deg * (Math.PI / 180)
   }
-  
-  var userToShow =[];
-    for (let i=0; i<userToDisplay.length; i++) {
-      if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
-      filterFront.gender.includes(userToDisplay[i].gender) == true && 
-      user.blocked_user_id.includes(userToDisplay[i]._id) == false && 
+
+  var userToShow = [];
+  for (let i = 0; i < userToDisplay.length; i++) {
+    if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
+      filterFront.gender.includes(userToDisplay[i].gender) == true &&
+      user.blocked_user_id.includes(userToDisplay[i]._id) == false &&
       user.blocked_by_id.includes(userToDisplay[i]._id) == false) {
-        userToShow.push(userToDisplay[i]);
-      }
+      userToShow.push(userToDisplay[i]);
     }
+  }
 
-    let userFilterOnLocation = [];
-    if(filterFront.localisation == 'France') {
-      res.json({userToShow: userToShow, user:user})
-    } else {
-      for(var i = 0; i<userToShow.length; i++){
+  let userFilterOnLocation = [];
+  if (filterFront.localisation == 'France') {
+    res.json({ userToShow: userToShow, user: user })
+  } else {
+    for (var i = 0; i < userToShow.length; i++) {
 
-        if(userToShow[i].localisation.coordinates[0]){
-          let distance = getDistanceFromLatLonInKm(user.localisation.coordinates[0], user.localisation.coordinates[1], userToShow[i].localisation.coordinates[0], userToShow[i].localisation.coordinates[1])
-          if(distance <= filterFront.localisation){
-            userFilterOnLocation.push(userToShow[i])
-          }
+      if (userToShow[i].localisation.coordinates[0]) {
+        let distance = getDistanceFromLatLonInKm(user.localisation.coordinates[0], user.localisation.coordinates[1], userToShow[i].localisation.coordinates[0], userToShow[i].localisation.coordinates[1])
+        if (distance <= filterFront.localisation) {
+          userFilterOnLocation.push(userToShow[i])
         }
       }
-    res.json({userToShow:userFilterOnLocation, user:user});
+    }
+    res.json({ userToShow: userFilterOnLocation, user: user });
   }
 });
 
@@ -380,10 +380,10 @@ router.get('/show-msg', async function (req, res, next) {
     now = new Date()
 
     let statusOnLine = 'off'
-    if(lastMsgFriend){
-      statusOnLine = now - lastMsgFriend.date < 1800000 ? 'recent' : 'off'  // - de 30 min, soit 1000 * 30 * 60 = 1800000 ms
+    if (lastMsgFriend) {
       statusOnLine = now - lastMsgFriend.date < 900000 ? 'on' : 'recent'    // - de 15 min, soit 1000 * 15 * 60 = 900000 ms
-      if(myFriend) { // si !null (cas utilisateur supprimé DB)
+      statusOnLine = now - lastMsgFriend.date < 1800000 ? 'recent' : 'off'  // - de 30 min, soit 1000 * 30 * 60 = 1800000 ms
+      if (myFriend) { // si !null (cas utilisateur supprimé DB)
         myFriend = { ...myFriend.toObject(), statusOnLine }
       }
     }
@@ -398,8 +398,8 @@ router.get('/show-msg', async function (req, res, next) {
 
   // tri du tableau 
   conversations.sort((a, b) => {
-      // par date dernier message
-    if(a.lastMessage && b.lastMessage) {
+    // par date dernier message
+    if (a.lastMessage && b.lastMessage) {
       return a.lastMessage.date > b.lastMessage.date ? -1 : 1
     }
   })
@@ -468,12 +468,12 @@ router.post('/send-msg', async function (req, res, next) {
   var newMsg = await msg.save()
 
   let demandEnd = false
-  
-  if(searchConvWithUser.demand) {
+
+  if (searchConvWithUser.demand) {
     var allMsg = await MessagesModel.find(
       { conversation_id: searchConvWithUser._id }
     )
-  
+
     for (var i = 0; i < allMsg.length; i++) {
       if (allMsg[i].to_id == req.body.myId) {
         // condition fonctionnelle mais à améliorer
@@ -526,8 +526,8 @@ pouvez nous envoyer un email à l'adresse mail....'
 router.post('/signalement-help', async function (req, res, next) {
 
 
-  var user = await UserModel.findOne({token: req.body.tokenFront})
-  var confident = await UserModel.findOne({_id: req.body.confidentIdFront})
+  var user = await UserModel.findOne({ token: req.body.tokenFront })
+  var confident = await UserModel.findOne({ _id: req.body.confidentIdFront })
 
   signalementFind = await SignalementModel.findOne({
     user_emitter_id: user._id,
@@ -536,13 +536,13 @@ router.post('/signalement-help', async function (req, res, next) {
   })
 
   var reason;
-  req.body.reasonFront == '' ? reason = req.body.reasonOtherFront : reason= req.body.reasonFront;
+  req.body.reasonFront == '' ? reason = req.body.reasonOtherFront : reason = req.body.reasonFront;
 
   console.log(user, '<-------- USER')
   console.log(confident, '<-------- confident');
 
 
-  if(signalementFind == undefined){
+  if (signalementFind == undefined) {
     var newSignalement = new SignalementModel({
       type: req.body.typeFront,
       reason: reason,
@@ -560,20 +560,20 @@ router.post('/signalement-help', async function (req, res, next) {
 router.post('/block-user', async function (req, res, next) {
 
   console.log('coucou');
-  var user = await UserModel.findOne({token : req.body.tokenFront});
+  var user = await UserModel.findOne({ token: req.body.tokenFront });
 
   var userUpdate = await UserModel.updateOne(
-    { token: req.body.tokenFront},
-    {$push: { blocked_user_id: req.body.confidentIdFront}}
-    );
-  
+    { token: req.body.tokenFront },
+    { $push: { blocked_user_id: req.body.confidentIdFront } }
+  );
+
   var confidentUpdate = await UserModel.updateOne(
-    {_id: req.body.confidentIdFront},
-    {$push: {blocked_by_id: user._id}}
+    { _id: req.body.confidentIdFront },
+    { $push: { blocked_by_id: user._id } }
   );
   console.log('coucou 2');
 
-  res.json({result: true, message: "L'utilisateur a été bloqué"});
+  res.json({ result: true, message: "L'utilisateur a été bloqué" });
 });
 
 /* loadProfil : mettre à jour les information en BDD de l'utilisateur qui modifie son profil. */
@@ -638,7 +638,7 @@ router.post('/delete-my-profil', async function (req, res, next) {
     email: userSupp.email,
   })
 
-  var user = await userDeleted.save();
+  var user = await userDeleted.save();
 
   var result;
   user ? result = true : result = false
@@ -677,7 +677,7 @@ response: conversationsUpdated
 router.post('/delete-convers', async function (req, res, next) {
 
   await ConversationsModel.deleteOne(
-    { _id: req.body.convId}
+    { _id: req.body.convId }
   );
   res.render('index', { title: 'Express' });
 });
