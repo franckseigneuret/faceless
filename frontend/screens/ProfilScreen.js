@@ -26,6 +26,8 @@ import Geolocalisation from "../components/Geolocalisation";
 import BlueButton from "../components/BlueButton";
 
 import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome } from '@expo/vector-icons'; 
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
 import {
   useFonts,
@@ -122,7 +124,6 @@ export default function ProfilScreen(props) {
 
       var localisation = response.userFromBack.localisation;
       if (response.userFromBack.localisation) {
-
         setLocalisation(localisation);
       }
 
@@ -154,7 +155,7 @@ export default function ProfilScreen(props) {
     setVisibleAvatar(!visibleAvatar);
   };
 
-  const handleClickOnAvatar = () => { };
+  const handleClickOnAvatar = () => {};
 
   const handlePressEmail = () => {
     setEmailVisible(!emailVisible);
@@ -188,19 +189,19 @@ export default function ProfilScreen(props) {
   };
 
   const handleSaveChange = () => {
-
-    var problemsTypeStringify = JSON.stringify(problems)
+    var problemsTypeStringify = JSON.stringify(problems);
     // console.log(problemsTypeStringify, "<--- problemsTypeStringify changé")
 
     async function updateUser() {
-
       // console.log(localisation, "<--- localisation changé localisation on ASYNC handleSaveChange");
       // console.log(problems, "<--- problems changé problems on ASYNC handleSaveChange")
 
       var rawResponse = await fetch(`${HTTP_IP_DEV}/update-profil`, {
         method: "PUT",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `tokenFront=${tokenAsync}&avatarFront=${avatar}&emailFront=${email}&localisationFront=${JSON.stringify(localisation)}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}&problemsTypeFront=${problemsTypeStringify}`,
+        body: `tokenFront=${tokenAsync}&avatarFront=${avatar}&emailFront=${email}&localisationFront=${JSON.stringify(
+          localisation
+        )}&passwordFront=${password}&genderFront=${gender}&descriptionProblemFront=${problemDescription}&problemsTypeFront=${problemsTypeStringify}`,
       });
       var response = await rawResponse.json();
 
@@ -369,133 +370,157 @@ export default function ProfilScreen(props) {
     );
   });
 
-
   if (!fontsLoaded) {
     return <AppLoading />;
   }
 
   return (
-    <ScrollView style={{backgroundColor: '#FFF1E2'}}>
       <View style={styles.container}>
         {/* UPPER SECTION  ---> Info */}
 
         <View
           style={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-            justifyContent: "center",
+            display:'flex',
+            flexDirection:'row',
+            alignItems:'center',
+            justifyContent:'flex-start',
+            width:windowWidth,
+            marginLeft:windowWidth/5
           }}
         >
           <Text style={styles.titleHome}>Mon Profil</Text>
-
-          <TouchableOpacity onPress={handleAvatar}>
-            <Image
-              style={{ marginVertical: 15, width: 80, height: 80 }}
-              source={{ uri: avatar }}
-            />
+          <TouchableOpacity style={styles.buttonPrevious} onPress={() => handleDisconnect()} >
+            
+                <MaterialCommunityIcons name="location-exit" style={{ alignSelf: 'center', marginTop: 3 }} size={24} color="#5571D7" />
           </TouchableOpacity>
-
-          <Overlay
-            isVisible={visibleAvatar}
-            onBackdropPress={handleAvatar}
-            overlayStyle={{
-              height: "30%",
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#FFF1E2",
-              textAlign: "center",
-              width: "80%",
-              borderColor: "#2d3436",
-            }}
-            backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
-          >
-            <Ionicons name="chevron-back-outline" size={40} color="#5571D7" />
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            >
-              {imgAvatar}
-            </ScrollView>
-            <Ionicons
-              name="chevron-forward-outline"
-              size={40}
-              color="#5571D7"
-            />
-          </Overlay>
-
-          <Text style={styles.pseudo}>
-            {pseudo}
-            <Ionicons name="lock-closed" size={18} color="#5571D7" />
-          </Text>
+          
         </View>
-
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.viewContent}
-        >
-          <Text style={styles.title}>Change tes infos : </Text>
-          <View style={styles.containerContent}>
-            {!emailVisible ? (
-              <>
-                <Text style={styles.subtitle}>{email}</Text>
-                <TouchableOpacity onPress={handlePressEmail}>
-                  <Ionicons name="pencil" size={18} color="#5571D7" />
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <TextInput
-                  style={styles.subtitleChanged}
-                  onChangeText={(value) => setEmail(value)}
-                  value={email}
-                  placeholder="Ton email"
+        
+          <View style={{display:'flex', flexDirection:'row', alignItems:'center', marginBottom:15}}>
+            <View>
+              <TouchableOpacity onPress={handleAvatar}>
+                <Image
+                  style={{ marginVertical: 15, width: 100, height: 100 }}
+                  source={{ uri: avatar }}
                 />
-              </>
-            )}
-          </View>
+              </TouchableOpacity>
 
-
-          <View style={styles.containerContent}>
-            {!mdpVisible ? (
-              <>
-                <Text style={styles.subtitle}>Mot de passe</Text>
-                <TouchableOpacity onPress={handlePressMdp}>
-                  <Ionicons name="pencil" size={18} color="#5571D7" />
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <TextInput
-                  secureTextEntry={true}
-                  style={styles.subtitleChanged}
-                  placeholder="Ton nouveau mot de passe"
-                  onChangeText={(value) => setPassword(value)}
-                  defaultValue={password}
+              <Overlay
+                isVisible={visibleAvatar}
+                onBackdropPress={handleAvatar}
+                overlayStyle={{
+                  height: "30%",
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: "#FFF1E2",
+                  textAlign: "center",
+                  width: "80%",
+                  borderColor: "#2d3436",
+                }}
+                backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
+              >
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={40}
+                  color="#5571D7"
                 />
-              </>
-            )}
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                >
+                  {imgAvatar}
+                </ScrollView>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={40}
+                  color="#5571D7"
+                />
+              </Overlay>
+            </View>
+
+            <View style={{marginLeft:30}}>
+              <Text style={styles.pseudo}>
+                {pseudo}
+                <Ionicons name="lock-closed" size={18} color="#5571D7" />
+              </Text>
+
+              <View style={styles.containerMail}>
+                {!emailVisible ? (
+                  <>
+                    <Text style={styles.subtitle}>{email}</Text>
+                    <TouchableOpacity onPress={handlePressEmail}>
+                      <Ionicons name="pencil" size={18} color="#5571D7" />
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <TextInput
+                      style={styles.subtitleChanged}
+                      onChangeText={(value) => setEmail(value)}
+                      value={email}
+                      placeholder="Ton email"
+                    />
+                  </>
+                )}
+              </View>
+
+              <View style={styles.containerMDP}>
+                {!mdpVisible ? (
+                  <>
+                    <Text style={styles.subtitle}>Mot de passe</Text>
+                    <TouchableOpacity onPress={handlePressMdp}>
+                      <Ionicons name="pencil" size={18} color="#5571D7" />
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <TextInput
+                      secureTextEntry={true}
+                      style={styles.subtitleChanged}
+                      placeholder="Ton nouveau mot de passe"
+                      onChangeText={(value) => setPassword(value)}
+                      defaultValue={password}
+                    />
+                  </>
+                )}
+              </View>
+            </View>
           </View>
 
-          <Text style={styles.title}>Change ta ville : </Text>
-          <View style={styles.containerContent}>
-
-            <Geolocalisation getValueParent={(value) => setLocalisation(value)} lieu={localisation.label} />
-
-          </View>
-
-          <Text style={styles.title}>Genre : </Text>
           <View
             style={{
               display: "flex",
               flexDirection: "row",
-              marginVertical: 10,
-              justifyContent: "space-evenly",
-              width: "100%",
+              width: windowWidth,
+              justifyContent: "flex-start",
+              alignItems: "center",
+              marginBottom:7
             }}
           >
-            {image}
+            <View style={styles.containerVille}>
+              <Text style={styles.titleVille}>Change ta ville : </Text>
+
+              <Geolocalisation
+                getValueParent={(value) => setLocalisation(value)}
+                lieu={localisation.label}
+              />
+            </View>
+
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <Text style={styles.titleGenre}>Genre : </Text>
+              <View style={{ display: "flex", flexDirection: "row" }}>
+                {image}
+              </View>
+            </View>
           </View>
 
           {/* BELOW SECTION  ---> Description & type of problem */}
@@ -509,24 +534,26 @@ export default function ProfilScreen(props) {
             }}
           >
             <View style={styles.containerContent}>
-              <Text style={styles.title}>En quelques mots:</Text>
+              <Text style={styles.title}>En quelques mots :</Text>
               <TouchableOpacity onPress={toggleOverlayDescription}>
                 <Ionicons name="pencil" size={18} color="#5571D7" />
               </TouchableOpacity>
             </View>
-            <Text style={{ width: "100%" }} numberOfLines={4}>
+            <Text style={{ width: "100%" }} numberOfLines={3}>
               {problemDescription}
             </Text>
           </View>
-
+          
           <Overlay
             isVisible={visible}
             onBackdropPress={toggleOverlayDescription}
-            backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
+            overlayBackgroundColor="pink" overlayStyle={{ backgroundColor: "rgba(255, 241, 226, 0.5)"}}
             overlayStyle={styles.overlay}
           >
+            
             <>
-              <Text style={styles.title}>En quelques mots:</Text>
+              <Text style={styles.titleOverlay}>En quelques mots:</Text>
+              
               <TextInput
                 onChangeText={(value) => {
                   setProblemDescription(value);
@@ -536,45 +563,86 @@ export default function ProfilScreen(props) {
                 style={{
                   backgroundColor: "white",
                   borderRadius: 15,
-                  width: "100%",
-                  paddingVertical: 40,
-                  paddingHorizontal: 10,
-                  marginVertical: 15,
-                  height: 150,
+                  width: '80%',
+                  height: 50,
+                  paddingHorizontal:10,
+                  paddingVertical:10
                 }}
               ></TextInput>
+              <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.viewContent}
+        >
               <Button
                 title="ok"
                 type="solid"
-                buttonStyle={styles.buttonValider}
+                buttonStyle={styles.buttonValiderOverlay}
                 titleStyle={{
                   fontFamily: "Montserrat_700Bold",
                 }}
                 onPress={() => handleSaveDescription()}
               />
+              </KeyboardAvoidingView>
             </>
           </Overlay>
-        </KeyboardAvoidingView>
+         
 
         <View style={styles.viewTitleOrange}>
-          <Text style={styles.title}>Type de problème(s): </Text>
+          <Text style={styles.title}>Type de soucis: </Text>
         </View>
 
         <View>
           <View style={styles.badgeContainer}>
-            <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problems.includes('Amoureux') ? styles.badgeBis : styles.badge}>
+            <TouchableOpacity
+              onPress={() => {
+                handleSelectProblems(`Amoureux`);
+              }}
+              style={
+                problems.includes("Amoureux") ? styles.badgeBis : styles.badge
+              }
+              >
               <Text style={styles.fontBadge}>Amoureux</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problems.includes('Familial') ? styles.badgeBis : styles.badge}>
+            <TouchableOpacity
+              onPress={() => {
+                handleSelectProblems(`Familial`);
+              }}
+              style={
+                problems.includes("Familial") ? styles.badgeBis : styles.badge
+              }
+              >
               <Text style={styles.fontBadge}>Familial</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={problems.includes('Physique') ? styles.badgeBis : styles.badge}>
+            <TouchableOpacity
+              onPress={() => {
+                handleSelectProblems(`Physique`);
+              }}
+              style={
+                problems.includes("Physique") ? styles.badgeBis : styles.badge
+              }
+              >
               <Text style={styles.fontBadge}>Physique</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={problems.includes('Professionnel') ? styles.badgeBis : styles.badge}>
+            <TouchableOpacity
+              onPress={() => {
+                handleSelectProblems(`Professionnel`);
+              }}
+              style={
+                problems.includes("Professionnel")
+                ? styles.badgeBis
+                : styles.badge
+              }
+              >
               <Text style={styles.fontBadge}>Professionnel</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={problems.includes('Scolaire') ? styles.badgeBis : styles.badge}>
+            <TouchableOpacity
+              onPress={() => {
+                handleSelectProblems(`Scolaire`);
+              }}
+              style={
+                problems.includes("Scolaire") ? styles.badgeBis : styles.badge
+              }
+              >
               <Text style={styles.fontBadge}>Scolaire</Text>
             </TouchableOpacity>
           </View>
@@ -593,7 +661,7 @@ export default function ProfilScreen(props) {
             onPress={handleSaveChange}
           />
 
-          <Button
+          {/* <Button
             title="déconnexion"
             type="solid"
             buttonStyle={styles.buttonDisconnect}
@@ -601,10 +669,10 @@ export default function ProfilScreen(props) {
               fontFamily: "Montserrat_700Bold",
             }}
             onPress={() => handleDisconnect()}
-          />
+          /> */}
         </View>
 
-        <View style={styles.viewSaveDisconnect}>
+        {/* <View style={styles.viewSaveDisconnect}>
           <Button
             title="Supprimer mon compte"
             type="solid"
@@ -614,9 +682,8 @@ export default function ProfilScreen(props) {
             }}
             onPress={() => handleDeactivate()}
           />
-        </View>
+        </View> */}
       </View>
-    </ScrollView>
   );
 }
 
@@ -624,16 +691,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: windowHeight,
-    backgroundColor: "#FFF1E2",
-    alignItems: "center",
+    backgroundColor: "#ffeddb",
     flexDirection: "column",
     justifyContent: "center",
+    paddingLeft:30
   },
   containerContent: {
     display: "flex",
     flexDirection: "row",
     width: "100%",
+    marginVertical: 7,
+  },
+  containerMDP: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    width: "100%",
     marginVertical: 5,
+  },
+  containerMail: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    width: "100%",
+    marginVertical: 5,
+  },
+  containerVille: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    height: "100%",
+    marginVertical: 5,
+    marginLeft:-30
   },
   viewHead: {
     display: "flex",
@@ -662,8 +751,9 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "space-around",
     alignItems: "flex-end",
-    marginTop: 15,
-    marginBottom: 5,
+    marginTop:10,
+    top:20,
+    marginLeft:-20
   },
   viewDeleteDisable: {
     flexDirection: "row",
@@ -684,19 +774,19 @@ const styles = StyleSheet.create({
     color: "#5571D7",
     fontSize: 28,
     fontFamily: "Montserrat_800ExtraBold",
-    marginTop: 50,
+    
   },
   pseudo: {
-    textAlign: "center",
+    textAlign: "left",
     color: "#5571D7",
     fontFamily: "Montserrat_700Bold",
+    marginBottom:7
   },
   subtitle: {
     textAlign: "center",
     color: "#303030",
     fontFamily: "Montserrat_800ExtraBold",
     fontStyle: "italic",
-    marginRight: 10,
   },
   subtitleChanged: {
     textAlign: "center",
@@ -704,10 +794,29 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat_800ExtraBold",
     fontStyle: "italic",
   },
+  titleGenre: {
+    color: "#EC9A1F",
+    fontFamily: "Montserrat_700Bold",
+    justifyContent: "flex-start",
+  },
   title: {
     color: "#EC9A1F",
     fontFamily: "Montserrat_700Bold",
-    width: "85%",
+    justifyContent: "flex-start",
+    marginRight: 10,
+  },
+  titleOverlay: {
+    color: "#EC9A1F",
+    fontFamily: "Montserrat_700Bold",
+    justifyContent: "flex-start",
+    marginRight: 10,
+    marginBottom:10
+  },
+  titleVille: {
+    color: "#EC9A1F",
+    fontFamily: "Montserrat_700Bold",
+    marginBottom: 7,
+    marginLeft:3
   },
   text: {
     borderWidth: 2,
@@ -729,17 +838,24 @@ const styles = StyleSheet.create({
   },
   buttonValider: {
     backgroundColor: "#5571D7",
+    marginTop:10,
     borderRadius: 86,
-    width: 159,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+    width: 200,
+    margin: 10,
   },
   buttonValiderBIS: {
     backgroundColor: "#BCC8F0",
+    marginTop:10,
     borderRadius: 86,
-    width: 159,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+    width: 200,
+    margin: 10,
+  },
+  buttonValiderOverlay: {
+    backgroundColor: "#5571D7",
+    justifyContent:'center',
+    borderRadius: 86,
+    width: 200,
+    margin: 10,
   },
   buttonOK: {
     backgroundColor: "#5571D7",
@@ -774,6 +890,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "80%",
     borderColor: "#2d3436",
+    borderRadius:15
   },
   badge: {
     backgroundColor: "#BCC8F0",
@@ -795,13 +912,25 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     marginVertical: 5,
     fontFamily: "Montserrat_700Bold",
-    fontSize: 16,
+    fontSize: 13,
   },
   badgeContainer: {
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-start",
-    width: "100%",
+    width: windowWidth,
+  },
+  buttonPrevious: {
+    backgroundColor: "#FFEEDD",
+    padding: 10,
+    width: 50,
+    height: 50,
+    marginLeft:40,
+    borderRadius: 30,
+    borderColor: '#5571D7',
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.5
   },
 });

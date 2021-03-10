@@ -120,26 +120,7 @@ function MessageScreen(props) {
           break;
       }
 
-      const leftContent = <Text>Pull to activate</Text>;
-
-const rightButtons = [
-  <TouchableHighlight><Text>Button 1</Text></TouchableHighlight>,
-  <TouchableHighlight><Text>Button 2</Text></TouchableHighlight>
-];
-
-const rightActions = () => {
-  return (<View style={{width:100, backgroundColor:'black'}}>
-            <Text>LALLALALA</Text>
-          </View>
-  )
-}
-
-    return <Swipeable
-      renderRightActions={() => rightActions()}
-      onSwipeableLeftOpen={() => console.log('opening')}
-      key={i}
-    >
-      <TouchableHighlight
+      return <TouchableHighlight
         underlayColor
         activeOpacity={1}
         onPress={() => {
@@ -160,16 +141,16 @@ const rightActions = () => {
             avatar: el.friendsDatas.avatar
           })
         }}>
-        <Animated.View style={styles.conversationsItem}>
+        <View style={styles.conversationsItem}>
           {
             unreadPerConversation[i] ?
-              <Animated.View style={styles.nonLuContent}>
+              <View style={styles.nonLuContent}>
                 <Text style={styles.nonLuText}>{unreadPerConversation[i]}</Text>
-              </Animated.View>
+              </View>
               :
               <Text />
           }
-          <Animated.View style={styles.lastMessage}>
+          <View style={styles.lastMessage}>
             <Text style={styles.friend}>
               {el.friendsDatas.pseudo} <Octicons name="primitive-dot" size={16} color={onLineColor} />
             </Text>
@@ -179,8 +160,8 @@ const rightActions = () => {
             <Text style={styles.msg} numberOfLines={4} ellipsizeMode='tail'>
               <Text style={styles.last}>Dernier message : </Text>{el.lastMessage.content}
             </Text>
-          </Animated.View>
-          <Animated.View>
+          </View>
+          <View>
             {
               el.friendsDatas.avatar && el.friendsDatas.avatar !== undefined && el.friendsDatas.avatar !== '' ?
 
@@ -188,22 +169,19 @@ const rightActions = () => {
                 :
                 <Text />
             }
-          </Animated.View>
-        </Animated.View>
-
+          </View>
+        </View>
+        
       </TouchableHighlight>
-      </Swipeable>
-
     }
 
   })
 
   const [showLoader, setShowLoader] = useState(styles.loader);
-  const onRefresh = React.useCallback(() => {
-    setShowLoader(styles.loader),
-      Vibration.vibrate(10);
+  const onRefresh = useCallback(() => {
+    Vibration.vibrate(10);
     let bool = part === 'demandes' ? true : false
-    loadConversations({ demandes: bool })
+    loadConversations({ demandes: bool });
   }, []);
 
 
