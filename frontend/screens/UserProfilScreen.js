@@ -90,17 +90,15 @@ function UserProfilScreen(props) {
   }
 
   const handleBlockConfirmation = async () => {
-    // props.route.params.userID
     var rawResponse = await fetch(`${HTTP_IP_DEV}/block-user`, {
       method: 'POST',
       headers: {'Content-Type':'application/x-www-form-urlencoded'},
       body: `tokenFront=${token}&confidentIdFront=${props.route.params.userID}`
      });
      var response = await rawResponse.json();
-     setBlockedResult(response.result);
      setMessageBlocked(response.message)
 
-     if(blockedResult) {
+     if(response.result) {
       setBlockUserVisible(false);
       setOverlayBlockedConfirmation(!overlayBlockedConfirmation);
       setTimeout(()=> props.navigation.navigate('HomeScreen') , 1000);
@@ -189,6 +187,7 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
                 <Text style={styles.textBlockUser}>Bloquer</Text>
               </TouchableOpacity>
               <Overlay isVisible={blockUserVisible} onBackdropPress={handleBlockUser} overlayStyle={styles.overlayBlockUser}>
+                <>
                 <Text style={styles.textBlockOverlay}>Es-tu sûr de vouloir bloquer cet utilisateur ?</Text>  
                 <View style={{display: 'flex', flexDirection:'row', justifyContent: 'space-around', width: '80%'}}>
                   <TouchableOpacity style={styles.buttonBlockConfirmation}>
@@ -198,11 +197,12 @@ for (let i=0; i<props.route.params.problems_types.length; i++){
                     <Text style={styles.textBlockCancel} onPress={() => handleBlockUser()}>Non</Text>
                   </TouchableOpacity>
                 </View>
+                </>
               </Overlay>
 
               <Overlay isVisible={overlayBlockedConfirmation} onBackdropPress={handleConfirmationVisible} overlayStyle={styles.overlayBlockUser}>
                 <View style={styles.containerBlockConfirmation}>
-                  <Ionicons name="checkmark-done" size={34} color="#FF7C7C" />
+                  <Ionicons name="checkmark-done" size={34} color="#9DD893" />
                   <Text style={styles.textBlockedConfirmation}>{messageBlocked}</Text>  
                 </View>
               </Overlay>
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
         textAlign: 'center'
       },
       textBlockedConfirmation: {
-        color: "#FF7C7C",
+        color: "#9DD893",
         fontSize:20,
         fontFamily: "Montserrat_700Bold",
         width: '60%',
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
         padding: 5,
         backgroundColor: '#FFEEDD',
         borderColor: '#5571D7',
-        shadowColor: "#FF7C7C",
+        shadowColor: "#9DD893",
         shadowOffset: { width: 1, height: 1 },
         shadowOpacity: 0.8,
       },
