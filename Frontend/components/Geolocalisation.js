@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFCC99',
     paddingHorizontal: 15,
     height: 40,
+    maxWidth:150,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
@@ -105,6 +106,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 5,
+    maxWidth:150,
     overflow: 'hidden',
   },
   town: {
