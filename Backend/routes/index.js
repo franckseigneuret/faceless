@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+
 const UserModel = require('../models/users');
 const ConversationsModel = require('../models/conversations')
 const SignalementModel = require('../models/signalement')
@@ -205,11 +206,26 @@ router.get('/show-card', async function (req, res, next) {
   //
   var user = await UserModel.findOne({ token: req.query.tokenFront });
 
+  console.log(req.query.tokenFront, '<----- token from front')
+  var conversations = await ConversationsModel.find({
+    participants : ObjectId(user._id),
+  })
+
+  console.log(conversations[0].participants[1], '<--------- my conversations !!');
+  var conversationsWithId
+  conversations.map((e, i) => {
+    e.participants[0] == user._id ? conversationsWithId.push(e.participants[1]) : conversationsWithId.push(e.participants[0])
+  })
+
+  console.log(conversationsWithId, '<--------- list id with conversations')
+
   var userToDisplay = await UserModel.find({
     token: { $ne: req.query.tokenFront },
     is_adult: user.is_adult,
     birthDate: { $gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString()) },
   })
+
+
   function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
     console.log(lat1, lat2, lon1, lon2)
     var R = 6371; 
