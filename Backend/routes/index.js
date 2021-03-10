@@ -332,13 +332,13 @@ router.get('/show-msg', async function (req, res, next) {
   const blockedBy = user.blocked_by_id
   const allBlockedId = blockedBy.concat(user.blocked_user_id)
 
-  console.log("allBlockedId", allBlockedId)
+  // console.log("allBlockedId", allBlockedId)
 
   // compter le nb de demandes de conversation
   const allConversations = await ConversationsModel.find({
     participants: { $in: [myConnectedId], $nin: allBlockedId },
   })
-  console.log("allConversations", allConversations)
+  // console.log("allConversations", allConversations)
   allConversations.forEach(element => {
     nbNewConversations = element.demand === true ? ++nbNewConversations : nbNewConversations
   });

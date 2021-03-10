@@ -74,7 +74,16 @@ var imgDiscover = imgDiscover.map((url, key) => {
   } else {
     return (
       <View style={styles.container}>
-          <ScrollView pagingEnabled={true} scrollEventThrottle={16} onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }] )} contentContainerStyle={styles.logo} showsHorizontalScrollIndicator={false} snapToInterval={windowWidth} decelerationRate='fast' horizontal >
+          <ScrollView
+            pagingEnabled={true}
+            scrollEventThrottle={16}
+            onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {useNativeDriver: true})}
+            contentContainerStyle={styles.logo}
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={windowWidth}
+            decelerationRate='fast'
+            horizontal
+          >
             
               {imgDiscover}
             
