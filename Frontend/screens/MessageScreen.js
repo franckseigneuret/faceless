@@ -22,6 +22,7 @@ const windowSize = Dimensions.get('screen');
 
 function MessageScreen(props) {
   const isFocused = useIsFocused();
+  
   const [token, setToken] = useState(null)
   const [myId, setMyId] = useState(null)
   const [conversations, setConversations] = useState([])
@@ -87,7 +88,7 @@ function MessageScreen(props) {
     // quand on quitte le screen, l'interval est stoppé
     if (isFocused) {
       const interval = setInterval(() => loadConversations({ demandes: false }), 3000)
-      if(part === 'demandes') {
+      if (part === 'demandes') {
         clearInterval(interval)
       }
       return () => {
@@ -121,6 +122,7 @@ function MessageScreen(props) {
       }
 
       return <TouchableHighlight
+        key={i}
         underlayColor
         activeOpacity={1}
         onPress={() => {
@@ -171,7 +173,7 @@ function MessageScreen(props) {
             }
           </View>
         </View>
-        
+
       </TouchableHighlight>
     }
 

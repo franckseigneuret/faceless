@@ -9,8 +9,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import Swipeable from 'react-native-gesture-handler/Swipeable';
 // import { GestureHandler } from 'expo';
 import * as GestureHandler from 'react-native-gesture-handler'
-const { Swipeable } = GestureHandler
+import { useIsFocused } from "@react-navigation/native";
 
+const { Swipeable } = GestureHandler
 
 
 const Tab = createBottomTabNavigator();
@@ -18,6 +19,7 @@ const Stack = createStackNavigator();
 
 
 function ConversationScreen(props) {
+    const isFocused = useIsFocused();
 
     const [demandEnd, setDemandeEnd] = useState(false)
     const [token, setToken] = useState(null)
@@ -61,7 +63,22 @@ function ConversationScreen(props) {
         loadMsg()
     }, [props.route.params.convId, token])
 
+
+    useEffect(() => {
+        // au focus du screen, le contenu de la page se réinitialise à interval 3 secondes
+        // quand on quitte le screen, l'interval est stoppé
+        if (isFocused) {
+          const interval = setInterval(() => loadMsg(), 3000)
+          return () => {
+            console.log('fin')
+            clearInterval(interval)
+          }
+        }
+    
+      }, [isFocused])
+
     var sendMsg = async () => {
+        setDisableSendBtn(true)
         const rawResponseDemand = await fetch(`${HTTP_IP_DEV}/send-msg`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -69,7 +86,6 @@ function ConversationScreen(props) {
         });
         setCurrentMsg('')
         loadMsg()
-        setDisableSendBtn(true)
 
         const responseDemand = await rawResponseDemand.json()
 
