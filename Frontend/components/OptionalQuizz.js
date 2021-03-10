@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Dimensions } from 'react-native';
-import {connect} from 'react-redux';
+import { View, Dimensions, KeyboardAvoidingView } from 'react-native';
+import { connect } from 'react-redux';
 
 import NavigationOptionalQuizz from "./NavigationOptionalQuizz"
 import QuizzProbleme from "./QuizzProbleme"
@@ -12,11 +12,11 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 import {
-    useFonts,
-    Montserrat_700Bold,
-    Montserrat_900Black,
-    Montserrat_800ExtraBold,
-  } from "@expo-google-fonts/montserrat";
+  useFonts,
+  Montserrat_700Bold,
+  Montserrat_900Black,
+  Montserrat_800ExtraBold,
+} from "@expo-google-fonts/montserrat";
 
 
 function OptionalQuizz(props) {
@@ -27,26 +27,32 @@ function OptionalQuizz(props) {
     setStep(props.count)
   }, [props.count]);
 
-// console.log(props.userDisplay)
-    let [fontsLoaded] = useFonts({
-        Montserrat_700Bold,
-        Montserrat_900Black,
-        Montserrat_800ExtraBold,
-      });
+  // console.log(props.userDisplay)
+  let [fontsLoaded] = useFonts({
+    Montserrat_700Bold,
+    Montserrat_900Black,
+    Montserrat_800ExtraBold,
+  });
 
-    return(
-      <View style={{flex:1, backgroundColor: '#FFF1E2'}}>
-        {step === 0 && <QuizzProbleme/>} 
-        {step === 1 && <QuizzLocalisation/>} 
-        {step === 2 && <QuizzGender/>} 
-        {step === 3 && <QuizzAvatar/>} 
-        {step === 4 &&  props.navigation.navigate('BottomNavigator', { screen: 'HomeScreen' })} 
-        <NavigationOptionalQuizz/>
-      </View>
-    );
+  return (
+    <View style={{ flex: 1, backgroundColor: '#FFF1E2' }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={-60}
+      >
+        {step === 0 && <QuizzProbleme />}
+        {step === 1 && <QuizzLocalisation />}
+        {step === 2 && <QuizzGender />}
+        {step === 3 && <QuizzAvatar />}
+        {step === 4 && props.navigation.navigate('BottomNavigator', { screen: 'HomeScreen' })}
+        <NavigationOptionalQuizz step={step} />
+      </KeyboardAvoidingView>
+    </View>
+  );
 };
 function mapStateToProps(state) {
- return { count: state.count }
+  return { count: state.count }
 }
 
 export default connect(

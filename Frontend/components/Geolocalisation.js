@@ -77,7 +77,7 @@ export default function Geolocalisation(props) {
     <View style={styles.view}>
       <View style={styles.view2}>
         <TextInput
-          style={styles.chooseTown}
+          style={[styles.chooseTown, props.large ? styles.chooseTownLarge : '']}
           onChangeText={text => onChangeText(text)}
           value={search}
           placeholder={'Votre ville ?'}
@@ -88,7 +88,7 @@ export default function Geolocalisation(props) {
         }} />
       </View>
       {
-        TownListComponent.length > 0 && <View style={styles.townsList}>
+        TownListComponent.length > 0 && <View style={[styles.townsList, props.large ? styles.townsListLarge : '']}>
           {TownListComponent}
         </View>
       }
@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
   view2: {
     flexDirection: 'row',
     alignItems: 'center',
+    height: 40,
   },
   delete: {
     color: "#5571D7",
@@ -113,18 +114,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFCC99',
     paddingHorizontal: 15,
     height: 40,
-    // maxWidth: 150,
     minWidth: 150,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
   },
+  chooseTownLarge:{
+    width: '90%',
+  },
   townsList: {
+    position: 'absolute',
+    bottom: 40,
+    left: 38,
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 5,
     maxWidth: 150,
     overflow: 'hidden',
+  },
+  townsListLarge: {
+    width: '100%',
+    maxWidth: '95%',
+    left: 42,
   },
   town: {
     paddingVertical: 5,

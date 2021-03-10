@@ -39,7 +39,7 @@ function QuizzLocalisation(props) {
         style={styles.container}
       >
         <QuizzTitre title="Tu viens d'où ?" />
-        <Geolocalisation getValueParent={getValue}/>
+        <Geolocalisation getValueParent={getValue} large />
         <BlueButton btnTitle="enregistrer" handleClickParent={handleClick} />
       </KeyboardAvoidingView>
     </View>
