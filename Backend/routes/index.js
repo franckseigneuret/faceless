@@ -212,15 +212,17 @@ router.get('/show-card', async function (req, res, next) {
   })
 
   console.log(conversations[0].participants[1], '<--------- my conversations !!');
-  var conversationsWithId
-  conversations.map((e, i) => {
-    e.participants[0] == user._id ? conversationsWithId.push(e.participants[1]) : conversationsWithId.push(e.participants[0])
-  })
+  
+  var conversationsWithId= []
 
+  for(var i=0; i<conversations.length; i++){
+    conversations[i].participants[0] == user._id ? conversationsWithId.push(conversations[i].participants[1]) : conversationsWithId.push(conversations[i].participants[0])
+ }
   console.log(conversationsWithId, '<--------- list id with conversations')
 
   var userToDisplay = await UserModel.find({
     token: { $ne: req.query.tokenFront },
+    _id: {$nin: conversationsWithId},
     is_adult: user.is_adult,
     birthDate: { $gte: new Date((dateMaxCondition).toISOString()), $lt: new Date((dateMinCondition).toISOString()) },
   })
