@@ -92,7 +92,7 @@ function MessageScreen(props) {
         clearInterval(interval)
       }
       return () => {
-        console.log('fin')
+        // console.log('fin')
         clearInterval(interval)
       }
     }

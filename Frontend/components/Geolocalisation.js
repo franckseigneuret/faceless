@@ -5,6 +5,7 @@ import {
   TextInput,
   StyleSheet,
   Dimensions,
+  Keyboard,
 } from 'react-native';
 
 import { Entypo } from '@expo/vector-icons';
@@ -52,7 +53,6 @@ export default function Geolocalisation(props) {
   }
 
   const TownListComponent = townList.map((item, i, arr) => {
-    // console.log('i', townList)
     const styleItem = [styles.town]
     selectedTown === item.postcode ? styleItem.push(styles.townSelected) : ''
     arr.length - 1 === i ? styleItem.push(styles.lastItem) : ''
@@ -66,6 +66,7 @@ export default function Geolocalisation(props) {
               setTownList([])
             }, 500);
             props.getValueParent(item);
+            Keyboard.dismiss()
           }}
         >{item.label} ({item.postcode})</Text>
       </View>

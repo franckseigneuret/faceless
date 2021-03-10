@@ -28,8 +28,6 @@ function ConversationScreen(props) {
     const [currentMsg, setCurrentMsg] = useState("")
     const [myContactId, setMyContactId] = useState("")
     const [pseudo, setPseudo] = useState("")
-    const [avatar, setAvatar] = useState("https://i.imgur.com/P3rBF8E.png")
-    const [showDate, setShowDate] = useState(false)
     const [disableSendBtn, setDisableSendBtn] = useState(true)
 
     const scrollViewRef = useRef();
@@ -39,11 +37,10 @@ function ConversationScreen(props) {
         var response = await rawResponse.json();
         setData(response.allMessagesWithOneUser)
         setPseudo(response.pseudo)
-        // setAvatar(response.avatar)
         setMyContactId(props.route.params.myContactId)
     }
 
-    var infoUser= props.route.params
+    var infoUser = props.route.params
     // console.log(infoUser,'<------ INFO À RENVOYER')
 
     useEffect(() => {
@@ -68,14 +65,14 @@ function ConversationScreen(props) {
         // au focus du screen, le contenu de la page se réinitialise à interval 3 secondes
         // quand on quitte le screen, l'interval est stoppé
         if (isFocused) {
-          const interval = setInterval(() => loadMsg(), 3000)
-          return () => {
-            console.log('fin')
-            clearInterval(interval)
-          }
+            const interval = setInterval(() => loadMsg(), 3000)
+            return () => {
+                // console.log('fin')
+                clearInterval(interval)
+            }
         }
-    
-      }, [isFocused])
+
+    }, [isFocused])
 
     var sendMsg = async () => {
         setDisableSendBtn(true)
@@ -104,27 +101,27 @@ function ConversationScreen(props) {
 
     var rightActions = (val) => {
         return (
-            <View style={{justifyContent: "center"}}><Text style={styles.hoursRight}>{val}</Text></View>
+            <View style={{ justifyContent: "center" }}><Text style={styles.hoursRight}>{val}</Text></View>
         )
     }
 
     var leftActions = (val) => {
         return (
-            <View style={{justifyContent: "center"}}><Text style={styles.hoursLeft}>{val}</Text></View>
+            <View style={{ justifyContent: "center" }}><Text style={styles.hoursLeft}>{val}</Text></View>
         )
     }
-    
 
-    let dateCheck 
+
+    let dateCheck
     let dateToShow
 
     var tabMsg = data.map((item, i) => {
         let when = new Date(item.date)
         // let whenFormat = when.toLocaleDateString('fr-FR', { weekday: 'short', month: 'numeric', day: 'numeric' })
         //     + ' à ' + when.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-        let hours = when.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        let hours = when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         let date = when.toLocaleDateString('fr-FR', { weekday: 'long', month: 'short', day: 'numeric' })
-        if(date != dateCheck){
+        if (date != dateCheck) {
             dateCheck = date
             dateToShow = dateCheck
         } else {
@@ -132,34 +129,34 @@ function ConversationScreen(props) {
         }
 
         if (item.to_id === myContactId) {
-            return  (
-            <View key={i}>
-                <Text style={styles.date}>{dateToShow}</Text>
-                <View style={{justifyContent: "center", marginBottom: 10}}>
-                    <Swipeable renderRightActions={()=> rightActions(hours)}>
-                        <View style={styles.blocRight}>
-                            <View style={styles.msgRight}>
-                                <Text style={styles.textRight} >{item.content}</Text>
+            return (
+                <View key={i}>
+                    <Text style={styles.date}>{dateToShow}</Text>
+                    <View style={{ justifyContent: "center", marginBottom: 10 }}>
+                        <Swipeable renderRightActions={() => rightActions(hours)}>
+                            <View style={styles.blocRight}>
+                                <View style={styles.msgRight}>
+                                    <Text style={styles.textRight} >{item.content}</Text>
+                                </View>
                             </View>
-                        </View>
-                    </Swipeable>
-                </View>
-            </View>)
+                        </Swipeable>
+                    </View>
+                </View>)
 
         } else {
-            return( 
-            <View key={i}>
-                <Text style={styles.date}>{dateToShow}</Text>
-                <View style={{justifyContent: "center", marginBottom: 10}}>
-                    <Swipeable renderLeftActions={()=> leftActions(hours)}>
-                        <View style={styles.blocLeft}>
-                            <View style={styles.msgLeft}>
-                                <Text style={styles.textLeft} >{item.content}</Text>
+            return (
+                <View key={i}>
+                    <Text style={styles.date}>{dateToShow}</Text>
+                    <View style={{ justifyContent: "center", marginBottom: 10 }}>
+                        <Swipeable renderLeftActions={() => leftActions(hours)}>
+                            <View style={styles.blocLeft}>
+                                <View style={styles.msgLeft}>
+                                    <Text style={styles.textLeft} >{item.content}</Text>
+                                </View>
                             </View>
-                        </View>
-                    </Swipeable>
+                        </Swipeable>
+                    </View>
                 </View>
-            </View>
             )
         }
     })
@@ -172,17 +169,17 @@ function ConversationScreen(props) {
                     <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
                 </TouchableOpacity>
                 <View style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <TouchableOpacity onPress={()=> props.navigation.navigate('UserProfilScreen', {
-                      pseudo: infoUser.pseudo,
-                      gender: infoUser.gender,
-                      subscriptionDate: infoUser.subscriptionDate,
-                      problemDesc : infoUser.problemDesc,
-                      problems_types : infoUser.problems_types,
-                      avatar: infoUser.avatar,
-                      userID: infoUser.myContactId
-                    })}> 
-                  <Image source={{uri: infoUser.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
-                </TouchableOpacity>
+                    <TouchableOpacity onPress={() => props.navigation.navigate('UserProfilScreen', {
+                        pseudo: infoUser.pseudo,
+                        gender: infoUser.gender,
+                        subscriptionDate: infoUser.subscriptionDate,
+                        problemDesc: infoUser.problemDesc,
+                        problems_types: infoUser.problems_types,
+                        avatar: infoUser.avatar,
+                        userID: infoUser.myContactId
+                    })}>
+                        <Image source={{ uri: infoUser.avatar }} style={{ borderWidth: 3, borderRadius: 50, borderColor: '#EC9A1F', width: 100, height: 100 }} />
+                    </TouchableOpacity>
                     <Text style={styles.pseudo}>{pseudo}</Text>
                 </View>
                 <TouchableOpacity style={styles.button}>
@@ -208,7 +205,13 @@ function ConversationScreen(props) {
                         checkTextSize(val)
                     }}
                 />
-                <TouchableOpacity style={disableSendBtn ? styles.buttonSend : styles.buttonReadyToSend} onPress={() => sendMsg()} disabled={disableSendBtn}>
+                <TouchableOpacity
+                    style={disableSendBtn ? styles.buttonSend : styles.buttonReadyToSend}
+                    onPress={() => {
+                        
+                        sendMsg()
+                    }}
+                    disabled={disableSendBtn}>
                     <Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton} />
                 </TouchableOpacity>
             </KeyboardAvoidingView>

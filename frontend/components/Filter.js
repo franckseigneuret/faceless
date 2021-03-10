@@ -95,14 +95,7 @@ function Filter(props) {
     props.navigation.navigate('BottomNavigator', { screen: 'HomeScreen' })
   }
   
- 
-  var problemsBadge = [
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problems.includes('Amoureux') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Amoureux</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problems.includes('Familial') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Familial</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={ problems.includes('Physique') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Physique</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={ problems.includes('Professionnel') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Professionnel</Text></TouchableOpacity>,
-    <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={ problems.includes('Scolaire') ? styles.badgeBis : styles.badge}><Text style={styles.fontBadge}>Scolaire</Text></TouchableOpacity>
-  ]
+
 
   var imagesGender = [
     { unSelected: <TouchableOpacity onPress={() => { handleSelectGender(`other`) }}><Image source={require('../assets/gender_1.png')} /></TouchableOpacity>, selected: <TouchableOpacity onPress={() => { handleSelectGender(`other`) }}><Image source={require('../assets/gender_1_selected.png')} /></TouchableOpacity> },
@@ -126,7 +119,22 @@ function Filter(props) {
         <View style={styles.problemsSelect}>
           <Text style={styles.titleProblems}>J'aimerais parler de soucis...</Text>
           <View style={styles.badgeContainer}>
-            {problemsBadge}
+            
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Amoureux`) }} style={problems.includes('Amoureux') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Amoureux</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Familial`) }} style={problems.includes('Familial') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Familial</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Physique`) }} style={ problems.includes('Physique') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Physique</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Professionnel`) }} style={ problems.includes('Professionnel') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Professionnel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => { handleSelectProblems(`Scolaire`) }} style={ problems.includes('Scolaire') ? styles.badgeBis : styles.badge}>
+            <Text style={styles.fontBadge}>Scolaire</Text>
+          </TouchableOpacity>
           </View>
         </View>
         <View style={styles.bottomContainer}>
