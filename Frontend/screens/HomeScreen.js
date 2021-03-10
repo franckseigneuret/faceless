@@ -200,7 +200,7 @@ function HomeScreen(props) {
                       userID: e._id,
                     })}
                     style={styles.buttonInfo}>     
-                    <Text style={styles.textInfo}>i</Text>
+                    <Ionicons name="person" size={24} color="#FFEEDD" />
                   </TouchableOpacity>
         </View>
       </View>
