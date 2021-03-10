@@ -232,7 +232,9 @@ router.get('/show-card', async function (req, res, next) {
   var userToShow =[];
     for (let i=0; i<userToDisplay.length; i++) {
       if (filterFront.problemsTypes.some((element) => userToDisplay[i].problems_types.includes(element)) == true &&
-      filterFront.gender.includes(userToDisplay[i].gender) == true && user.blocked_user_id.includes(userToDisplay[i]._id) == false && user.blocked_by_id.includes(userToDisplay[i]._id) == false) {
+      filterFront.gender.includes(userToDisplay[i].gender) == true && 
+      user.blocked_user_id.includes(userToDisplay[i]._id) == false && 
+      user.blocked_by_id.includes(userToDisplay[i]._id) == false) {
         userToShow.push(userToDisplay[i]);
       }
     }
