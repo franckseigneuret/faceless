@@ -310,7 +310,6 @@ router.get('/get-id-from-token', async function (req, res, next) {
  **/
 router.get('/show-msg', async function (req, res, next) {
 
-  let messagesPerPerson = []
   let friendsData = []
   let conversations = []
   let askNewConversation = false
@@ -358,7 +357,6 @@ router.get('/show-msg', async function (req, res, next) {
     })
       .sort({ date: -1 })
       .limit(1)
-    messagesPerPerson.push(lastMsg)
 
     // construit un tableau des infos de mes contacts (avatar, pseudo...)
     const notMe = element.participants[0] == myConnectedId ? element.participants[1] : element.participants[0]
@@ -369,7 +367,7 @@ router.get('/show-msg', async function (req, res, next) {
       from_id: notMe,
     }).sort({ date: -1 })
 
-    console.log("lastMsgFriend", lastMsgFriend)
+    // console.log("lastMsgFriend", lastMsgFriend)
 
     now = new Date()
 
@@ -377,7 +375,9 @@ router.get('/show-msg', async function (req, res, next) {
     if(lastMsgFriend){
       statusOnLine = now - lastMsgFriend.date < 1800000 ? 'recent' : 'off'  // - de 30 min, soit 1000 * 30 * 60 = 1800000 ms
       statusOnLine = now - lastMsgFriend.date < 900000 ? 'on' : 'recent'    // - de 15 min, soit 1000 * 15 * 60 = 900000 ms
-      myFriend = { ...myFriend.toObject(), statusOnLine }
+      if(myFriend) { // si !null (cas utilisateur supprimé DB)
+        myFriend = { ...myFriend.toObject(), statusOnLine }
+      }
     }
 
     friendsData.push(myFriend)
@@ -386,14 +386,16 @@ router.get('/show-msg', async function (req, res, next) {
       lastMessage: lastMsg[0],
       friendsDatas: myFriend,
     })
-
-    // tri du tableau 
-    conversations.sort((a, b) => {
-      a.lastMessage && b.lastMessage && a.lastMessage.date > b.lastMessage.date ? -1 : 1
-    }) // par date dernier message
-    conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1) // messages non lus en 1er
   }))
 
+  // tri du tableau 
+  conversations.sort((a, b) => {
+      // par date dernier message
+    if(a.lastMessage && b.lastMessage) {
+      return a.lastMessage.date > b.lastMessage.date ? -1 : 1
+    }
+  })
+  conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1) // messages non lus en 1er
 
 
   res.json({

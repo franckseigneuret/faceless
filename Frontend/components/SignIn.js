@@ -116,6 +116,7 @@ function SignIn(props) {
       <Text style={styles.textTitle}>Bon retour !</Text>
       <View style={styles.containerInput}>
         <Input
+          keyboardType={"email-address"}
           placeholder="helicoptere530@gmail.com"
           inputContainerStyle={styles.inputConnect}
           onChangeText={(value) => setSignInEmail(value)}

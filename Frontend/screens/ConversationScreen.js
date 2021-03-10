@@ -117,11 +117,11 @@ function ConversationScreen(props) {
 
         if (item.to_id === myContactId) {
             return  (
-            <View >
+            <View key={i}>
                 <Text style={styles.date}>{dateToShow}</Text>
                 <View style={{justifyContent: "center", marginBottom: 10}}>
                     <Swipeable renderRightActions={()=> rightActions(hours)}>
-                        <View style={styles.blocRight} key={i} >
+                        <View style={styles.blocRight}>
                             <View style={styles.msgRight}>
                                 <Text style={styles.textRight} >{item.content}</Text>
                             </View>
@@ -132,11 +132,11 @@ function ConversationScreen(props) {
 
         } else {
             return( 
-            <View>
+            <View key={i}>
                 <Text style={styles.date}>{dateToShow}</Text>
                 <View style={{justifyContent: "center", marginBottom: 10}}>
                     <Swipeable renderLeftActions={()=> leftActions(hours)}>
-                        <View style={styles.blocLeft} key={i}>
+                        <View style={styles.blocLeft}>
                             <View style={styles.msgLeft}>
                                 <Text style={styles.textLeft} >{item.content}</Text>
                             </View>
