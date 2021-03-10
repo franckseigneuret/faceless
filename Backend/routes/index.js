@@ -211,7 +211,7 @@ router.get('/show-card', async function (req, res, next) {
     participants : ObjectId(user._id),
   })
 
-  console.log(conversations[0].participants[1], '<--------- my conversations !!');
+  // console.log(conversations[0].participants[1], '<--------- my conversations !!');
   
   var conversationsWithId= []
 
@@ -328,17 +328,25 @@ router.get('/show-msg', async function (req, res, next) {
 
   const myConnectedId = req.query.user_id
 
+  const user = await UserModel.findById(myConnectedId)
+
+  const blockedBy = user.blocked_by_id
+  const allBlockedId = blockedBy.concat(user.blocked_user_id)
+
+  console.log("allBlockedId", allBlockedId)
+
   // compter le nb de demandes de conversation
   const allConversations = await ConversationsModel.find({
-    participants: { $in: [myConnectedId] },
+    participants: { $in: [myConnectedId], $nin: allBlockedId },
   })
+  console.log("allConversations", allConversations)
   allConversations.forEach(element => {
     nbNewConversations = element.demand === true ? ++nbNewConversations : nbNewConversations
   });
 
   // load les conversations avec mes contacts
   const conversationsPerPart = await ConversationsModel.find({
-    participants: { $in: [myConnectedId] },
+    participants: { $in: [myConnectedId], $nin: allBlockedId },
     demand: askNewConversation,
   })
 
@@ -369,7 +377,7 @@ router.get('/show-msg', async function (req, res, next) {
       from_id: notMe,
     }).sort({ date: -1 })
 
-    console.log("lastMsgFriend", lastMsgFriend)
+    // console.log("lastMsgFriend", lastMsgFriend)
 
     now = new Date()
 
@@ -394,6 +402,8 @@ router.get('/show-msg', async function (req, res, next) {
     conversations.sort((a, b) => a.nbUnreadMsg > b.nbUnreadMsg ? -1 : 1) // messages non lus en 1er
   }))
 
+  // console.log("conversations", conversations)
+  // console.log("nbNewConversations", nbNewConversations)
 
 
   res.json({
