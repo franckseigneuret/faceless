@@ -77,7 +77,7 @@ var imgDiscover = imgDiscover.map((url, key) => {
           <ScrollView
             pagingEnabled={true}
             scrollEventThrottle={16}
-            onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {useNativeDriver: true})}
+            onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {useNativeDriver: false})}
             contentContainerStyle={styles.logo}
             showsHorizontalScrollIndicator={false}
             snapToInterval={windowWidth}
