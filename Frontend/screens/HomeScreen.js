@@ -129,7 +129,7 @@ function HomeScreen(props) {
       console.log(e,'INFOS USERS')
       moment.locale('fr');
     var NewDate = moment(e.subscriptionDate).format('Do MMMM YYYY')
-    return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
+    return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={2000} direction="alternate" style={styles.cardContainer}>
       <View style={styles.topCard}>
         <Overlay isVisible={visible} overlayBackgroundColor="pink" overlayStyle={{ backgroundColor: "rgba(255, 241, 226, 0.5)"}}>
           <View style={styles.centeredView}>
@@ -169,7 +169,7 @@ function HomeScreen(props) {
         </TouchableOpacity>
         <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
         <Text style={styles.member}>Membre depuis le {NewDate}</Text>
-        <Text style={{marginTop: 5, opacity:0.6, fontFamily:'Montserrat_600SemiBold'}}><Ionicons name='location' size={15} /> Region de {e.localisation.label == undefined ? 'France' : e.localisation.label}</Text>
+        <Text style={{marginTop: 5, opacity:0.6, fontFamily:'Montserrat_600SemiBold'}}><Ionicons name='location' size={15} /> Region de {e.localisation.label  ?  e.localisation.label : 'France'}</Text>
       </View>
       <View style={styles.problemDesc}>
         <Text style={styles.subtitle}>En quelques mots :</Text>
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     textAlign: 'center',
     color: '#5571D7',
-    marginRight:5
+    marginRight:30
   },
   cardContainer: {
     width: windowWidth - 40,

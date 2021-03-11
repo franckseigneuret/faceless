@@ -171,7 +171,7 @@ function Filter(props) {
             markerStyle={styles.markerStyle}
             min={0}
             max={100}
-            values={localisation != "France" ? [localisation] : [91]}
+            values={localisation != "France" ? [localisation] : [100]}
             enabledTwo
             onValuesChange={value => { value > 90 ? setLocalisation(franceLocalisation) : setLocalisation(value)}}
             pressedMarkerStyle={styles.stepLabelStyle}
