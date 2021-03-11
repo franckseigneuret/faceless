@@ -200,9 +200,9 @@ function quizz(props) {
       <View style={styles.container}>
         <View style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={Platform.OS === "ios" ? "padding" : "padding"}
             style={styles.container}
-            keyboardVerticalOffset={-60}
+            keyboardVerticalOffset={-125}
           >
             <ProgressSteps
               completedStepIconColor='#5571D7'
