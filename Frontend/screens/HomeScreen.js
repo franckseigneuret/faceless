@@ -1,3 +1,5 @@
+import HTTP_IP_DEV from '../mon_ip'
+import colors from '../colors'
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Image, KeyboardAvoidingView, Button } from 'react-native';
 import { Input, Overlay } from 'react-native-elements';
@@ -8,7 +10,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { ScrollView } from 'react-native-gesture-handler';
 import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import HTTP_IP_DEV from '../mon_ip'
 import moment from "moment";
 import 'moment/locale/fr'
 
@@ -134,12 +135,12 @@ function HomeScreen(props) {
         <Overlay isVisible={visible} overlayBackgroundColor="pink" overlayStyle={{ backgroundColor: "rgba(255, 241, 226, 0.5)"}}>
           <View style={styles.centeredView}>
             <TouchableOpacity style={styles.buttonRelatif} onPress={() => { setVisible(false), deleteConv(newConvId), toggleOverlay() }}>
-              <Ionicons name="close-outline" size={30} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
+              <Ionicons name="close-outline" size={30} color={colors.HavelockBlue} style={{ alignSelf: 'center', marginTop: 3 }} />
             </TouchableOpacity>
             <View style={styles.modalView}>
               <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ width: "80%", display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
                 <Input
-                  containerStyle={{ borderWidth: 2, minHeight: 40, borderColor: "#8C8C8C", borderRadius: 20, backgroundColor: "white" }}
+                  containerStyle={{ borderWidth: 2, minHeight: 40, borderColor: colors.gray, borderRadius: 20, backgroundColor: "white" }}
                   placeholder='Your message'
                   inputContainerStyle={{ borderBottomWidth: 0 }}
                   multiline={true}
@@ -150,7 +151,7 @@ function HomeScreen(props) {
                   }}
                 />
                 <TouchableOpacity style={disableSendBtn ? styles.buttonDisabled : styles.buttonSend} onPress={() => sendMsg(myContactId, currentMsg)} disabled={disableSendBtn}>
-                  <Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton} />
+                  <Ionicons name="send" size={25} color={colors.peachCream} style={styles.sendButton} />
                 </TouchableOpacity>
               </KeyboardAvoidingView>
             </View>
@@ -165,7 +166,7 @@ function HomeScreen(props) {
                       avatar: e.avatar,
                       userID: e._id,
                     })}> 
-                  <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:'#EC9A1F', width:100, height:100}}/>
+                  <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:colors.carrot, width:100, height:100}}/>
         </TouchableOpacity>
         <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
         <Text style={styles.member}>Membre depuis le {NewDate}</Text>
@@ -173,7 +174,7 @@ function HomeScreen(props) {
       </View>
       <View style={styles.problemDesc}>
         <Text style={styles.subtitle}>En quelques mots :</Text>
-        <Text style={{ color: "#264653", fontFamily: "Montserrat_400Regular", }} numberOfLines={4}>{e.problem_description}</Text>
+        <Text style={{ color: colors.blueDiane, fontFamily: "Montserrat_400Regular", }} numberOfLines={4}>{e.problem_description}</Text>
       </View>
       <View style={styles.problemContainer}>
         <Text style={styles.subtitle}>Type(s) de probleme(s)</Text>
@@ -187,7 +188,7 @@ function HomeScreen(props) {
           <TouchableOpacity
             style={styles.buttonSend}
             onPress={() => { setVisible(true), createConv(e._id), setMyContactId(e._id), toggleOverlay() }}
-          ><Ionicons name="send" size={25} color="#FFEEDD" style={styles.sendButton} />
+          ><Ionicons name="send" size={25} color={colors.peachCream} style={styles.sendButton} />
           </TouchableOpacity>
           <TouchableOpacity 
                     onPress={()=> props.navigation.navigate('UserProfilScreen', {
@@ -200,7 +201,7 @@ function HomeScreen(props) {
                       userID: e._id,
                     })}
                     style={styles.buttonInfo}>     
-                    <Ionicons name="person" size={24} color="#FFEEDD" />
+                    <Ionicons name="person" size={24} color={colors.peachCream} />
                   </TouchableOpacity>
         </View>
       </View>
@@ -216,13 +217,13 @@ function HomeScreen(props) {
   } else {
     if (userToDisplay.length > 0) {
       return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFEEDD' }}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.peachCream }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 40, marginBottom: 20, width: '65%' }}>
             <Text style={styles.textTitle}>
               Salut {pseudo} !
           </Text>
             <TouchableOpacity style={styles.buttonDate} onPress={() => handlePressFilter()}>
-              <Ionicons name="funnel" size={25} color="#5571D7" style={{ alignSelf: 'center', marginTop: 3 }} />
+              <Ionicons name="funnel" size={25} color={colors.HavelockBlue} style={{ alignSelf: 'center', marginTop: 3 }} />
             </TouchableOpacity>
           </View>
           <ScrollView showsHorizontalScrollIndicator={false} snapToInterval={windowWidth} decelerationRate='fast' horizontal >
@@ -250,12 +251,12 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   buttonDate: {
-    backgroundColor: "#FFEEDD",
+    backgroundColor: colors.peachCream,
     padding: 10,
     width: 50,
     height: 50,
     borderRadius: 30,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.5
@@ -266,14 +267,14 @@ const styles = StyleSheet.create({
     fontSize: 26,
     lineHeight: 32,
     textAlign: 'center',
-    color: '#5571D7',
+    color: colors.HavelockBlue,
     marginRight:5
   },
   cardContainer: {
     width: windowWidth - 40,
     marginHorizontal: 20,
     marginVertical: 10,
-    backgroundColor: "#FFEEDD",
+    backgroundColor: colors.peachCream,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -316,12 +317,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap'
   },
   buttonDisabled: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     padding: 10,
     width: 50,
     height: 50,
     borderRadius: 30,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.5,
@@ -332,11 +333,11 @@ const styles = StyleSheet.create({
     opacity: 0.3
     }, 
   buttonInfo: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     width: 50,
     height: 50,
     borderRadius: 30,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.5,
@@ -347,10 +348,10 @@ const styles = StyleSheet.create({
   textInfo: {
     fontFamily: 'Montserrat_800ExtraBold',
     fontSize: 20,
-    color: "#FFEEDD"
+    color: colors.peachCream
   },
   badge: {
-    backgroundColor: '#5571D7',
+    backgroundColor: colors.HavelockBlue,
     margin: 2,
     fontSize: 10,
     borderRadius: 30
@@ -364,18 +365,18 @@ const styles = StyleSheet.create({
   pseudo: {
     textAlign: "center",
     fontSize: 20,
-    color: "#5571D7",
+    color: colors.HavelockBlue,
     fontFamily: "Montserrat_700Bold",
   },
   member: {
     textAlign: "center",
-    color: "#909090",
+    color: colors.gray,
     fontFamily: "Montserrat_700Bold",
     fontStyle: 'italic',
     marginTop: 5
   },
   subtitle: {
-    color: "#EC9A1F",
+    color: colors.carrot,
     fontSize: 16,
     fontFamily: "Montserrat_700Bold",
   },
@@ -384,18 +385,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,
-    // backgroundColor: "#FFEEDD"
+    // backgroundColor: colors.peachCream
   },
   modalView: {
     width: "90%",
     minHeight: "30%",
     margin: 20,
-    backgroundColor: "#FFF1E2",
+    backgroundColor: colors.peachCream,
     borderRadius: 20,
     padding: 35,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOffset: {
       width: 0,
       height: 2
@@ -405,12 +406,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonSend: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     padding: 10,
     width: 50,
     height: 50,
     borderRadius: 30,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.5,
@@ -426,11 +427,11 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-45deg' }]
   },
   button: {
-    backgroundColor: "#FFF1E2",
+    backgroundColor: colors.peachCream,
     width: 50,
     height: 50,
     borderRadius: 30,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.5,
@@ -440,11 +441,11 @@ const styles = StyleSheet.create({
     margin: 15
   },
   buttonRelatif: {
-    backgroundColor: "#FFF1E2",
+    backgroundColor: colors.peachCream,
     width: 50,
     height: 50,
     borderRadius: 30,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.5,
@@ -459,7 +460,7 @@ const styles = StyleSheet.create({
   noCardContainer: {
     width: '100%',
     height: windowHeight - 50,
-    backgroundColor: "#FFEEDD",
+    backgroundColor: colors.peachCream,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-around',
@@ -468,12 +469,12 @@ const styles = StyleSheet.create({
   noCardText: {
     fontFamily: 'Montserrat_700Bold',
     fontSize: 22,
-    color: '#EC9A1F',
+    color: colors.carrot,
     textAlign: 'left',
     width: '80%'
   },
   noCardButton: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     borderRadius: 86,
     margin: 20,
     padding: 10
@@ -481,7 +482,7 @@ const styles = StyleSheet.create({
   noCardButtonText: {
     fontFamily: 'Montserrat_700Bold',
     fontSize: 22,
-    color: '#FFEEDD',
+    color: colors.peachCream,
     textAlign: 'center'
   }
 })

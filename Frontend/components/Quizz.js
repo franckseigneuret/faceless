@@ -1,3 +1,5 @@
+import colors from '../colors'
+import HTTP_IP_DEV from '../mon_ip'
 import React, { useState } from 'react';
 import { Input } from 'react-native-elements';
 import { StyleSheet, Text, View, Dimensions, Pressable, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
@@ -7,7 +9,6 @@ import AppLoading from 'expo-app-loading';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import HTTP_IP_DEV from '../mon_ip'
 
 import {
   useFonts,
@@ -187,7 +188,7 @@ function quizz(props) {
       <Pressable key={i} style={visible[i] ? styles.problemCardBis : styles.problemCard}
         onPress={() => { handleSelectProblem(i); }}
       >
-        <Ionicons name={item.icon} size={24} color="#5571D7" />
+        <Ionicons name={item.icon} size={24} color={colors.HavelockBlue} />
         <Text style={styles.textProblem}>{item.name}</Text>
       </Pressable>)
   }
@@ -205,16 +206,16 @@ function quizz(props) {
             keyboardVerticalOffset={-125}
           >
             <ProgressSteps
-              completedStepIconColor='#5571D7'
-              progressBarColor='#BCC8F0'
-              completedProgressBarColor='#5571D7'
-              activeStepIconColor='#5571D7'
-              activeStepIconBorderColor='#BCC8F0'
-              disabledStepNumColor='#BCC8F0'
-              disabledStepIconColor='#BCC8F0'
-              completedStepNumColor='#5571D7'
-              activeStepNumColor='#5571D7'
-              completedCheckColor='#5571D7'
+              completedStepIconColor={colors.HavelockBlue}
+              progressBarColor={colors.peche}
+              completedProgressBarColor={colors.HavelockBlue}
+              activeStepIconColor={colors.HavelockBlue}
+              activeStepIconBorderColor={colors.peche}
+              disabledStepNumColor={colors.peche}
+              disabledStepIconColor={colors.peche}
+              completedStepNumColor={colors.HavelockBlue}
+              activeStepNumColor={colors.HavelockBlue}
+              completedCheckColor={colors.HavelockBlue}
               topOffset={windowHeight - 100}
             >
               <ProgressStep nextBtnText='valider'
@@ -345,12 +346,12 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF1E2',
+    backgroundColor: colors.peachCream,
     alignItems: 'center',
     justifyContent: 'center',
   },
   buttonNext: {
-    backgroundColor: '#5571D7',
+    backgroundColor: colors.HavelockBlue,
     width: 130,
     borderRadius: 86,
     marginBottom: 25,
@@ -364,7 +365,7 @@ const styles = StyleSheet.create({
 
   },
   buttonPreviousText: {
-    color: '#EC9A1F',
+    color: colors.carrot,
     width: 'auto',
     fontFamily: 'Montserrat_700Bold',
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
@@ -373,7 +374,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20
   },
   buttonNextText: {
-    color: '#FFF1E2',
+    color: colors.peachCream,
     fontFamily: 'Montserrat_700Bold',
     fontSize: 18,
     textAlign: 'center',
@@ -383,12 +384,12 @@ const styles = StyleSheet.create({
     right: 10
   },
   textTitleQuizz: {
-    color: '#5571D7',
+    color: colors.HavelockBlue,
     fontFamily: 'Montserrat_900Black',
     fontSize: 56,
   },
   textQuizz: {
-    color: '#5571D7',
+    color: colors.HavelockBlue,
     fontFamily: 'Montserrat_800ExtraBold',
     fontSize: 22,
     marginTop: 20,
@@ -415,7 +416,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: windowHeight / 20,
     padding: 4,
-    backgroundColor: '#FFCC99',
+    backgroundColor: colors.peachOrange,
     borderWidth: 1,
     borderColor: 'black',
     borderRadius: 5,
@@ -435,14 +436,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: windowHeight / 20,
     padding: 4,
-    backgroundColor: '#BCC8F0',
+    backgroundColor: colors.peche,
     borderWidth: 1,
     borderColor: 'black',
     borderRadius: 5,
     margin: 10,
   },
   buttonDate: {
-    backgroundColor: "#FFF1E2",
+    backgroundColor: colors.peachCream,
     padding: 10,
     width: '100%',
     borderBottomWidth: 1,

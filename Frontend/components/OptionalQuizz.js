@@ -1,3 +1,4 @@
+import colors from '../colors'
 import React, { useState, useEffect } from 'react';
 import { View, Dimensions, KeyboardAvoidingView } from 'react-native';
 import { connect } from 'react-redux';
@@ -35,7 +36,7 @@ function OptionalQuizz(props) {
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#FFF1E2' }}>
+    <View style={{ flex: 1, backgroundColor: colors.peachCream }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}

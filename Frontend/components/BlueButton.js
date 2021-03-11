@@ -1,3 +1,4 @@
+import colors from '../colors'
 import React from 'react';
 import { Button } from 'react-native-elements';
 import { StyleSheet, View } from 'react-native';
@@ -54,7 +55,7 @@ export default connect(
 
 const styles = StyleSheet.create({
   buttonValider: {
-    backgroundColor: '#5571D7',
+    backgroundColor: colors.HavelockBlue,
     borderRadius: 86,
     width: 159,
     margin: 50   

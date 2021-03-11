@@ -1,3 +1,4 @@
+import colors from '../colors'
 import React, { useEffect, useState } from 'react';
 import { Text, View, Dimensions, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Button } from 'react-native-elements';
@@ -7,8 +8,6 @@ import AppLoading from 'expo-app-loading';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from "@react-navigation/native";
-
-import HTTP_IP_DEV from '../mon_ip'
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -112,7 +111,7 @@ function Filter(props) {
       <View style={styles.container}>
         <View style={styles.topContainer}>
           <TouchableOpacity style={styles.buttonPrevious} onPress={() => handleClickBack()} >
-            <Ionicons name="chevron-back" size={30} color="#5571D7" style={{ alignSelf: 'center',}} />
+            <Ionicons name="chevron-back" size={30} color={colors.HavelockBlue} style={{ alignSelf: 'center',}} />
           </TouchableOpacity>
           <Text style={styles.textTitle}>Mes filtres</Text>
         </View>
@@ -205,7 +204,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: '#FFF1E2',
+    backgroundColor: colors.peachCream,
     width: windowWidth,
     height: windowHeight,
   },
@@ -218,12 +217,12 @@ const styles = StyleSheet.create({
     width: '85%',
   },
   buttonPrevious: {
-    backgroundColor: "#FFEEDD",
+    backgroundColor: colors.peachCream,
     padding: 10,
     width: 50,
     height: 50,
     borderRadius: 30,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.5
@@ -233,14 +232,14 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     fontSize: 26,
     lineHeight: 32,
-    color: '#5571D7',
+    color: colors.HavelockBlue,
     left: '95%',
   },
   problemsSelect: {
 
   },
   badge: {
-    backgroundColor: '#BCC8F0',
+    backgroundColor: colors.peche,
     margin: 2,
     fontSize: 10,
     borderRadius: 30,
@@ -248,7 +247,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   badgeBis: {
-    backgroundColor: '#5571D7',
+    backgroundColor: colors.HavelockBlue,
     margin: 2,
     fontSize: 10,
     borderRadius: 30,
@@ -274,7 +273,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat_600SemiBold',
     fontSize: 20,
     marginBottom: 10,
-    color: '#5571D7'
+    color: colors.HavelockBlue
   },
   bottomContainer: {
     display: 'flex',
@@ -288,24 +287,24 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonSave: {
-    backgroundColor: '#5571D7',
+    backgroundColor: colors.HavelockBlue,
     borderRadius: 86,
     width: 159,
     marginLeft: 60,
     marginBottom: 20,
   },
   markerStyle: {
-    backgroundColor: '#EC9A1F',
+    backgroundColor: colors.carrot,
     borderWidth: 0,
     width: 30,
     height: 30
   },
   selectedStyle: {
     height: 4,
-    backgroundColor: '#5571D7'
+    backgroundColor: colors.HavelockBlue
   },
   unselectedStyle: {
-    backgroundColor: '#BCC8F0'
+    backgroundColor: colors.peche
   },
   sliderLabel: {
     bottom: 0,
@@ -318,7 +317,7 @@ const styles = StyleSheet.create({
   },
   textDynamic: {
     fontFamily: 'Montserrat_700Bold',
-    color: '#EC9A1F',
+    color: colors.carrot,
     fontSize: 18
   }
 })

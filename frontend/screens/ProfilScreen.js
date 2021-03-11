@@ -1,3 +1,4 @@
+import colors from '../colors'
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
@@ -10,9 +11,6 @@ import {
   Platform,
   ScrollView,
   Dimensions,
-  Modal,
-  Pressable,
-  Alert,
 } from "react-native";
 
 import { Button, Overlay } from "react-native-elements";
@@ -391,7 +389,7 @@ export default function ProfilScreen(props) {
           <Text style={styles.titleHome}>Mon Profil</Text>
           <TouchableOpacity style={styles.buttonPrevious} onPress={() => handleDisconnect()} >
             
-                <MaterialCommunityIcons name="location-exit" style={{ alignSelf: 'center', marginTop: 3 }} size={24} color="#5571D7" />
+                <MaterialCommunityIcons name="location-exit" style={{ alignSelf: 'center', marginTop: 3 }} size={24} color={colors.HavelockBlue} />
           </TouchableOpacity>
           
         </View>
@@ -413,18 +411,18 @@ export default function ProfilScreen(props) {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
-                  backgroundColor: "#FFF1E2",
+                  backgroundColor: colors.peachCream,
                   textAlign: "center",
                   width: "80%",
-                  borderColor: "#2d3436",
+                  borderColor: colors.outerSpace
                 }}
-                backdropStyle={{ opacity: 0.8, backgroundColor: "#FFF1E2" }}
+                backdropStyle={{ opacity: 0.8, backgroundColor: colors.peachCream }}
               >
                 <>
                 <Ionicons
                   name="chevron-back-outline"
                   size={40}
-                  color="#5571D7"
+                  color={colors.HavelockBlue}
                 />
                 <ScrollView
                   horizontal={true}
@@ -435,7 +433,7 @@ export default function ProfilScreen(props) {
                 <Ionicons
                   name="chevron-forward-outline"
                   size={40}
-                  color="#5571D7"
+                  color={colors.HavelockBlue}
                 />
                 </>
               </Overlay>
@@ -444,7 +442,7 @@ export default function ProfilScreen(props) {
             <View style={{marginLeft:30}}>
               <Text style={styles.pseudo}>
                 {pseudo}
-                <Ionicons name="lock-closed" size={18} color="#5571D7" />
+                <Ionicons name="lock-closed" size={18} color={colors.HavelockBlue} />
               </Text>
 
               <View style={styles.containerMail}>
@@ -452,7 +450,7 @@ export default function ProfilScreen(props) {
                   <>
                     <Text style={styles.subtitle}>{email}</Text>
                     <TouchableOpacity onPress={handlePressEmail}>
-                      <Ionicons name="pencil" size={18} color="#5571D7" />
+                      <Ionicons name="pencil" size={18} color={colors.HavelockBlue} />
                     </TouchableOpacity>
                   </>
                 ) : (
@@ -472,7 +470,7 @@ export default function ProfilScreen(props) {
                   <>
                     <Text style={styles.subtitle}>Mot de passe</Text>
                     <TouchableOpacity onPress={handlePressMdp}>
-                      <Ionicons name="pencil" size={18} color="#5571D7" />
+                      <Ionicons name="pencil" size={18} color={colors.HavelockBlue} />
                     </TouchableOpacity>
                   </>
                 ) : (
@@ -538,7 +536,7 @@ export default function ProfilScreen(props) {
             <View style={styles.containerContent}>
               <Text style={styles.title}>En quelques mots :</Text>
               <TouchableOpacity onPress={toggleOverlayDescription}>
-                <Ionicons name="pencil" size={18} color="#5571D7" />
+                <Ionicons name="pencil" size={18} color={colors.HavelockBlue} />
               </TouchableOpacity>
             </View>
             <Text style={{ width: "100%" }} numberOfLines={3}>
@@ -693,7 +691,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: windowHeight,
-    backgroundColor: "#ffeddb",
+    backgroundColor: colors.peachCream,
     flexDirection: "column",
     justifyContent: "center",
     paddingLeft:30
@@ -773,49 +771,49 @@ const styles = StyleSheet.create({
   },
   titleHome: {
     textAlign: "center",
-    color: "#5571D7",
+    color: colors.HavelockBlue,
     fontSize: 28,
     fontFamily: "Montserrat_800ExtraBold",
     
   },
   pseudo: {
     textAlign: "left",
-    color: "#5571D7",
+    color: colors.HavelockBlue,
     fontFamily: "Montserrat_700Bold",
     marginBottom:7
   },
   subtitle: {
     textAlign: "center",
-    color: "#303030",
+    color: colors.mineShaft,
     fontFamily: "Montserrat_800ExtraBold",
     fontStyle: "italic",
   },
   subtitleChanged: {
     textAlign: "center",
-    color: "#BCC8F0",
+    color: colors.peche,
     fontFamily: "Montserrat_800ExtraBold",
     fontStyle: "italic",
   },
   titleGenre: {
-    color: "#EC9A1F",
+    color: colors.carrot,
     fontFamily: "Montserrat_700Bold",
     justifyContent: "flex-start",
   },
   title: {
-    color: "#EC9A1F",
+    color: colors.carrot,
     fontFamily: "Montserrat_700Bold",
     justifyContent: "flex-start",
     marginRight: 10,
   },
   titleOverlay: {
-    color: "#EC9A1F",
+    color: colors.carrot,
     fontFamily: "Montserrat_700Bold",
     justifyContent: "flex-start",
     marginRight: 10,
     marginBottom:10
   },
   titleVille: {
-    color: "#EC9A1F",
+    color: colors.carrot,
     fontFamily: "Montserrat_700Bold",
     marginBottom: 7,
     marginLeft:3
@@ -823,13 +821,13 @@ const styles = StyleSheet.create({
   text: {
     borderWidth: 2,
     textAlign: "left",
-    color: "#264653",
+    color: colors.blueDiane,
     fontFamily: "Montserrat_400Regular",
   },
   textFin: {
     alignItems: "center",
     textAlign: "center",
-    color: "#BCC8F0",
+    color: colors.peche,
     fontFamily: "Montserrat_800ExtraBold",
     fontSize: 10,
   },
@@ -839,42 +837,42 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   buttonValider: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     marginTop:10,
     borderRadius: 86,
     width: 200,
     margin: 10,
   },
   buttonValiderBIS: {
-    backgroundColor: "#BCC8F0",
+    backgroundColor: colors.bleuCiel,
     marginTop:10,
     borderRadius: 86,
     width: 200,
     margin: 10,
   },
   buttonValiderOverlay: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     justifyContent:'center',
     borderRadius: 86,
     width: 200,
     margin: 10,
   },
   buttonOK: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     borderRadius: 86,
     width: 159,
     paddingHorizontal: 10,
     paddingVertical: 3,
   },
   buttonDisconnect: {
-    backgroundColor: "#D75555",
+    backgroundColor: colors.roman,
     borderRadius: 86,
     width: 159,
     paddingHorizontal: 10,
     paddingVertical: 3,
   },
   buttonEnd: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     borderRadius: 86,
     width: 159,
     paddingHorizontal: 10,
@@ -882,20 +880,20 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: "#000000",
+    borderColor: colors.black,
     borderBottomWidth: 1,
     marginBottom: 36,
   },
   overlay: {
-    backgroundColor: "#FFF1E2",
+    backgroundColor: colors.peachCream,
     textAlign: "center",
     alignItems: "center",
     width: "80%",
-    borderColor: "#2d3436",
+    borderColor: colors.outerSpace,
     borderRadius:15
   },
   badge: {
-    backgroundColor: "#BCC8F0",
+    backgroundColor: colors.bleuCiel,
     margin: 2,
     fontSize: 10,
     borderRadius: 30,
@@ -903,7 +901,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 3,
   },
   badgeBis: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     margin: 2,
     fontSize: 10,
     borderRadius: 30,
@@ -924,13 +922,13 @@ const styles = StyleSheet.create({
     width: windowWidth,
   },
   buttonPrevious: {
-    backgroundColor: "#FFEEDD",
+    backgroundColor: colors.peachCream,
     padding: 10,
     width: 50,
     height: 50,
     marginLeft:40,
     borderRadius: 30,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.5

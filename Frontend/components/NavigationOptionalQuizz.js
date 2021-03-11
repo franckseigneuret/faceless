@@ -1,8 +1,9 @@
+import HTTP_IP_DEV from '../mon_ip'
+import colors from '../colors'
 import React, { useState } from 'react';
 import { Button } from 'react-native-elements';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import HTTP_IP_DEV from '../mon_ip'
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -50,11 +51,11 @@ function NavigationOptionalQuizz(props) {
         title="Revoir"
         type="clear"
         icon={
-          <Ionicons name="chevron-back-outline" size={24} color="#EC9A1F" />
+          <Ionicons name="chevron-back-outline" size={24} color={colors.carrot} />
         }
         buttonStyle={props.step === 0 ? styles.hidden : ''}
         titleStyle={{
-          color: '#EC9A1F',
+          color: colors.carrot,
           fontFamily: 'Montserrat_700Bold'
         }}
         onPress={() => props.onDecrease()}
@@ -64,11 +65,11 @@ function NavigationOptionalQuizz(props) {
         title="Passer"
         type="clear"
         icon={
-          <Ionicons name="chevron-forward-outline" size={24} color="#5571D7" />
+          <Ionicons name="chevron-forward-outline" size={24} color={colors.HavelockBlue} />
         }
         buttonStyle={props.step === 3 ? styles.hidden : ''}
         titleStyle={{
-          color: '#5571D7',
+          color: colors.HavelockBlue,
           fontFamily: 'Montserrat_700Bold',
         }}
         onPress={() => { props.onIncrease(); props.count == 3 ? handleClick() : null }}

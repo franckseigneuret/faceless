@@ -1,3 +1,4 @@
+import colors from './colors'
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
@@ -68,10 +69,10 @@ const BottomNavigator = () => {
         },
       })}
       tabBarOptions={{
-        activeTintColor: "#5571D7",
-        inactiveTintColor: "#BCC8F0",
+        activeTintColor: colors.HavelockBlue,
+        inactiveTintColor: colors.peche,
         style: {
-          backgroundColor: "#FFEEDD",
+          backgroundColor: colors.peachCream,
           height: 60,
           borderTopWidth: 0,
         },
@@ -107,7 +108,7 @@ LogBox.ignoreAllLogs();//Ignore all log notifications
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF1E2",
+    backgroundColor: colors.peachCream,
     alignItems: "center",
     justifyContent: "center",
   },

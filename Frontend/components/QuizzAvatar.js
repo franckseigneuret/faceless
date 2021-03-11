@@ -1,9 +1,10 @@
+import HTTP_IP_DEV from '../mon_ip'
+import colors from '../colors'
 import React, { useState } from 'react';
 import { StyleSheet, View, Dimensions, Image, ScrollView, TouchableOpacity } from 'react-native';
 import {connect} from 'react-redux';
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import  HTTP_IP_DEV from '../mon_ip'
 
 import BlueButton from './BlueButton';
 
@@ -78,11 +79,11 @@ function QuizzAvatar(props) {
                 <Image source={{uri: imgAvatarSelected}} style={{width: 200, height: 200}}/>
             </View>
             <View style={styles.avatar}>
-                <Ionicons name="chevron-back-outline" size={40} color="#5571D7" />
+                <Ionicons name="chevron-back-outline" size={40} color={colors.HavelockBlue} />
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                     {imgAvatar}
                 </ScrollView>
-                <Ionicons name="chevron-forward-outline" size={40} color="#5571D7" />
+                <Ionicons name="chevron-forward-outline" size={40} color={colors.HavelockBlue} />
             </View>
             <BlueButton btnTitle="enregistrer" handleClickParent={handleClick}/>
         </View>
@@ -111,7 +112,7 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF1E2', 
+    backgroundColor: colors.peachCream, 
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",

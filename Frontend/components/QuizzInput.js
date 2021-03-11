@@ -1,15 +1,7 @@
-import React, { useState } from 'react';
-import { Input, Button } from 'react-native-elements';
+import colors from '../colors'
+import React from 'react';
+import { Button } from 'react-native-elements';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
-import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
-import { Ionicons } from '@expo/vector-icons'; 
-
-import QuizzTitre from "./QuizzTitre"
-import NavigationOptionalQuizz from "./NavigationOptionalQuizz"
-
-
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
 
 import {
     useFonts,
@@ -47,7 +39,7 @@ export default function QuizzInput(props) {
 
 const styles = StyleSheet.create({
   buttonValider: {
-    backgroundColor: '#5571D7',
+    backgroundColor: colors.HavelockBlue,
     borderRadius: 86,
     width: 159,
     margin: 50   
