@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import colors from '../colors'
+import HTTP_IP_DEV from "../mon_ip";
+import React, { useState } from "react";
 import { Button, Input } from "react-native-elements";
 import { StyleSheet, View, Dimensions, Text, TouchableOpacity } from "react-native";
 import AppLoading from "expo-app-loading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';
-import HTTP_IP_DEV from "../mon_ip";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -90,7 +91,7 @@ function SignIn(props) {
   };
 
   var tabErrorsSignIn = listErrorsSignIn.map((error, i) => {
-    return <Text style={{ fontFamily: "Montserrat_700Bold" }}>{error}</Text>;
+    return <Text key={i} style={{ fontFamily: "Montserrat_700Bold" }}>{error}</Text>;
   });
 
   if (!fontsLoaded) {
@@ -107,7 +108,7 @@ function SignIn(props) {
           <Ionicons
             name="chevron-back"
             size={25}
-            color="#5571D7"
+            color={colors.HavelockBlue}
             style={{ alignSelf: "center", marginTop: 3 }}
           />
         </TouchableOpacity>
@@ -120,14 +121,18 @@ function SignIn(props) {
           placeholder="helicoptere530@gmail.com"
           inputContainerStyle={styles.inputConnect}
           onChangeText={(value) => setSignInEmail(value)}
+          placeholderTextColor={colors.boulder}
           value={signInEmail}
-        ></Input>
+          style={{fontFamily: "Montserrat_400Regular"}}
+          ></Input>
         <Input
           secureTextEntry={true}
           placeholder="Ton mot de passe"
           inputContainerStyle={styles.inputConnect}
           onChangeText={(value) => setSignInPassword(value)}
+          placeholderTextColor={colors.boulder}
           value={signInPassword}
+          style={{fontFamily: "Montserrat_400Regular"}}
         ></Input>
       </View>
       {tabErrorsSignIn}
@@ -147,7 +152,7 @@ function SignIn(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF1E2",
+    backgroundColor: colors.peachCream,
     alignItems: "center",
     width: windowWidth,
     height: windowHeight,
@@ -162,12 +167,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   buttonPrevious: {
-    backgroundColor: "#FFEEDD",
+    backgroundColor: colors.peachCream,
     padding: 10,
     width: 50,
     height: 50,
     borderRadius: 30,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     shadowColor: "black",
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.5
@@ -176,7 +181,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   textTitle: {
-    color: "#5571D7",
+    color: colors.HavelockBlue,
     fontFamily: "Montserrat_900Black",
     fontSize: 43,
     width: "75%",
@@ -184,9 +189,10 @@ const styles = StyleSheet.create({
   },
   inputConnect: {
     width: "75%",
+    borderColor: colors.boulder,
   },
   buttonNext: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     marginTop:40,
     borderRadius: 86,
     width: 200,

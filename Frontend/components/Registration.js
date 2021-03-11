@@ -1,10 +1,10 @@
+import colors from '../colors'
 import React, { useEffect } from "react";
 import { Button } from "react-native-elements";
 import { StyleSheet, View, Dimensions, Image, Text,Animated } from "react-native";
 import AppLoading from "expo-app-loading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import HTTP_IP_DEV from '../mon_ip'
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -98,7 +98,7 @@ var imgDiscover = imgDiscover.map((url, key) => {
               return (
                 <Animated.View
                   key={i}
-                  style={{ opacity, height: 10, width: 10, backgroundColor: '#5571D7', margin: 8, borderRadius: 5 }}
+                  style={{ opacity, height: 10, width: 10, backgroundColor: colors.HavelockBlue, margin: 8, borderRadius: 5 }}
                 />
               );
             })}
@@ -119,7 +119,7 @@ var imgDiscover = imgDiscover.map((url, key) => {
               buttonStyle={styles.buttonConnection}
               titleStyle={{
                 fontFamily: "Montserrat_700Bold",
-                color: '#5571D7',
+                color: colors.HavelockBlue,
               }}
               onPress={() => props.navigation.navigate("SignIn")}
             />
@@ -132,20 +132,20 @@ var imgDiscover = imgDiscover.map((url, key) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#feeddb",
+    backgroundColor: colors.peachCream,
     alignItems: "center",
     justifyContent: "center",
   },
   buttonNext: {
-    backgroundColor: "#5571D7",
+    backgroundColor: colors.HavelockBlue,
     borderRadius: 86,
     width: 200,
     margin: 10,
   },
   buttonConnection: {
-    backgroundColor: "#FFF1E2",
+    backgroundColor: colors.peachCream,
     borderWidth:3,
-    borderColor: '#5571D7',
+    borderColor: colors.HavelockBlue,
     borderRadius: 86,
     width: 200,
     margin: 10,

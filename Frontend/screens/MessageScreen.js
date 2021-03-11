@@ -1,4 +1,5 @@
 import HTTP_IP_DEV from '../mon_ip'
+import colors from '../colors'
 import React, { useEffect, useState, useCallback } from 'react';
 import { SafeAreaView, RefreshControl, StyleSheet, Text, View, Button, Image, TouchableOpacity, ScrollView, Dimensions, Vibration, TouchableHighlight, Animated } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,7 +10,6 @@ import { Octicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { useIsFocused } from "@react-navigation/native";
-
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -199,11 +199,11 @@ function MessageScreen(props) {
               value === 'demandes' ? loadConversations({ demandes: true }) : loadConversations({ demandes: false })
               setPart(value)
             }}
-            textColor={'#5571D7'}
-            selectedColor={'#FFF'}
-            backgroundColor={'#b9c7f3'}
-            buttonColor={'#5571D7'}
-            borderColor={'#BCC8F0'}
+            textColor={colors.HavelockBlue}
+            selectedColor={colors.white}
+            backgroundColor={colors.bleuCiel}
+            buttonColor={colors.HavelockBlue}
+            borderColor={colors.peche}
             hasPadding
             fontSize={18}
             options={[
@@ -260,19 +260,19 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: '#ffeddb',
+    backgroundColor: colors.peachCream,
     height: '100%',
   },
   main: {
     // borderWidth: 1,
-    // borderColor: "#CCC",
+    // borderColor: colors.silver,
     height: windowSize.height * .9,
     width: windowSize.width * .9,
   },
   mainTitle: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#5571D7',
+    color: colors.HavelockBlue,
     textAlign: 'center',
   },
   switch: {
@@ -309,11 +309,11 @@ const styles = StyleSheet.create({
     width: windowSize.width * .9,
     marginBottom: 20,
     padding: 10,
-    backgroundColor: '#fff1e0',
+    backgroundColor: colors.peachCream,
     borderWidth: 1,
-    borderColor: "#CCC",
+    borderColor: colors.silver,
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: colors.black,
     shadowOffset: {
       width: 2,
       height: 2,
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   nonLuContent: {
-    backgroundColor: '#5571D7',
+    backgroundColor: colors.HavelockBlue,
     position: 'absolute',
     right: -7,
     top: -7,
@@ -344,23 +344,23 @@ const styles = StyleSheet.create({
     height: 75,
     borderRadius: 75 / 2,
     borderWidth: 3,
-    borderColor: "#EC9A1F",
+    borderColor: colors.carrot,
   },
   friend: {
-    color: '#5571D7',
+    color: colors.HavelockBlue,
     fontSize: 20,
     fontWeight: 'bold',
   },
   date: {
     marginBottom: 5,
-    color: '#888',
+    color: colors.gray,
     fontSize: 10,
   },
   msg: {
     fontSize: 12,
   },
   last: {
-    color: '#888',
+    color: colors.gray,
     fontStyle: 'italic'
   },
 })

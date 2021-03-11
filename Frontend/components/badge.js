@@ -1,5 +1,5 @@
+import colors from '../colors'
 import React from 'react';
-import { Button } from 'react-native-elements';
 import { StyleSheet, View } from 'react-native';
 
 import {
@@ -29,7 +29,7 @@ export default badge;
   
 const styles = StyleSheet.create({
     badge : {
-        backgroundColor:'#5571D7',
+        backgroundColor:colors.HavelockBlue,
         margin:2,
         fontSize:10,
         borderRadius: 30,

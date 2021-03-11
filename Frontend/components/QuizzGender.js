@@ -1,7 +1,7 @@
+import colors from '../colors'
 import React, { useState } from 'react';
 import { StyleSheet, View, Image , TouchableOpacity } from 'react-native'; 
 import {connect} from 'react-redux';
-import HTTP_IP_DEV from '../mon_ip'
 
 import BlueButton from './BlueButton';
 import QuizzTitre from './QuizzTitre';
@@ -78,7 +78,7 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF1E2', 
+    backgroundColor: colors.peachCream, 
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",

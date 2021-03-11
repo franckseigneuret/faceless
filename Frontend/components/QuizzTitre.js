@@ -1,3 +1,4 @@
+import colors from '../colors'
 import React, { useState } from 'react';
 import { Input } from 'react-native-elements';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
@@ -43,7 +44,7 @@ export default function QuizzTitre(props) {
 
     if(props.type === "border"){
         var input = <Input style={styles.input}
-        placeholderTextColor='#303030'
+        placeholderTextColor={colors.mineShaft}
         inputContainerStyle={{borderBottomWidth:0}}
         placeholder={props.placeholder}
         onChangeText={(value) => onChangeContent(value)}
@@ -66,18 +67,18 @@ const styles = StyleSheet.create({
     paddingRight: windowWidth/10,
   },
   textQuizz: {
-    color: '#5571D7',
+    color: colors.HavelockBlue,
     fontFamily: 'Montserrat_800ExtraBold',
     fontSize: 22,
     marginTop: 20,
     marginBottom: 20,
   },
   input: {
-    backgroundColor: "#FECC9A",
+    backgroundColor: colors.peachOrange,
     marginTop: 20,
     marginBottom: 20,
     borderRadius: 6,
-    borderColor: "#303030",
+    borderColor: colors.mineShaft,
     borderWidth: 2,
     padding: 8,
     fontFamily: 'Montserrat_400Regular'

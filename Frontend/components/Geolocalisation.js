@@ -1,3 +1,4 @@
+import colors from '../colors'
 import React, { useEffect, useState } from 'react';
 import {
   Text,
@@ -108,19 +109,21 @@ const styles = StyleSheet.create({
     height: 40,
   },
   delete: {
-    color: "#5571D7",
+    color: colors.HavelockBlue,
   },
   chooseTown: {
-    backgroundColor: '#FFCC99',
+    backgroundColor: colors.peachOrange,
     paddingHorizontal: 15,
     height: 40,
-    minWidth: 150,
+    minWidth: 120,
+    maxWidth: 150,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
   },
   chooseTownLarge:{
     width: '90%',
+    maxWidth: '90%',
   },
   townsList: {
     position: 'absolute',
@@ -142,12 +145,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderColor: 'gray',
     borderBottomWidth: 1,
-    backgroundColor: '#FFCC99',
+    backgroundColor: colors.peachOrange,
   },
   lastItem: {
     borderBottomWidth: 0,
   },
   townSelected: {
-    backgroundColor: '#e7b685'
+    backgroundColor: colors.goldSand
   },
 })

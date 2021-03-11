@@ -1,3 +1,4 @@
+import colors from '../colors'
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import {connect} from 'react-redux';
@@ -55,7 +56,7 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF1E2', 
+    backgroundColor: colors.peachCream, 
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
