@@ -10,6 +10,7 @@ import { Octicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { useIsFocused } from "@react-navigation/native";
+import * as Animatable from 'react-native-animatable';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -121,7 +122,8 @@ function MessageScreen(props) {
           break;
       }
 
-      return <TouchableHighlight
+      return <Animatable.View key={i} animation="bounceInUp" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
+        <TouchableHighlight
         key={i}
         underlayColor
         activeOpacity={1}
@@ -175,6 +177,7 @@ function MessageScreen(props) {
         </View>
 
       </TouchableHighlight>
+      </Animatable.View>
     }
 
   })
@@ -276,7 +279,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   switch: {
-    marginVertical: 40,
+    marginVertical: 30,
   },
   conversations: {
     position: 'relative',
@@ -307,7 +310,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     height: 115,
     width: windowSize.width * .9,
-    marginBottom: 20,
+    marginBottom: 10,
     padding: 10,
     backgroundColor: colors.peachCream,
     borderWidth: 1,
