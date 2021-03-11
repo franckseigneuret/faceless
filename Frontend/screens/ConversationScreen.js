@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
     },
     textRight: {
-        textAlign: "right",
+        textAlign: "left",
         color: colors.white,
         // fontFamily: "Montserrat_400Regular",
     },
