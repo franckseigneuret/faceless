@@ -91,6 +91,9 @@ export default function ProfilScreen(props) {
   // state modal
   const [modalVisible, setModalVisible] = useState(false);
 
+  const [isValidated, setIsValidated] = useState(false);
+
+
   useEffect(() => {
     console.log("app load");
 
@@ -151,21 +154,14 @@ export default function ProfilScreen(props) {
   }, []);
 
   const handleAvatar = () => {
-    console.log("ici");
     setVisibleAvatar(!visibleAvatar);
   };
-
-  const handleClickOnAvatar = () => {};
 
   const handlePressEmail = () => {
     setEmailVisible(!emailVisible);
     setSaveButton(true);
   };
 
-  const handlePressCity = () => {
-    setCityVisible(!cityVisible);
-    setSaveButton(true);
-  };
 
   const handlePressMdp = () => {
     setMdpVisible(!mdpVisible);
@@ -238,8 +234,11 @@ export default function ProfilScreen(props) {
       }
     }
     updateUser();
+    setIsValidated(true);
 
-    setSaveButton(false);
+    setTimeout(function () {
+      setIsValidated(false);
+    }, 1200);
   };
 
   const handleDisconnect = () => {
@@ -301,6 +300,7 @@ export default function ProfilScreen(props) {
         url={url}
         onPress={() => {
           setAvatar(url);
+          setVisibleAvatar(!visibleAvatar);
         }}
       >
         <Image
@@ -651,28 +651,31 @@ export default function ProfilScreen(props) {
         </View>
 
         <View style={styles.viewSaveDisconnect}>
-          <Button
-            title="enregistrer"
-            type="solid"
-            buttonStyle={
-              saveButton ? styles.buttonValider : styles.buttonValiderBIS
-            }
-            titleStyle={{
-              fontFamily: "Montserrat_700Bold",
-            }}
-            onPress={handleSaveChange}
-          />
-
-          {/* <Button
-            title="déconnexion"
-            type="solid"
-            buttonStyle={styles.buttonDisconnect}
-            titleStyle={{
-              fontFamily: "Montserrat_700Bold",
-            }}
-            onPress={() => handleDisconnect()}
-          /> */}
-        </View>
+        <TouchableOpacity
+          onPress={handleSaveChange}
+          style={!isValidated ? styles.buttonValider : styles.buttonValiderBIS}
+        >
+          {isValidated ? (
+            <FontAwesome
+              name="check"
+              size={24}
+              color="white"
+              style={{ marginHorizontal: 15, marginVertical: 5 }}
+            />
+          ) : (
+            <Text
+              style={{
+                color: "white",
+                fontFamily: "Montserrat_700Bold",
+                fontSize: 18,
+                marginHorizontal: 15, marginVertical: 5
+              }}
+            >
+              enregistrer
+            </Text>
+          )}
+        </TouchableOpacity>
+      </View>
 
         {/* <View style={styles.viewSaveDisconnect}>
           <Button
@@ -840,10 +843,11 @@ const styles = StyleSheet.create({
   },
   buttonValider: {
     backgroundColor: "#5571D7",
-    marginTop:10,
+    marginTop: 10,
     borderRadius: 86,
     width: 200,
     margin: 10,
+    alignItems: "center",
   },
   buttonValiderBIS: {
     backgroundColor: "#BCC8F0",
@@ -851,6 +855,7 @@ const styles = StyleSheet.create({
     borderRadius: 86,
     width: 200,
     margin: 10,
+    alignItems: "center",
   },
   buttonValiderOverlay: {
     backgroundColor: "#5571D7",
