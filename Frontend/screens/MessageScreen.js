@@ -210,7 +210,7 @@ function MessageScreen(props) {
             hasPadding
             fontSize={18}
             options={[
-              { label: "Confidents", value: 'confidents' },
+              { label: "Confident(e)s", value: 'confidents' },
               { label: `Demandes (${nbDemand})`, value: 'demandes' },
             ]}
           />
@@ -242,7 +242,7 @@ function MessageScreen(props) {
                         :
                         'Vous n\'avez aucune demande !'
                     }</Text>
-                    <Button title="Rechercher des confidents"
+                    <Button title="Rechercher des confident(e)s"
                       onPress={() => props.navigation.navigate("HomeScreen")} />
                   </View>
                 }

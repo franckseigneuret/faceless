@@ -593,6 +593,7 @@ response: userSaved
 router.put("/update-profil", async function (req, res, next) {
 
   const hash = bcrypt.hashSync(req.body.passwordFront, cost);
+  console.log(hash, '<--- CLG HASH')
 
   var userBeforeUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   console.log(userBeforeUpdate, '<---- userBeforeUpdate')
@@ -606,12 +607,14 @@ router.put("/update-profil", async function (req, res, next) {
       avatar: req.body.avatarFront,
       email: req.body.emailFront,
       localisation: JSON.parse(req.body.localisationFront),
-      password: hash,
+      password: req.body.passwordFront == "" ? userBeforeUpdate.password : hash,
       gender: req.body.genderFront,
       problem_description: req.body.descriptionProblemFront,
       problems_types: problemsTypeParse,
     }
   );
+
+  console.log(req.body.passwordFront, '<--- req.body.passwordFromFront')
 
   var userAfterUpdate = await UserModel.findOne({ token: req.body.tokenFront })
   console.log(userAfterUpdate, '<---- userAfterUpdate')
