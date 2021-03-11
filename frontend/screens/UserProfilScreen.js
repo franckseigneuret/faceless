@@ -10,8 +10,8 @@ import moment from "moment";
 import 'moment/locale/fr'
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import HTTP_IP_DEV from '../mon_ip'
 import { Entypo } from '@expo/vector-icons';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 
@@ -182,10 +182,12 @@ function UserProfilScreen(props) {
         </View>
         <View style={styles.problemDesc}>
           <Text style={styles.subtitleDesc}>En quelques mots:</Text>
-          <View style={{ marginTop: 15, }}>
-            <Text style={{ color: colors.blueDiane, fontFamily: "Montserrat_400Regular", }}>
-              {props.route.params.problemDesc}
-            </Text>
+          <View style={{ marginTop: 15, height: 200}}>
+            <ScrollView showsVerticalScrollIndicator={true}>
+              <Text style={{ color: colors.blueDiane, fontFamily: "Montserrat_400Regular", }}>
+                {props.route.params.problemDesc}
+              </Text>
+            </ScrollView>
           </View>
         </View>
         <View style={styles.problemBadge}>
