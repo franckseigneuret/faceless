@@ -10,7 +10,6 @@ import moment from "moment";
 import 'moment/locale/fr'
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Entypo } from '@expo/vector-icons';
 import { ScrollView } from 'react-native-gesture-handler';
 
 
@@ -127,7 +126,7 @@ function UserProfilScreen(props) {
     setVisible(false)
   }
 
-  var imageGender = ''
+  var imageGender = <Text />
   if (props.route.params.gender == 'male') {
     imageGender = <Image source={require('../assets/gender_male.png')} style={{ width: 40, height: 40 }} />
   } else if (props.route.params.gender == 'female') {
