@@ -267,7 +267,7 @@ function quizz(props) {
                 <View style={styles.stepContainer}>
                   <Text style={styles.textQuizz}>Comment veux-tu qu'on t'appelle ?</Text>
                   <Input
-                    placeholder='ThermomixMT1820'
+                    placeholder='MonPetitPseudo'
                     inputContainerStyle={styles.inputQuizz}
                     onChangeText={pseudo => { setPseudo(pseudo) }}
                     value={pseudo}
