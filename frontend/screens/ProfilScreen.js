@@ -591,7 +591,7 @@ export default function ProfilScreen(props) {
           <Text style={styles.title}>Type de soucis: </Text>
         </View>
 
-        <View>
+        <View >
           <View style={styles.badgeContainer}>
             <TouchableOpacity
               onPress={() => {
