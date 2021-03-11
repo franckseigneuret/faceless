@@ -130,7 +130,7 @@ function HomeScreen(props) {
       console.log(e,'INFOS USERS')
       moment.locale('fr');
     var NewDate = moment(e.subscriptionDate).format('Do MMMM YYYY')
-    return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={2000} direction="alternate" style={styles.cardContainer}>
+    return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={1000} direction="alternate" style={styles.cardContainer}>
       <View style={styles.topCard}>
         <Overlay isVisible={visible} overlayBackgroundColor="pink" overlayStyle={{ backgroundColor: "rgba(255, 241, 226, 0.5)"}}>
           <View style={styles.centeredView}>
@@ -177,7 +177,7 @@ function HomeScreen(props) {
         <Text style={{ color: colors.blueDiane, fontFamily: "Montserrat_400Regular", }} numberOfLines={4}>{e.problem_description}</Text>
       </View>
       <View style={styles.problemContainer}>
-        <Text style={styles.subtitle}>Type(s) de probleme(s)</Text>
+        <Text style={styles.subtitle}>Type(s) de souci(s)</Text>
         <View style={styles.problemBadge}>
           {e.problems_types.map((arg, i) => {
             return (<View style={styles.badge} key={i}><Text style={styles.fontBadge}>{arg}</Text></View>)
