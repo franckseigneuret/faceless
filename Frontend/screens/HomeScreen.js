@@ -218,7 +218,7 @@ function HomeScreen(props) {
     if (userToDisplay.length > 0) {
       return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.peachCream }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 40, marginBottom: 20, width: '65%' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 40, marginBottom: 20, width: '65%', marginLeft:30 }}>
             <Text style={styles.textTitle}>
               Salut {pseudo} !
           </Text>
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
     textAlign: 'center',
     color: colors.HavelockBlue,
-    marginRight:5
+    marginRight:30
   },
   cardContainer: {
     width: windowWidth - 40,
