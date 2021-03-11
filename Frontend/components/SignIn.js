@@ -118,7 +118,7 @@ function SignIn(props) {
       <View style={styles.containerInput}>
         <Input
           keyboardType={"email-address"}
-          placeholder="helicoptere530@gmail.com"
+          placeholder="Mon adresse mail"
           inputContainerStyle={styles.inputConnect}
           onChangeText={(value) => setSignInEmail(value)}
           placeholderTextColor={colors.boulder}
@@ -127,7 +127,7 @@ function SignIn(props) {
           ></Input>
         <Input
           secureTextEntry={true}
-          placeholder="Ton mot de passe"
+          placeholder="Mon mot de passe"
           inputContainerStyle={styles.inputConnect}
           onChangeText={(value) => setSignInPassword(value)}
           placeholderTextColor={colors.boulder}
