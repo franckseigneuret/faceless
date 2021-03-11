@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Dimensions, TouchableOpacity, Image, KeyboardAvoidingView, Button } from 'react-native';
 import { Input, Overlay } from 'react-native-elements';
-import { useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold } from "@expo-google-fonts/montserrat";
+import { useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
 import { Ionicons } from '@expo/vector-icons';
 import AppLoading from 'expo-app-loading';
 import { useIsFocused } from "@react-navigation/native";
@@ -114,7 +114,7 @@ function HomeScreen(props) {
     Montserrat_700Bold,
     Montserrat_900Black,
     Montserrat_800ExtraBold,
-
+    Montserrat_600SemiBold
   });
 
   var noCard =
@@ -126,7 +126,7 @@ function HomeScreen(props) {
 
   
     var CardToSwipe = userToDisplay.map((e, i) => {
-      // console.log(e,'INFOS USERS')
+      console.log(e,'INFOS USERS')
       moment.locale('fr');
     var NewDate = moment(e.subscriptionDate).format('Do MMMM YYYY')
     return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={800} direction="alternate" style={styles.cardContainer}>
@@ -169,7 +169,7 @@ function HomeScreen(props) {
         </TouchableOpacity>
         <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
         <Text style={styles.member}>Membre depuis le {NewDate}</Text>
-        {/* <Text style={{marginTop: 5}}><Ionicons name='location' size={15} /> Region de {e.localisation.label == undefined ? 'France' : e.localisation.label}</Text> */}
+        <Text style={{marginTop: 5, opacity:0.6, fontFamily:'Montserrat_600SemiBold'}}><Ionicons name='location' size={15} /> Region de {e.localisation.label == undefined ? 'France' : e.localisation.label}</Text>
       </View>
       <View style={styles.problemDesc}>
         <Text style={styles.subtitle}>En quelques mots :</Text>
@@ -297,7 +297,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
-    width: '100%'
+    width: '100%',
+    marginTop:18
   },
   problemContainer: {
     width: '100%',
@@ -376,7 +377,7 @@ const styles = StyleSheet.create({
   subtitle: {
     color: "#EC9A1F",
     fontSize: 16,
-    fontFamily: "Montserrat_700Bold"
+    fontFamily: "Montserrat_700Bold",
   },
   centeredView: {
     flex: 1,
