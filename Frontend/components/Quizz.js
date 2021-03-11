@@ -229,7 +229,7 @@ function quizz(props) {
                   <Text style={styles.textQuizz}>C'est quoi ton email ?</Text>
                   <Input
                     keyboardType={"email-address"}
-                    placeholder='helicoptere530@gmail.com'
+                    placeholder='monmail@gmail.com'
                     inputContainerStyle={styles.inputQuizz}
                     onChangeText={email => { setEmail(email) }}
                   />
