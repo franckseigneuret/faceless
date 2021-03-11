@@ -110,6 +110,8 @@ function HomeScreen(props) {
     setCurrentMsg("")
   }
 
+  
+
   let [fontsLoaded] = useFonts({
     Montserrat_400Regular,
     Montserrat_700Bold,
@@ -128,6 +130,17 @@ function HomeScreen(props) {
   
     var CardToSwipe = userToDisplay.map((e, i) => {
       console.log(e,'INFOS USERS')
+      var imageGender = ''
+  if (e.gender == 'male') {
+    imageGender = <Image source={require('../assets/gender_male.png')} style={{ width: 30, height: 30 }} />
+  } else if (e.gender == 'female') {
+    imageGender = <Image source={require('../assets/gender_female.png')} style={{ width: 30, height: 30 }} />
+  } else if (e.gender == 'other') {
+    imageGender = <Image source={require('../assets/gender_1.png')} style={{ width: 30, height: 30 }} />
+  };
+
+  var age = moment(e.birthDate, "YYYYMMDD").fromNow().slice(7, 9);
+  console.log(age,'<------------------- Age')
       moment.locale('fr');
     var NewDate = moment(e.subscriptionDate).format('Do MMMM YYYY')
     return (<Animatable.View key={i} animation="bounceInLeft" easing="ease-in-out" iterationCount={1} duration={1000} direction="alternate" style={styles.cardContainer}>
@@ -168,13 +181,17 @@ function HomeScreen(props) {
                     })}> 
                   <Image source={{uri: e.avatar}} style={{borderWidth:3, borderRadius:50, borderColor:colors.carrot, width:100, height:100}}/>
         </TouchableOpacity>
+        <View style={{ display: 'flex', flexDirection: 'row', alignItems:'center', justifyContent:'space-around' }}>
         <Text style={styles.pseudo} numberOfLines={1}>{e.pseudo}</Text>
+        {imageGender}
+        <Text style={styles.member} numberOfLines={1}>({age} ans)</Text>
+        </View>
         <Text style={styles.member}>Membre depuis le {NewDate}</Text>
         <Text style={{marginTop: 5, opacity:0.6, fontFamily:'Montserrat_600SemiBold'}}><Ionicons name='location' size={15} /> Region de {e.localisation.label  ?  e.localisation.label : 'France'}</Text>
       </View>
       <View style={styles.problemDesc}>
         <Text style={styles.subtitle}>En quelques mots :</Text>
-        <Text style={{ color: colors.blueDiane, fontFamily: "Montserrat_400Regular", }} numberOfLines={4}>{e.problem_description}</Text>
+        <Text style={{ color: colors.blueDiane, fontFamily: "Montserrat_400Regular", }} numberOfLines={3}>{e.problem_description}</Text>
       </View>
       <View style={styles.problemContainer}>
         <Text style={styles.subtitle}>Type(s) de souci(s)</Text>
