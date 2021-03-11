@@ -11,6 +11,7 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import { useIsFocused } from "@react-navigation/native";
 import * as Animatable from 'react-native-animatable';
+import { useFonts, Montserrat_400Regular, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold,} from "@expo-google-fonts/montserrat";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -162,7 +163,7 @@ function MessageScreen(props) {
               {whenFormat}
             </Text>
             <Text style={styles.msg} numberOfLines={4} ellipsizeMode='tail'>
-              <Text style={styles.last}>Dernier message : </Text>{el.lastMessage.content}
+              <Text style={styles.last}>Dernier message : </Text><Text style={{fontFamily: 'Montserrat_400Regular'}}>{el.lastMessage.content}</Text>
             </Text>
           </View>
           <View>
@@ -341,6 +342,7 @@ const styles = StyleSheet.create({
   },
   lastMessage: {
     width: '70%',
+    fontFamily: 'Montserrat_400Regular',
   },
   avatar: {
     width: 75,
@@ -352,7 +354,7 @@ const styles = StyleSheet.create({
   friend: {
     color: colors.HavelockBlue,
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat_700Bold'
   },
   date: {
     marginBottom: 5,

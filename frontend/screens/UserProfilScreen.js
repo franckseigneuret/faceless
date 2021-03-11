@@ -1,7 +1,7 @@
 import HTTP_IP_DEV from '../mon_ip'
 import colors from '../colors'
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Dimensions, Image, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, Dimensions, Image, TouchableOpacity, Text, KeyboardAvoidingView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { useFonts, Montserrat_400Regular, Montserrat_500Medium, Montserrat_700Bold, Montserrat_900Black, Montserrat_800ExtraBold } from "@expo-google-fonts/montserrat";
@@ -10,7 +10,8 @@ import moment from "moment";
 import 'moment/locale/fr'
 import AppLoading from 'expo-app-loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import HTTP_IP_DEV from '../mon_ip'
+import { Entypo } from '@expo/vector-icons';
 
 
 
@@ -45,6 +46,7 @@ function UserProfilScreen(props) {
 
   const toggleOverlay = () => {
     setVisible(!visible);
+
   };
   const handleClickBack = () => {
     props.navigation.goBack()
@@ -73,6 +75,7 @@ function UserProfilScreen(props) {
     setAlerterVisible(false)
     setVisible(false)
     setSignalementValidation(true)
+    setTimeout(() => props.navigation.navigate('HomeScreen'), 2000);
 
     var rawResponse = await fetch(`${HTTP_IP_DEV}/signalement-help`, {
       method: 'POST',
@@ -84,6 +87,7 @@ function UserProfilScreen(props) {
     setAlerterVisible(false)
     setVisible(false)
     setSignalementValidation(true)
+    setTimeout(() => props.navigation.navigate('HomeScreen'), 2000);
 
     var rawResponse = await fetch(`${HTTP_IP_DEV}/signalement-help`, {
       method: 'POST',
@@ -117,6 +121,11 @@ function UserProfilScreen(props) {
     setSignalerVisible(false);
   }
 
+  const handleClose = () => {
+    setSignalerVisible(false);
+    setAlerterVisible(false);
+    setVisible(false)
+  }
 
   var imageGender = ''
   if (props.route.params.gender == 'male') {
@@ -149,7 +158,6 @@ function UserProfilScreen(props) {
     Montserrat_800ExtraBold,
 
   });
-
 
   if (!fontsLoaded) {
     return <AppLoading />;
@@ -213,11 +221,20 @@ function UserProfilScreen(props) {
           </>
         </Overlay>
 
+      
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.containerKeyboardAvoiding}
+        >
+          <Overlay isVisible={visible} onBackdropPress={toggleOverlay} overlayStyle={styles.overlay}>
 
-        <Overlay isVisible={visible} onBackdropPress={toggleOverlay} overlayStyle={styles.overlay}>
-          <>
+            <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', height: 10, zIndex: 1, }}>
+              <TouchableOpacity style={styles.buttonPrevious} onPress={() => handleClose()} >
+                <Ionicons name="close-outline" size={30} color="#5571D7" style={{ alignSelf: 'center', }} />
+              </TouchableOpacity>
+            </View>
             {signalerVisible == false && alerterVisible == false ?
-              <View style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', width: '100%', marginVertical: 20 }}>
+              <View style={styles.overlayContainer}>
                 <Text style={styles.textNeedHelp}>Cette personne a besoin d'aide:</Text>
                 <TouchableOpacity
                   style={styles.touchableOverlay}
@@ -329,17 +346,19 @@ function UserProfilScreen(props) {
                 </TouchableOpacity>
 
               </View>
-              : null
-            }
-          </>
+              : null}
+          </Overlay>
+          <Overlay isVisible={signalementValidation} overlayStyle={styles.overlayBlockUser}>
+            <Text style={styles.textBlockedConfirmation}>Votre signalement a été pris en compte</Text>
         </Overlay>
+        </KeyboardAvoidingView>
       </View>
     )
 
-  }
+  };
+
+
 }
-
-
 
 export default UserProfilScreen;
 
