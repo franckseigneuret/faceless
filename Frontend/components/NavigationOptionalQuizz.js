@@ -53,7 +53,7 @@ function NavigationOptionalQuizz(props) {
         icon={
           <Ionicons name="chevron-back-outline" size={24} color={colors.carrot} />
         }
-        buttonStyle={props.step === 0 ? styles.hidden : ''}
+        buttonStyle={props.step === 0 ? styles.hidden : {}}
         titleStyle={{
           color: colors.carrot,
           fontFamily: 'Montserrat_700Bold'
@@ -67,7 +67,7 @@ function NavigationOptionalQuizz(props) {
         icon={
           <Ionicons name="chevron-forward-outline" size={24} color={colors.HavelockBlue} />
         }
-        buttonStyle={props.step === 3 ? styles.hidden : ''}
+        buttonStyle={props.step === 3 ? styles.hidden : {}}
         titleStyle={{
           color: colors.HavelockBlue,
           fontFamily: 'Montserrat_700Bold',

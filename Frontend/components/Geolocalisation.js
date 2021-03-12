@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     height: 40,
     minWidth: 120,
-    maxWidth: 150,
+    maxWidth: 120,
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 5,
-    maxWidth: 150,
+    maxWidth: 120,
     overflow: 'hidden',
   },
   townsListLarge: {
