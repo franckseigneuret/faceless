@@ -130,7 +130,7 @@ function HomeScreen(props) {
   
     var CardToSwipe = userToDisplay.map((e, i) => {
       console.log(e,'INFOS USERS')
-      var imageGender = ''
+      var imageGender = <Text />
   if (e.gender == 'male') {
     imageGender = <Image source={require('../assets/gender_male.png')} style={{ width: 30, height: 30 }} />
   } else if (e.gender == 'female') {
